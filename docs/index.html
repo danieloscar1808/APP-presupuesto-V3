@@ -73,9 +73,21 @@
 
         });
       </script>
+      <script>
+        let deferredPrompt = null;
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+       e.preventDefault();
+      deferredPrompt = e;
+
+      const installBtn = document.getElementById('install-button');
+      installBtn.style.display = 'block';
+      });
+      </script>
 
   </body>
 </html>
+
 
 
 
