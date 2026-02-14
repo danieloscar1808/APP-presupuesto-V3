@@ -1,14 +1,45 @@
-const CACHE_NAME="pwa-presupuesto-v3-v4";
-const URLS_TO_CACHE=["/APP-presupuesto-V3/","/APP-presupuesto-V3/index.html"];
+const CACHE_NAME = "presupuesto-v1"; // cambia número cuando quieras forzar actualización
 
-self.addEventListener("install",e=>{
- e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(URLS_TO_CACHE)));
- self.skipWaiting();
+const urlsToCache = [
+  "/",
+];
+
+/* INSTALACIÓN */
+self.addEventListener("install", (event) => {
+  console.log("Service Worker instalando...");
+
+  self.skipWaiting(); // activa inmediatamente
+
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(urlsToCache);
+    })
+  );
 });
-self.addEventListener("activate",e=>{
- e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>k!==CACHE_NAME?caches.delete(k):null))));
- self.clients.claim();
+
+/* ACTIVACIÓN */
+self.addEventListener("activate", (event) => {
+  console.log("Service Worker activado");
+
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            console.log("Eliminando cache viejo:", cache);
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
+  );
+
+  return self.clients.claim(); // toma control inmediato
 });
-self.addEventListener("fetch",e=>{
- e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match("/APP-presupuesto-V3/index.html"))));
+
+/* FETCH */
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
 });
