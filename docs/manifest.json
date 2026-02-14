@@ -1,6 +1,6 @@
 {
   "name": "APP Presupuesto V3",
-  "short_name": "Presupuestos",
+  "short_name": "Budget",
   "description": "Aplicaci\u00f3n PWA para crear presupuestos.",
   "start_url": "/APP-presupuesto-V3/",
   "scope": "/APP-presupuesto-V3/",
@@ -14,8 +14,7 @@
       "sizes": "192x192",
       "type": "image/png"
     },
-   
-    {
+       {
       "src": "/APP-presupuesto-V3/icon-1024x1024-splash.png",
       "sizes": "1024x1024",
       "type": "image/png"
