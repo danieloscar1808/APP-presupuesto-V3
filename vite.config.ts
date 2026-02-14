@@ -5,16 +5,20 @@ import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
   base: "/APP-presupuesto-V3/",
+  
   plugins: [
     react(),
     mode === "development" && componentTagger(),
   ].filter(Boolean),
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+
   build: {
     outDir: "docs",
+    emptyOutDir: true,   // ← Esto limpia docs automáticamente
   },
 }));
