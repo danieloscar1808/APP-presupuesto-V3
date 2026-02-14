@@ -31,6 +31,30 @@
   </head>
 
   <body>
-    <div id="root"></div>
+       <!-- SPLASH SCREEN PERSONALIZADO -->
+      <div id="splash-screen">
+        <img src="icons/icon-1024x1024-splash.png" alt="Splash">
+      </div>
+
+      <div id="root"></div>
+
+      <script>
+        window.addEventListener("load", function() {
+
+        setTimeout(function() {
+
+        const splash = document.getElementById("splash-screen");
+        splash.style.opacity = "0";
+
+        setTimeout(function() {
+          splash.style.display = "none";
+        }, 500);
+
+        }, 3000);
+
+        });
+      </script>
+
   </body>
 </html>
+
