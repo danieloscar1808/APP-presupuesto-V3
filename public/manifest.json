@@ -9,7 +9,11 @@
   "theme_color": "#0f172a",
   "orientation": "portrait-primary",
   "icons": [
-    
+    {
+      "src": "/APP-presupuesto-V3/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
     {
       "src": "/APP-presupuesto-V3/icons/icon-1024x1024-splash.png",
       "sizes": "1024x1024",
