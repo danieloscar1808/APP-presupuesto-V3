@@ -1,4 +1,4 @@
-const CACHE_NAME="pwa-presupuesto-v3-v4";
+const CACHE_NAME="pwa-presupuesto-v3-v5";
 const URLS_TO_CACHE=["/APP-presupuesto-V3/","/APP-presupuesto-V3/index.html"];
 
 self.addEventListener("install",e=>{
