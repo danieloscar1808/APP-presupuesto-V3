@@ -4,17 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
-  <title>Presupuestos Pro - AC, Electrica, Fotovoltaica</title>
-  <meta name="description" content="Aplicacion profesional para generar presupuestos de instalaciones de aire acondicionado, electricas y sistemas fotovoltaicos" />
-  <meta name="author" content="Presupuestos Pro" />
-
+  <title>Presupuestos Pro</title>
   <meta name="theme-color" content="#0f172a" />
 
-  <link rel="manifest" href="/APP-presupuesto-V3/manifest.json">
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.json" />
 
-  <script type="module" crossorigin src="/APP-presupuesto-V3/assets/index-B9ok3fgY.js"></script>
-  <link rel="stylesheet" crossorigin href="/APP-presupuesto-V3/assets/index-hfmETRq_.css">
-
+  <!-- Splash + botón estilos -->
   <style>
     /* SPLASH */
     #splash-screen {
@@ -34,7 +30,7 @@
       height: 180px;
     }
 
-    /* BOTON INSTALAR */
+    /* BOTÓN INSTALAR */
     #install-button {
       display: none;
       position: fixed;
@@ -55,37 +51,41 @@
       background-color: #1d4ed8;
     }
   </style>
-
 </head>
 
 <body>
 
-  <!-- SPLASH PERSONALIZADO -->
+  <!-- Splash -->
   <div id="splash-screen">
-    <img src="icons/icon-1024x1024-splash.png" alt="Splash">
+    <img src="/icons/icon-1024x1024-splash.png" alt="Splash">
   </div>
 
+  <!-- React -->
   <div id="root"></div>
 
+  <!-- Botón instalar -->
   <button id="install-button">Instalar Aplicación</button>
 
+  <!-- Script principal Vite -->
+  <script type="module" src="/src/main.tsx"></script>
+
+  <!-- Control Splash + Instalación -->
   <script>
     let deferredPrompt = null;
     const installButton = document.getElementById('install-button');
 
-    /* CONTROL SPLASH */
+    /* Splash control */
     window.addEventListener("load", function () {
       setTimeout(function () {
         const splash = document.getElementById("splash-screen");
         splash.style.opacity = "0";
-
         setTimeout(function () {
           splash.style.display = "none";
         }, 400);
-      }, 800); // tiempo optimizado
+      }, 800);
     });
 
-    /* CAPTURAR EVENTO INSTALACION */
+    /* Evento instalación */
     window.addEventListener('beforeinstallprompt', (e) => {
       console.log("beforeinstallprompt detectado");
       e.preventDefault();
@@ -96,18 +96,15 @@
       }
     });
 
-    /* BOTON INSTALAR */
+    /* Click instalar */
     if (installButton) {
       installButton.addEventListener('click', async () => {
         if (deferredPrompt) {
           deferredPrompt.prompt();
-
           const result = await deferredPrompt.userChoice;
 
           if (result.outcome === 'accepted') {
             console.log('Usuario aceptó instalación');
-          } else {
-            console.log('Usuario canceló instalación');
           }
 
           deferredPrompt = null;
@@ -116,7 +113,7 @@
       });
     }
 
-    /* CUANDO SE INSTALA */
+    /* Cuando ya se instaló */
     window.addEventListener('appinstalled', () => {
       console.log('App instalada');
       if (installButton) {
