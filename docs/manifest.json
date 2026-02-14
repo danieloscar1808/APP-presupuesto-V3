@@ -15,12 +15,12 @@
       "type": "image/png"
     },
     {
-      "src": "/APP-presupuesto-V3/icons/icon-512.png",
+      "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "icon-1024x1024-splash.png",
+      "src": "/APP-presupuesto-V3/icon-1024x1024-splash.png",
       "sizes": "1024x1024",
       "type": "image/png"
     } 
