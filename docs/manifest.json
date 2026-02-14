@@ -1,12 +1,12 @@
 {
-  "name": "APP Presupuesto V4",
+  "name": "budget",
   "short_name": "Budget",
   "description": "Aplicaci\u00f3n PWA para crear presupuestos.",
   "start_url": "/APP-presupuesto-V3/",
   "scope": "/APP-presupuesto-V3/",
   "display": "standalone",
-  "background_color": "##000000",
-  "theme_color": "##000000",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait-primary",
   "icons": [
     {
