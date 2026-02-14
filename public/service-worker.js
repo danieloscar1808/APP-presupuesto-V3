@@ -1,4 +1,4 @@
-const CACHE_NAME = "presupuesto-v2"; 
+const CACHE_NAME = "presupuesto-v3"; 
 // Cambia el número cuando quieras forzar actualización total
 
 const urlsToCache = [
