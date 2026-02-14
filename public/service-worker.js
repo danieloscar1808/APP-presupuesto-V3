@@ -1,14 +1,18 @@
-const CACHE_NAME = "presupuesto-v1"; // cambia número cuando quieras forzar actualización
+const CACHE_NAME = "presupuesto-v1"; 
+// Cambia el número cuando quieras forzar actualización total
 
 const urlsToCache = [
   "/",
 ];
 
-/* INSTALACIÓN */
+/* =========================
+   INSTALACIÓN
+========================= */
 self.addEventListener("install", (event) => {
   console.log("Service Worker instalando...");
 
-  self.skipWaiting(); // activa inmediatamente
+  // Activa inmediatamente sin esperar
+  self.skipWaiting();
 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -17,7 +21,9 @@ self.addEventListener("install", (event) => {
   );
 });
 
-/* ACTIVACIÓN */
+/* =========================
+   ACTIVACIÓN
+========================= */
 self.addEventListener("activate", (event) => {
   console.log("Service Worker activado");
 
@@ -34,12 +40,31 @@ self.addEventListener("activate", (event) => {
     })
   );
 
-  return self.clients.claim(); // toma control inmediato
+  // Toma control inmediato de todas las pestañas
+  return self.clients.claim();
 });
 
-/* FETCH */
+/* =========================
+   ESCUCHAR MENSAJE PARA ACTUALIZAR
+========================= */
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    console.log("Forzando activación inmediata");
+    self.skipWaiting();
+  }
+});
+
+/* =========================
+   FETCH
+========================= */
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    fetch(event.request)
+      .then((response) => {
+        return response;
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
   );
 });
