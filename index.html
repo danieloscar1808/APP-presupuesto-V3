@@ -45,16 +45,14 @@
      =============================== */
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/APP-presupuesto-V3/service-worker.js')
-      .then(registration => {
-
-        console.log("Service Worker registrado");
-
-        // Si ya hay uno esperando
-        if (registration.waiting) {
-          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-        }
-
+  navigator.serviceWorker.register('/APP-presupuesto-V3/service-worker.js')
+    .then(registration => {
+      console.log("Service Worker registrado correctamente");
+    })
+    .catch(error => {
+      console.error("Error registrando SW:", error);
+    });
+}
         // Detectar nueva versión
         registration.onupdatefound = () => {
           const newWorker = registration.installing;
