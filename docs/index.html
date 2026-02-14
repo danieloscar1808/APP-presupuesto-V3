@@ -1,147 +1,129 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#1e3a5f" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>Presupuestos Pro - AC, Electrica, Fotovoltaica</title>
-    <meta name="description" content="Aplicacion profesional para generar presupuestos de instalaciones de aire acondicionado, electricas y sistemas fotovoltaicos" />
-    <meta name="author" content="Presupuestos Pro" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
-    <meta property="og:title" content="Presupuestos Pro" />
-    <meta property="og:description" content="Genera presupuestos profesionales para instalaciones de AC, electricas y fotovoltaicas" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+  <title>Presupuestos Pro - AC, Electrica, Fotovoltaica</title>
+  <meta name="description" content="Aplicacion profesional para generar presupuestos de instalaciones de aire acondicionado, electricas y sistemas fotovoltaicos" />
+  <meta name="author" content="Presupuestos Pro" />
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@PresupuestosPro" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#0f172a" />
 
-    <link rel="manifest" href="/APP-presupuesto-V3/manifest.json">
-    <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="/APP-presupuesto-V3/manifest.json">
 
-    <script type="module" crossorigin src="/APP-presupuesto-V3/assets/index-B9ok3fgY.js"></script>
-    <link rel="stylesheet" crossorigin href="/APP-presupuesto-V3/assets/index-hfmETRq_.css">
-     <style>
-        #splash-screen {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        background: #000000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        transition: opacity 0.5s ease;
-        }
+  <script type="module" crossorigin src="/APP-presupuesto-V3/assets/index-B9ok3fgY.js"></script>
+  <link rel="stylesheet" crossorigin href="/APP-presupuesto-V3/assets/index-hfmETRq_.css">
 
-        #splash-screen img {
-        width: 350px;
-        height: 350px;
-        }
-      </style>
+  <style>
+    /* SPLASH */
+    #splash-screen {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+    }
 
-      <style>
-        #install-button {
-        display: none;
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 12px 18px;
-        background-color: #2563eb;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        cursor: pointer;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        z-index: 9999;
-        }
+    #splash-screen img {
+      width: 180px;
+      height: 180px;
+    }
 
-        #install-button:hover {
-        background-color: #1d4ed8;
-        }
-      </style>
+    /* BOTON INSTALAR */
+    #install-button {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 18px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 9999;
+    }
 
-      </head>
+    #install-button:hover {
+      background-color: #1d4ed8;
+    }
+  </style>
 
-  <body>
-       <!-- SPLASH SCREEN PERSONALIZADO -->
-      <div id="splash-screen">
-        <img src="icons/icon-1024x1024-splash.png" alt="Splash">
-      </div>
+</head>
 
-      <div id="root"></div>
-    
-      <button id="install-button">Instalar Aplicación</button>
+<body>
 
-      <script>
-        window.addEventListener("load", function() {
+  <!-- SPLASH PERSONALIZADO -->
+  <div id="splash-screen">
+    <img src="icons/icon-1024x1024-splash.png" alt="Splash">
+  </div>
 
-        setTimeout(function() {
+  <div id="root"></div>
 
+  <button id="install-button">Instalar Aplicación</button>
+
+  <script>
+    let deferredPrompt = null;
+    const installButton = document.getElementById('install-button');
+
+    /* CONTROL SPLASH */
+    window.addEventListener("load", function () {
+      setTimeout(function () {
         const splash = document.getElementById("splash-screen");
         splash.style.opacity = "0";
 
-        setTimeout(function() {
+        setTimeout(function () {
           splash.style.display = "none";
-        }, 500);
+        }, 400);
+      }, 800); // tiempo optimizado
+    });
 
-        }, 3000);
+    /* CAPTURAR EVENTO INSTALACION */
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log("beforeinstallprompt detectado");
+      e.preventDefault();
+      deferredPrompt = e;
 
-        });
-      </script>
-      <script>
-        let deferredPrompt = null;
+      if (installButton) {
+        installButton.style.display = 'block';
+      }
+    });
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-         e.preventDefault();
-        deferredPrompt = e;
-
-        const installBtn = document.getElementById('install-button');
-        installBtn.style.display = 'block';
-        });
-      </script>
-
-      <script>
-        document.getElementById('install-button').addEventListener('click', async () => {
+    /* BOTON INSTALAR */
+    if (installButton) {
+      installButton.addEventListener('click', async () => {
         if (deferredPrompt) {
-        deferredPrompt.prompt();
+          deferredPrompt.prompt();
 
-        const result = await deferredPrompt.userChoice;
+          const result = await deferredPrompt.userChoice;
 
-        if (result.outcome === 'accepted') {
-        console.log('Usuario aceptó instalación');
-        } else {
-        console.log('Usuario canceló instalación');
+          if (result.outcome === 'accepted') {
+            console.log('Usuario aceptó instalación');
+          } else {
+            console.log('Usuario canceló instalación');
+          }
+
+          deferredPrompt = null;
+          installButton.style.display = 'none';
         }
+      });
+    }
 
-        deferredPrompt = null;
-        document.getElementById('install-button').style.display = 'none';
-        }
-        });
-      </script>
+    /* CUANDO SE INSTALA */
+    window.addEventListener('appinstalled', () => {
+      console.log('App instalada');
+      if (installButton) {
+        installButton.style.display = 'none';
+      }
+    });
+  </script>
 
-      <script>
-        window.addEventListener('appinstalled', () => {
-        document.getElementById('install-button').style.display = 'none';
-        console.log('App instalada');
-        });
-      </script>
-
-      </body>
+</body>
 </html>
-
-
-
-
-
-
-
-
