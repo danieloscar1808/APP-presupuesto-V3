@@ -2,7 +2,9 @@
   let deferredPrompt = null;
   const installButton = document.getElementById('install-button');
 
-  /* SPLASH */
+  /* =========================
+     SPLASH
+  ========================= */
   window.addEventListener("load", function () {
     setTimeout(function () {
       const splash = document.getElementById("splash-screen");
@@ -13,7 +15,9 @@
     }, 3000);
   });
 
-  /* INSTALACIÓN PWA */
+  /* =========================
+     INSTALACIÓN PWA
+  ========================= */
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
@@ -40,35 +44,43 @@
     }
   });
 
-  /* ===============================
-     ACTUALIZACIÓN AUTOMÁTICA
-     =============================== */
-
+  /* =========================
+     SERVICE WORKER + ACTUALIZACIÓN AUTOMÁTICA
+  ========================= */
   if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/APP-presupuesto-V3/service-worker.js')
-    .then(registration => {
-      console.log("Service Worker registrado correctamente");
-    })
-    .catch(error => {
-      console.error("Error registrando SW:", error);
-    });
-}
+
+    navigator.serviceWorker.register('/APP-presupuesto-V3/service-worker.js')
+      .then((registration) => {
+
+        console.log("Service Worker registrado correctamente");
+
+        // Si ya hay uno esperando
+        if (registration.waiting) {
+          registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+
         // Detectar nueva versión
         registration.onupdatefound = () => {
+
           const newWorker = registration.installing;
 
+          if (!newWorker) return;
+
           newWorker.onstatechange = () => {
+
             if (newWorker.state === 'installed') {
 
               if (navigator.serviceWorker.controller) {
                 console.log("Nueva versión detectada");
 
-                // Activa inmediatamente
                 newWorker.postMessage({ type: 'SKIP_WAITING' });
               }
             }
           };
         };
+      })
+      .catch(error => {
+        console.error("Error registrando SW:", error);
       });
 
     // Cuando el nuevo SW toma control
