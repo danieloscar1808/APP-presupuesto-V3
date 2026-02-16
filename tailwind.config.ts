@@ -13,7 +13,26 @@ export default {
       },
     },
     extend: {
+      /*
+      |--------------------------------------------------------------------------
+      | 🎨 PALETA PROFESIONAL
+      |--------------------------------------------------------------------------*/
+      
+
+      
       colors: {
+        brand: {
+          50: "#f5f7ff",
+          100: "#e0e7ff",
+          200: "#c7d2fe",
+          300: "#a5b4fc",
+          400: "#818cf8",
+          500: "#6366f1",
+          600: "#4f46e5",
+          700: "#4338ca",
+          800: "#3730a3",
+          900: "#1e1b4b",
+                },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -39,14 +58,11 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
-        warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
-        },
+        success: "#16a34a",
+        warning: "#f59e0b",
+        danger: "#dc2626",
+        surface: "#ffffff",
+        background: "#f8fafc", 
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -66,17 +82,35 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
+      /*
+      |--------------------------------------------------------------------------
+      | 🧱 BORDES PREMIUM
+      |--------------------------------------------------------------------------
+      */
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        xl: "1rem",
+        "2xl": "1.5rem",
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
       },
+     /*
+      |--------------------------------------------------------------------------
+      | 🌫 SOMBRAS PROFESIONALES
+      |--------------------------------------------------------------------------
+      */
       boxShadow: {
-        'card': 'var(--shadow-card)',
-        'elevated': '0 8px 24px -8px rgb(0 0 0 / 0.12)',
+        card: "0 4px 12px rgba(0, 0, 0, 0.05)",
+        cardHover: "0 8px 24px rgba(0, 0, 0, 0.08)",
+        soft: "0 2px 8px rgba(0, 0, 0, 0.04)",
+      },
+       /*
+      |--------------------------------------------------------------------------
+      | 🅰 TIPOGRAFÍA
+      |--------------------------------------------------------------------------
+      */
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
@@ -102,7 +136,16 @@ export default {
         "fade-in": "fade-in 0.3s ease-out",
         "slide-up": "slide-up 0.4s ease-out",
       },
+      /*
+      |--------------------------------------------------------------------------
+      | ✨ TRANSICIONES SUAVES
+      |--------------------------------------------------------------------------
+      */
+      transitionTimingFunction: {
+        smooth: "cubic-bezier(0.4, 0, 0.2, 1)",
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+  plugins: [],
+};
+export default config;
