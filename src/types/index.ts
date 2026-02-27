@@ -38,6 +38,7 @@ export interface BudgetItem {
 
 export interface Budget {
   id: string;
+  number: string; 
   clientId: string;
   clientName: string;
   category: BudgetCategory;
