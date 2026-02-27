@@ -4,6 +4,10 @@ import { Budget, Profile, CATEGORY_LABELS } from '@/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
+// IMPORTAR LOGO (desde src/lib → subir un nivel → entrar a assets)
+import logoHeader from '../assets/logo-header.png';
+
+
 export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -13,10 +17,25 @@ export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
   const accentColor: [number, number, number] = [46, 125, 102];
   const textColor: [number, number, number] = [51, 51, 51];
   
-  // Header background
+  // ────────────────────────────────────────────
+  //  HEADER
+  // ────────────────────────────────────────────
+  // Background azul
   doc.setFillColor(...primaryColor);
   doc.rect(0, 0, pageWidth, 45, 'F');
-  
+
+  // LOGO en el encabezado
+  const logoWidth = 38;
+  const logoHeight = 38;
+  const logoX = 14;
+  const logoY = 4;
+
+  doc.addImage(logoHeader, 'PNG', logoX, logoY, logoWidth, logoHeight);
+
+  // Header background
+  //doc.setFillColor(...primaryColor);
+  //doc.rect(0, 0, pageWidth, 45, 'F');
+    
   // Company info
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(18);
