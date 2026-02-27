@@ -4,6 +4,25 @@ import { Budget, Profile, CATEGORY_LABELS } from '@/types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
+
+// Generador AAAAMM-XXX
+const generarNumeroPresupuesto = () => {
+  const ahora = new Date();
+  const year = ahora.getFullYear();
+  const month = String(ahora.getMonth() + 1).padStart(2, "0");
+
+  const key = `${year}${month}`;
+
+  const ultimo = Number(localStorage.getItem(`presupuesto_${key}`) || 0);
+
+  const nuevo = ultimo + 1;
+
+  localStorage.setItem(`presupuesto_${key}`, String(nuevo));
+
+  return `${key}-${String(nuevo).padStart(3, "0")}`;
+};
+
+
 // IMPORTAR LOGO (desde src/lib → subir un nivel → entrar a assets)
 import logoHeader from '../assets/logo-header.png';
 
@@ -54,7 +73,9 @@ export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
   doc.text('PRESUPUESTO', pageWidth - 14, 18, { align: 'right' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.text(`No. ${budget.id.substring(0, 8).toUpperCase()}`, pageWidth - 14, 26, { align: 'right' });
+  
+  const numeroPresupuesto = generarNumeroPresupuesto();
+  doc.text(`No. ${numeroPresupuesto}`, pageWidth - 14, 26, { align: 'right' });
   doc.text(format(new Date(budget.createdAt), "d 'de' MMMM, yyyy", { locale: es }), pageWidth - 14, 32, { align: 'right' });
   
   // Category badge
@@ -252,7 +273,10 @@ export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
 
 export const downloadPDF = (budget: Budget, profile: Profile): void => {
   const doc = generateBudgetPDF(budget, profile);
-  doc.save(`Presupuesto_${budget.id.substring(0, 8)}_${budget.clientName.replace(/\s/g, '_')}.pdf`);
+
+  const numeroPresupuesto = generarNumeroPresupuesto();
+
+  doc.save(`Presupuesto_${numeroPresupuesto}_${budget.clientName.replace(/\s/g, '_')}.pdf`);
 };
 
 export const getPDFBlob = (budget: Budget, profile: Profile): Blob => {
