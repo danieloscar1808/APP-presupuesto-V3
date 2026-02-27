@@ -27,8 +27,8 @@ export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
   // LOGO en el encabezado
   const logoWidth = 38;
   const logoHeight = 0;
-  const logoX = 110;
-  const logoY = 20;
+  const logoX = 105;
+  const logoY = 25;
 
   doc.addImage(logoHeader, 'PNG', logoX, logoY, logoWidth, logoHeight);
 
