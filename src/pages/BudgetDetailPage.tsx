@@ -82,7 +82,7 @@ const BudgetDetailPage = () => {
         <div className="flex-1">
           <h1 className="font-semibold text-foreground">Presupuesto</h1>
           <p className="text-sm text-muted-foreground">
-            #{budget.id.substring(0, 8).toUpperCase()}
+            #{budget.number}
           </p>
         </div>
         <Button variant="ghost" size="icon" onClick={handleDelete} className="text-destructive">
