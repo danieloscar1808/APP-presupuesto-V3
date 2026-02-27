@@ -28,7 +28,7 @@ export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
   const logoWidth = 38;
   const logoHeight = 0;
   const logoX = 110;
-  const logoY = 5;
+  const logoY = 10;
 
   doc.addImage(logoHeader, 'PNG', logoX, logoY, logoWidth, logoHeight);
 
