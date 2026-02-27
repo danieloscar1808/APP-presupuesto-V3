@@ -33,6 +33,7 @@ const NewBudgetPage = () => {
 
   const [budget, setBudget] = useState<Partial<Budget>>({
     id: uuid(),
+    number: generarNumeroPresupuesto(),
     category: undefined,
     clientId: '',
     clientName: '',
