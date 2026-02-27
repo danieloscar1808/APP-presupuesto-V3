@@ -22,6 +22,23 @@ import { toast } from 'sonner';
 import { v4 as uuid } from 'uuid';
 import { ChevronRight, ChevronLeft, Save, Eye } from 'lucide-react';
 
+// ────────────────────────────────────────────
+// GENERADOR AAAAMM-XXX
+// ────────────────────────────────────────────
+const generarNumeroPresupuesto = () => {
+  const ahora = new Date();
+  const year = ahora.getFullYear();
+  const month = String(ahora.getMonth() + 1).padStart(2, "0");
+
+  const key = `${year}${month}`;
+  const ultimo = Number(localStorage.getItem(`presupuesto_${key}`) || 0);
+  const nuevo = ultimo + 1;
+
+  localStorage.setItem(`presupuesto_${key}`, String(nuevo));
+
+  return `${key}-${String(nuevo).padStart(3, "0")}`;
+};
+
 type Step = 'category' | 'client' | 'items' | 'summary';
 
 const NewBudgetPage = () => {
@@ -33,7 +50,7 @@ const NewBudgetPage = () => {
 
   const [budget, setBudget] = useState<Partial<Budget>>({
     id: uuid(),
-    //number: generarNumeroPresupuesto(),
+    number: generarNumeroPresupuesto(),
     category: undefined,
     clientId: '',
     clientName: '',
