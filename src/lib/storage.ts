@@ -106,3 +106,23 @@ export const getCatalogItemByName = async (name: string): Promise<CatalogItem | 
   const items = await db.catalog.toArray();
   return items.find(i => i.name.toLowerCase() === name.toLowerCase());
 };
+
+export async function generateBackup(): Promise<any> {
+  const profile = getProfile();
+  const clients = getClients();
+  const budgets = getBudgets();
+  const catalog = getCatalogItems();
+
+  const backup = {
+    profile,
+    clients,
+    budgets,
+    catalog,
+    timestamp: new Date().toISOString(),
+  };
+
+  // Guardar copia interna
+  localStorage.setItem("lastBackup", JSON.stringify(backup));
+
+  return backup;
+}

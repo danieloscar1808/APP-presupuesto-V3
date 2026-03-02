@@ -151,6 +151,78 @@ const ProfilePage = () => {
           <Save className="w-4 h-4 mr-2" />
           Guardar Perfil
         </Button>
+
+{/* BACKUP SECTION */}
+<div className="card-elevated p-4 space-y-3 mt-6">
+  <h3 className="font-medium text-foreground">Backup de Datos</h3>
+  <p className="text-sm text-muted-foreground">
+    Guarda o restaura una copia completa de tus clientes, presupuestos, catálogo y perfil.
+  </p>
+
+  {/* Exportar Backup */}
+  <Button
+    className="btn-accent w-full"
+    onClick={async () => {
+      const backup = await generateBackup();
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `backup_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+
+      URL.revokeObjectURL(url);
+    }}
+  >
+    Exportar Backup
+  </Button>
+
+  {/* Importar Backup */}
+  <Button
+    variant="outline"
+    className="w-full"
+    onClick={() => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+
+      input.onchange = (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result as string);
+
+            if (data.profile)
+              localStorage.setItem("presupuestos_profile", JSON.stringify(data.profile));
+            if (data.clients)
+              localStorage.setItem("presupuestos_clients", JSON.stringify(data.clients));
+            if (data.budgets)
+              localStorage.setItem("presupuestos_budgets", JSON.stringify(data.budgets));
+            if (data.catalog)
+              localStorage.setItem("presupuestos_catalog", JSON.stringify(data.catalog));
+
+            localStorage.setItem("lastBackup", JSON.stringify(data));
+
+            toast.success("Backup restaurado correctamente. Recarga la página.");
+          } catch {
+            toast.error("Archivo inválido");
+          }
+        };
+
+        reader.readAsText(file);
+      };
+
+      input.click();
+    }}
+  >
+    Importar Backup
+  </Button>
+</div>
+
       </form>
     </PageLayout>
   );
