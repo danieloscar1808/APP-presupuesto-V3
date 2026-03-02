@@ -6,6 +6,7 @@ import { Profile, Budget } from '@/types';
 import { Button } from '@/components/ui/button';
 import { BudgetCard } from '@/components/BudgetCard';
 import { Plus, FileText, Users, TrendingUp, Settings } from 'lucide-react';
+
 const Index = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -15,26 +16,38 @@ const Index = () => {
     budgets: 0,
     total: 0
   });
+
   useEffect(() => {
-    const p = getProfile();
-    setProfile(p);
-    const budgets = getBudgets();
-    const clients = getClients();
+    async function loadData() {
+      const p = await getProfile();
+      setProfile(p);
 
-    // Get 3 most recent budgets
-    const sorted = [...budgets].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    setRecentBudgets(sorted.slice(0, 3));
+      const budgets = await getBudgets();
+      const clients = await getClients();
 
-    // Calculate stats
-    const totalAmount = budgets.reduce((sum, b) => sum + b.total, 0);
-    setStats({
-      clients: clients.length,
-      budgets: budgets.length,
-      total: totalAmount
-    });
+      // Ordenar presupuestos
+      const sorted = [...budgets].sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setRecentBudgets(sorted.slice(0, 3));
+
+      // Calcular estadísticas
+      const totalAmount = budgets.reduce((sum, b) => sum + b.total, 0);
+
+      setStats({
+        clients: clients.length,
+        budgets: budgets.length,
+        total: totalAmount
+      });
+    }
+
+    loadData();
   }, []);
+
   if (!profile) {
-    return <PageLayout>
+    return (
+      <PageLayout>
         <div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
             <Settings className="w-10 h-10 text-primary" />
@@ -47,28 +60,34 @@ const Index = () => {
             Configurar Perfil
           </Button>
         </div>
-      </PageLayout>;
+      </PageLayout>
+    );
   }
-  return <PageLayout headerContent={<div className="space-y-4">
+
+  return (
+    <PageLayout
+      headerContent={
+        <div className="space-y-4">
           <div>
-            
             <h1 className="font-semibold text-primary-foreground text-2xl text-center">
               {profile.businessName || profile.name}
             </h1>
           </div>
-          
-          {/* Quick stats */}
+
+          {/* Stats */}
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
               <Users className="w-5 h-5 mx-auto mb-1 text-primary-foreground/80" />
               <p className="text-lg font-semibold text-primary-foreground">{stats.clients}</p>
               <p className="text-xs text-primary-foreground/70">Clientes</p>
             </div>
+
             <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
               <FileText className="w-5 h-5 mx-auto mb-1 text-primary-foreground/80" />
               <p className="text-lg font-semibold text-primary-foreground">{stats.budgets}</p>
-              <p className="text-xs text-primary-foreground/70 text-center">Presupuestos</p>
+              <p className="text-xs text-primary-foreground/70">Presupuestos</p>
             </div>
+
             <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
               <TrendingUp className="w-5 h-5 mx-auto mb-1 text-primary-foreground/80" />
               <p className="text-lg font-semibold text-primary-foreground">
@@ -77,30 +96,53 @@ const Index = () => {
               <p className="text-xs text-primary-foreground/70">Total</p>
             </div>
           </div>
-        </div>}>
-      {/* Quick action */}
-      <Button onClick={() => navigate('/budgets/new')} className="w-full btn-accent h-14 text-base mb-6">
+        </div>
+      }
+    >
+      {/* Botón nuevo presupuesto */}
+      <Button
+        onClick={() => navigate('/budgets/new')}
+        className="w-full btn-accent h-14 text-base mb-6"
+      >
         <Plus className="w-5 h-5 mr-2" />
         Nuevo Presupuesto
       </Button>
 
-      {/* Recent budgets */}
+      {/* Presupuestos recientes */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-foreground">Presupuestos Recientes</h2>
-          {recentBudgets.length > 0 && <Button variant="link" onClick={() => navigate('/budgets')} className="text-primary p-0 h-auto">
+          {recentBudgets.length > 0 && (
+            <Button
+              variant="link"
+              onClick={() => navigate('/budgets')}
+              className="text-primary p-0 h-auto"
+            >
               Ver todos
-            </Button>}
+            </Button>
+          )}
         </div>
 
-        {recentBudgets.length === 0 ? <div className="card-elevated p-6 text-center">
+        {recentBudgets.length === 0 ? (
+          <div className="card-elevated p-6 text-center">
             <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
-            <p className="text-muted-foreground">No hay presupuestos aun</p>
+            <p className="text-muted-foreground">No hay presupuestos aún</p>
             <p className="text-sm text-muted-foreground">Crea tu primer presupuesto</p>
-          </div> : <div className="space-y-3">
-            {recentBudgets.map(budget => <BudgetCard key={budget.id} budget={budget} onClick={() => navigate(`/budgets/${budget.id}`)} />)}
-          </div>}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {recentBudgets.map((budget) => (
+              <BudgetCard
+                key={budget.id}
+                budget={budget}
+                onClick={() => navigate(`/budgets/${budget.id}`)}
+              />
+            ))}
+          </div>
+        )}
       </div>
-    </PageLayout>;
+    </PageLayout>
+  );
 };
+
 export default Index;
