@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageLayout } from '@/components/PageLayout';
 import { BudgetCard } from '@/components/BudgetCard';
-import { Budget, CATEGORY_LABELS } from '@/types';
-import { getBudgets, deleteBudget } from '@/lib/storage';
+import { Budget } from '@/types';
+import { getBudgets } from '@/lib/storage';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, FileText, Filter } from 'lucide-react';
+import { Search, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type FilterCategory = 'all' | 'ac' | 'electric' | 'solar';
@@ -21,17 +21,21 @@ const BudgetsListPage = () => {
     loadBudgets();
   }, []);
 
-  const loadBudgets = () => {
-    const allBudgets = getBudgets();
-    // Sort by date descending
-    const sorted = allBudgets.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  const loadBudgets = async () => {
+    const allBudgets = await getBudgets();   // ✔ ahora sí esperamos la Promise
+
+    const sorted = [...allBudgets].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime()
     );
+
     setBudgets(sorted);
   };
 
   const filteredBudgets = budgets.filter((b) => {
-    const matchesSearch = b.clientName.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch =
+      b.clientName.toLowerCase().includes(search.toLowerCase());
     const matchesFilter = filter === 'all' || b.category === filter;
     return matchesSearch && matchesFilter;
   });
@@ -40,7 +44,7 @@ const BudgetsListPage = () => {
     { id: 'all', label: 'Todos' },
     { id: 'ac', label: 'AC' },
     { id: 'electric', label: 'Electrica' },
-    { id: 'solar', label: 'Solar' },
+    { id: 'solar', label: 'Solar' }
   ];
 
   return (
@@ -56,7 +60,7 @@ const BudgetsListPage = () => {
         />
       </div>
 
-      {/* Filter */}
+      {/* Filters */}
       <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-1">
         {filterButtons.map((btn) => (
           <Button
@@ -64,10 +68,7 @@ const BudgetsListPage = () => {
             variant={filter === btn.id ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter(btn.id)}
-            className={cn(
-              'shrink-0',
-              filter === btn.id && 'btn-gradient'
-            )}
+            className={cn('shrink-0', filter === btn.id && 'btn-gradient')}
           >
             {btn.label}
           </Button>

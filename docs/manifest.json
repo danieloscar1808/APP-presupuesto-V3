@@ -1,7 +1,7 @@
 {
   "name": "APP Presupuesto V3",
   "short_name": "Presupuestos",
-  "description": "Aplicaci\u00f3n PWA para crear presupuestos.",
+  "description": "Aplicación PWA para crear presupuestos.",
   "start_url": "/APP-presupuesto-V3/",
   "scope": "/APP-presupuesto-V3/",
   "display": "standalone",
