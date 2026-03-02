@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { v4 as uuid } from 'uuid';
-import { Plus, Search, User, Phone, Mail, MapPin, Trash2, Edit } from 'lucide-react';
+import { Plus, Search, User, Phone, Mail, Trash2, Edit } from 'lucide-react';
 
 const ClientsPage = () => {
   const navigate = useNavigate();
@@ -29,12 +29,19 @@ const ClientsPage = () => {
     address: '',
   });
 
+  // CARGA INICIAL ASÍNCRONA
   useEffect(() => {
-    loadClients();
+    const load = async () => {
+      const data = await getClients();
+      setClients(data);
+    };
+    load();
   }, []);
 
-  const loadClients = () => {
-    setClients(getClients());
+  // helper para recargar clientes
+  const loadClients = async () => {
+    const data = await getClients();
+    setClients(data);
   };
 
   const filteredClients = clients.filter(
@@ -54,15 +61,15 @@ const ClientsPage = () => {
     setFormData({
       name: client.name,
       phone: client.phone,
-      email: client.email,
-      address: client.address,
+      email: client.email || '',
+      address: client.address || '',
     });
     setIsDialogOpen(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name || !formData.phone) {
       toast.error('Nombre y telefono son requeridos');
       return;
@@ -77,16 +84,17 @@ const ClientsPage = () => {
       createdAt: editingClient?.createdAt || new Date().toISOString(),
     };
 
-    saveClient(client);
-    loadClients();
+    await saveClient(client);
+    await loadClients();
+
     setIsDialogOpen(false);
     toast.success(editingClient ? 'Cliente actualizado' : 'Cliente agregado');
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Eliminar este cliente?')) {
-      deleteClient(id);
-      loadClients();
+      await deleteClient(id);
+      await loadClients();
       toast.success('Cliente eliminado');
     }
   };

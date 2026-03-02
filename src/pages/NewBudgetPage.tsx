@@ -6,8 +6,8 @@ import { ClientSelector } from '@/components/ClientSelector';
 import { ItemsEditor } from '@/components/ItemsEditor';
 import { ACEquipmentData, ACEquipmentValues } from '@/components/ACEquipmentData';
 import { SolarSystemData, SolarSystemValues } from '@/components/SolarSystemData';
-import { Budget, BudgetItem, BudgetCategory, Profile, Client } from '@/types';
-import { saveBudget, getProfile, saveClient, getClients } from '@/lib/storage';
+import { Budget, BudgetCategory, Profile, Client } from '@/types';
+import { saveBudget, getProfile, saveClient } from '@/lib/storage';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -20,10 +20,10 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { v4 as uuid } from 'uuid';
-import { ChevronRight, ChevronLeft, Save, Eye } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Save } from 'lucide-react';
 
 // ────────────────────────────────────────────
-// GENERADOR AAAAMM-XXX
+// GENERADOR AAAAMM-XXX (se mantiene en localStorage)
 // ────────────────────────────────────────────
 const generarNumeroPresupuesto = () => {
   const ahora = new Date();
@@ -48,7 +48,7 @@ const NewBudgetPage = () => {
   const [isClientDialogOpen, setIsClientDialogOpen] = useState(false);
   const [clientForm, setClientForm] = useState({ name: '', phone: '', email: '', address: '' });
 
-  const [budget, setBudget] = useState<Partial<Budget>>({
+  const [budget, setBudget] = useState<Budget>({
     id: uuid(),
     number: generarNumeroPresupuesto(),
     category: undefined,
@@ -67,31 +67,34 @@ const NewBudgetPage = () => {
     paymentTerms: '50% anticipo, 50% al finalizar',
     status: 'draft',
     createdAt: new Date().toISOString(),
-     acEquipment: {
-       capacity: '',
-       technology: '',
-       status: '',
-     },
-     solarSystem: {
-       systemType: '',
-       panelType: '',
-       panelPower: '',
-       quantity: 0,
-       totalPower: 0,
-     },
+    acEquipment: {
+      capacity: '',
+      technology: '',
+      status: '',
+    },
+    solarSystem: {
+      systemType: '',
+      panelType: '',
+      panelPower: '',
+      quantity: 0,
+      totalPower: 0,
+    },
   });
 
+  // Cargar perfil
   useEffect(() => {
-    const p = getProfile();
-    if (!p) {
-      toast.error('Configura tu perfil primero');
-      navigate('/profile');
-      return;
-    }
-    setProfile(p);
+    (async () => {
+      const p = await getProfile();
+      if (!p) {
+        toast.error('Configura tu perfil primero');
+        navigate('/profile');
+        return;
+      }
+      setProfile(p);
+    })();
   }, [navigate]);
 
-  // Calculate totals when items or costs change
+  // Recalcular totales
   useEffect(() => {
     const subtotal = budget.items?.reduce((sum, item) => sum + item.total, 0) || 0;
     const baseAmount = subtotal + (budget.laborCost || 0);
@@ -127,29 +130,24 @@ const NewBudgetPage = () => {
       toast.error('Completa los campos requeridos');
       return;
     }
-    const nextIndex = currentStepIndex + 1;
-    if (nextIndex < steps.length) {
-      setStep(steps[nextIndex]);
-    }
+    setStep(steps[currentStepIndex + 1]);
   };
 
   const handleBack = () => {
-    const prevIndex = currentStepIndex - 1;
-    if (prevIndex >= 0) {
-      setStep(steps[prevIndex]);
-    }
+    setStep(steps[currentStepIndex - 1]);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!profile) return;
-    
-    saveBudget(budget as Budget);
+
+    await saveBudget(budget);
     toast.success('Presupuesto guardado');
     navigate(`/budgets/${budget.id}`);
   };
 
-  const handleAddClient = (e: React.FormEvent) => {
+  const handleAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!clientForm.name || !clientForm.phone) {
       toast.error('Nombre y telefono requeridos');
       return;
@@ -164,14 +162,17 @@ const NewBudgetPage = () => {
       createdAt: new Date().toISOString(),
     };
 
-    saveClient(newClient);
+    await saveClient(newClient);
+
     setBudget((prev) => ({
       ...prev,
       clientId: newClient.id,
       clientName: newClient.name,
     }));
+
     setIsClientDialogOpen(false);
     setClientForm({ name: '', phone: '', email: '', address: '' });
+
     toast.success('Cliente agregado');
   };
 
@@ -199,64 +200,67 @@ const NewBudgetPage = () => {
       case 'items':
         return (
           <div className="space-y-6">
-             {/* AC Equipment Data */}
-             {budget.category === 'ac' && (
-               <ACEquipmentData
-                 value={budget.acEquipment as ACEquipmentValues}
-                 onChange={(acEquipment) => setBudget((prev) => ({ ...prev, acEquipment }))}
-               />
-             )}
- 
-             {/* Solar System Data */}
-             {budget.category === 'solar' && (
-               <SolarSystemData
-                 value={budget.solarSystem as SolarSystemValues}
-                 onChange={(solarSystem) => setBudget((prev) => ({ ...prev, solarSystem }))}
-               />
-             )}
- 
+            {budget.category === 'ac' && (
+              <ACEquipmentData
+                value={budget.acEquipment as ACEquipmentValues}
+                onChange={(acEquipment) => setBudget((prev) => ({ ...prev, acEquipment }))}
+              />
+            )}
+
+            {budget.category === 'solar' && (
+              <SolarSystemData
+                value={budget.solarSystem as SolarSystemValues}
+                onChange={(solarSystem) => setBudget((prev) => ({ ...prev, solarSystem }))}
+              />
+            )}
+
             <ItemsEditor
               items={budget.items || []}
               onChange={(items) => setBudget((prev) => ({ ...prev, items }))}
-               category={budget.category}
+              category={budget.category as BudgetCategory}
             />
 
             <div className="card-elevated p-4 space-y-4">
               <div>
-                <Label htmlFor="laborCost">Mano de Obra</Label>
+                <Label>Mano de Obra</Label>
                 <Input
-                  id="laborCost"
                   type="number"
                   value={budget.laborCost || ''}
                   onChange={(e) =>
-                    setBudget((prev) => ({ ...prev, laborCost: Number(e.target.value) }))
+                    setBudget((prev) => ({
+                      ...prev,
+                      laborCost: Number(e.target.value),
+                    }))
                   }
-                  placeholder="0"
                   className="mt-1 text-right"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="taxRate">IVA (%)</Label>
+                  <Label>IVA (%)</Label>
                   <Input
-                    id="taxRate"
                     type="number"
-                    value={budget.taxRate || ''}
+                    value={budget.taxRate}
                     onChange={(e) =>
-                      setBudget((prev) => ({ ...prev, taxRate: Number(e.target.value) }))
+                      setBudget((prev) => ({
+                        ...prev,
+                        taxRate: Number(e.target.value),
+                      }))
                     }
                     className="mt-1 text-center"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="discount">Descuento ($)</Label>
+                  <Label>Descuento ($)</Label>
                   <Input
-                    id="discount"
                     type="number"
-                    value={budget.discount || ''}
+                    value={budget.discount}
                     onChange={(e) =>
-                      setBudget((prev) => ({ ...prev, discount: Number(e.target.value) }))
+                      setBudget((prev) => ({
+                        ...prev,
+                        discount: Number(e.target.value),
+                      }))
                     }
                     className="mt-1 text-right"
                   />
@@ -269,84 +273,99 @@ const NewBudgetPage = () => {
       case 'summary':
         return (
           <div className="space-y-4">
-            {/* Totals */}
             <div className="card-elevated p-4 space-y-3">
               <h3 className="font-medium text-foreground">Resumen</h3>
+
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Materiales</span>
                   <span>${budget.subtotal?.toLocaleString('es-AR')}</span>
                 </div>
+
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Mano de Obra</span>
                   <span>${budget.laborCost?.toLocaleString('es-AR')}</span>
                 </div>
+
                 {(budget.taxRate || 0) > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">IVA ({budget.taxRate}%)</span>
                     <span>${budget.taxAmount?.toLocaleString('es-AR')}</span>
                   </div>
                 )}
+
                 {(budget.discount || 0) > 0 && (
                   <div className="flex justify-between text-accent">
                     <span>Descuento</span>
-                    <span>-${budget.discount?.toLocaleString('es-AR')}</span>
+                    <span>-{budget.discount?.toLocaleString('es-AR')}</span>
                   </div>
                 )}
+
                 <div className="flex justify-between pt-2 border-t border-border font-semibold text-lg">
                   <span>Total</span>
                   <span className="text-primary">
-                    ${budget.total?.toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                    $
+                    {budget.total?.toLocaleString('es-AR', {
+                      minimumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Terms */}
             <div className="card-elevated p-4 space-y-4">
               <h3 className="font-medium text-foreground">Condiciones</h3>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor="validityDays">Validez (dias)</Label>
-                  <Input
-                    id="validityDays"
-                    type="number"
-                    value={budget.validityDays}
-                    onChange={(e) =>
-                      setBudget((prev) => ({ ...prev, validityDays: Number(e.target.value) }))
-                    }
-                    className="mt-1 text-center"
-                  />
-                </div>
+
+              <div>
+                <Label>Validez (dias)</Label>
+                <Input
+                  type="number"
+                  value={budget.validinityDays}
+                  onChange={(e) =>
+                    setBudget((prev) => ({
+                      ...prev,
+                      validityDays: Number(e.target.value),
+                    }))
+                  }
+                  className="mt-1 text-center"
+                />
               </div>
 
               <div>
-                <Label htmlFor="warranty">Garantia</Label>
+                <Label>Garantia</Label>
                 <Input
-                  id="warranty"
                   value={budget.warranty}
-                  onChange={(e) => setBudget((prev) => ({ ...prev, warranty: e.target.value }))}
+                  onChange={(e) =>
+                    setBudget((prev) => ({ ...prev, warranty: e.target.value }))
+                  }
                   className="mt-1"
                 />
               </div>
 
               <div>
-                <Label htmlFor="paymentTerms">Forma de Pago</Label>
+                <Label>Forma de Pago</Label>
                 <Input
-                  id="paymentTerms"
                   value={budget.paymentTerms}
-                  onChange={(e) => setBudget((prev) => ({ ...prev, paymentTerms: e.target.value }))}
+                  onChange={(e) =>
+                    setBudget((prev) => ({
+                      ...prev,
+                      paymentTerms: e.target.value,
+                    }))
+                  }
                   className="mt-1"
                 />
               </div>
 
               <div>
-                <Label htmlFor="notes">Observaciones</Label>
+                <Label>Observaciones</Label>
                 <Textarea
-                  id="notes"
                   value={budget.notes}
-                  onChange={(e) => setBudget((prev) => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e) =>
+                    setBudget((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
                   placeholder="Notas adicionales..."
                   className="mt-1"
                 />
@@ -379,6 +398,7 @@ const NewBudgetPage = () => {
             >
               {i + 1}
             </div>
+
             {i < steps.length - 1 && (
               <div
                 className={`w-8 h-0.5 ${
@@ -394,10 +414,8 @@ const NewBudgetPage = () => {
         Paso {currentStepIndex + 1}: {stepLabels[step]}
       </p>
 
-      {/* Step Content */}
       <div className="mb-6">{renderStep()}</div>
 
-      {/* Navigation */}
       <div className="flex gap-3">
         {currentStepIndex > 0 && (
           <Button variant="outline" onClick={handleBack} className="flex-1">
@@ -405,6 +423,7 @@ const NewBudgetPage = () => {
             Atras
           </Button>
         )}
+
         {currentStepIndex < steps.length - 1 ? (
           <Button onClick={handleNext} className="flex-1 btn-gradient" disabled={!canProceed()}>
             Siguiente
@@ -424,6 +443,7 @@ const NewBudgetPage = () => {
           <DialogHeader>
             <DialogTitle>Nuevo Cliente</DialogTitle>
           </DialogHeader>
+
           <form onSubmit={handleAddClient} className="space-y-4">
             <div>
               <Label htmlFor="newClientName">Nombre *</Label>
@@ -434,6 +454,7 @@ const NewBudgetPage = () => {
                 className="mt-1"
               />
             </div>
+
             <div>
               <Label htmlFor="newClientPhone">Telefono *</Label>
               <Input
@@ -444,6 +465,7 @@ const NewBudgetPage = () => {
                 className="mt-1"
               />
             </div>
+
             <div>
               <Label htmlFor="newClientEmail">Email</Label>
               <Input
@@ -454,6 +476,7 @@ const NewBudgetPage = () => {
                 className="mt-1"
               />
             </div>
+
             <div className="flex gap-3 pt-2">
               <Button type="button" variant="outline" onClick={() => setIsClientDialogOpen(false)} className="flex-1">
                 Cancelar

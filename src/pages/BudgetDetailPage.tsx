@@ -7,47 +7,54 @@ import { getBudgetById, getProfile, deleteBudget } from '@/lib/storage';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ArrowLeft, Trash2, Edit } from 'lucide-react';
+import { ArrowLeft, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
   const [budget, setBudget] = useState<Budget | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
+  // Carga inicial: ahora async
   useEffect(() => {
     if (!id) return;
-    
-    const b = getBudgetById(id);
-    const p = getProfile();
-    
-    if (!b) {
-      toast.error('Presupuesto no encontrado');
-      navigate('/budgets');
-      return;
-    }
-    
-    setBudget(b);
-    setProfile(p);
+
+    (async () => {
+      const b = await getBudgetById(id);
+      const p = await getProfile();
+
+      if (!b) {
+        toast.error('Presupuesto no encontrado');
+        navigate('/budgets');
+        return;
+      }
+
+      setBudget(b);
+      setProfile(p);
+    })();
   }, [id, navigate]);
 
-  const loadBudget = () => {
+  // Recargar presupuesto luego de cambiar estado
+  const loadBudget = async () => {
     if (!id) return;
-    const b = getBudgetById(id);
+    const b = await getBudgetById(id);
     if (b) setBudget(b);
   };
 
-  const handleDelete = () => {
+  // Eliminar presupuesto
+  const handleDelete = async () => {
     if (!id) return;
-    if (confirm('Eliminar este presupuesto?')) {
-      deleteBudget(id);
-      toast.success('Presupuesto eliminado');
-      navigate('/budgets');
-    }
+    if (!confirm('Eliminar este presupuesto?')) return;
+
+    await deleteBudget(id);
+    toast.success('Presupuesto eliminado');
+    navigate('/budgets');
   };
 
+  // Pantalla de carga
   if (!budget || !profile) {
     return (
       <PageLayout>
@@ -79,12 +86,12 @@ const BudgetDetailPage = () => {
         <Button variant="ghost" size="icon" onClick={() => navigate('/budgets')}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
+
         <div className="flex-1">
           <h1 className="font-semibold text-foreground">Presupuesto</h1>
-          <p className="text-sm text-muted-foreground">
-            #{budget.number}
-          </p>
+          <p className="text-sm text-muted-foreground">#{budget.number}</p>
         </div>
+
         <Button variant="ghost" size="icon" onClick={handleDelete} className="text-destructive">
           <Trash2 className="w-5 h-5" />
         </Button>
@@ -95,6 +102,7 @@ const BudgetDetailPage = () => {
         <span className={cn('text-xs px-3 py-1 rounded-full', CATEGORY_COLORS[budget.category])}>
           {CATEGORY_LABELS[budget.category]}
         </span>
+
         <span className={cn('text-xs px-3 py-1 rounded-full', statusStyles[budget.status])}>
           {statusLabels[budget.status]}
         </span>
@@ -112,6 +120,7 @@ const BudgetDetailPage = () => {
       {/* Items */}
       <div className="card-elevated p-4 mb-4">
         <h3 className="text-sm text-muted-foreground mb-3">Detalle</h3>
+
         <div className="space-y-2">
           {budget.items.map((item) => (
             <div key={item.id} className="flex justify-between text-sm">
@@ -124,28 +133,32 @@ const BudgetDetailPage = () => {
             </div>
           ))}
         </div>
-        
+
         <div className="border-t border-border mt-4 pt-4 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Materiales</span>
             <span>${budget.subtotal.toLocaleString('es-AR')}</span>
           </div>
+
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Mano de Obra</span>
             <span>${budget.laborCost.toLocaleString('es-AR')}</span>
           </div>
+
           {budget.taxRate > 0 && (
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">IVA ({budget.taxRate}%)</span>
               <span>${budget.taxAmount.toLocaleString('es-AR')}</span>
             </div>
           )}
+
           {budget.discount > 0 && (
             <div className="flex justify-between text-sm text-accent">
               <span>Descuento</span>
               <span>-${budget.discount.toLocaleString('es-AR')}</span>
             </div>
           )}
+
           <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
             <span>Total</span>
             <span className="text-primary">
@@ -158,20 +171,24 @@ const BudgetDetailPage = () => {
       {/* Terms */}
       <div className="card-elevated p-4 mb-4">
         <h3 className="text-sm text-muted-foreground mb-3">Condiciones</h3>
+
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Validez</span>
-            <span>{budget.validityDays} dias</span>
+            <span>{budget.validityDays} días</span>
           </div>
+
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Garantia</span>
+            <span className="text-muted-foreground">Garantía</span>
             <span>{budget.warranty}</span>
           </div>
+
           <div className="flex justify-between">
             <span className="text-muted-foreground">Forma de Pago</span>
             <span>{budget.paymentTerms}</span>
           </div>
         </div>
+
         {budget.notes && (
           <div className="mt-3 pt-3 border-t border-border">
             <p className="text-sm text-muted-foreground">Observaciones:</p>
