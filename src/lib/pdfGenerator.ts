@@ -26,37 +26,61 @@ export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
   const pageWidth = doc.internal.pageSize.getWidth();
   let y = 10;
 
-  // ENCABEZADO
-  doc.setFillColor(HEADER_BLUE.r, HEADER_BLUE.g, HEADER_BLUE.b);
-  doc.rect(0, 0, pageWidth, 40, "F");
+  // -----------------------------------------------------
+// ENCABEZADO
+// -----------------------------------------------------
+doc.setFillColor(HEADER_BLUE.r, HEADER_BLUE.g, HEADER_BLUE.b);
+doc.rect(0, 0, pageWidth, 40, "F");
 
-  // LOGO
-  doc.addImage(logoHeader, "PNG", 10, 5, 35, 30);
+// LOGO SIN ESTIRAR (altura fija – mantiene proporción)
+const LOGO_HEIGHT = 28;
+doc.addImage(logoHeader, "PNG", 10, 6, 0, LOGO_HEIGHT); // 0 = width auto
 
-  // TÍTULO
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(15);
-  doc.setTextColor(255, 255, 255);
-  doc.text("Servicios Integrales de Climatización y Energía", pageWidth / 2, 14, {
-    align: "center",
-  });
+// -----------------------------------------------------
+// TÍTULO EN 3 LÍNEAS
+// -----------------------------------------------------
+doc.setFont("helvetica", "bold");
+doc.setFontSize(18);
+doc.setTextColor(255, 255, 255);
 
-  doc.setFontSize(11);
-  doc.text("Presupuesto Profesional", pageWidth / 2, 22, { align: "center" });
+// Línea 1
+doc.text("Servicios Integrales", pageWidth / 2, 13, { align: "center" });
 
-  // NÚMERO Y FECHA
-  const numPresupuesto = generarNumeroPresupuesto();
+// Línea 2
+doc.setFontSize(14);
+doc.text("de", pageWidth / 2, 20, { align: "center" });
 
-  doc.setFontSize(10);
-  doc.text(`Presupuesto Nº: ${numPresupuesto}`, pageWidth - 12, 12, {
-    align: "right",
-  });
-  doc.text(
-    `Fecha: ${new Date(budget.createdAt).toLocaleDateString("es-AR")}`,
-    pageWidth - 12,
-    18,
-    { align: "right" }
-  );
+// Línea 3
+doc.setFontSize(18);
+doc.text("Climatización y Energía", pageWidth / 2, 28, { align: "center" });
+
+// SUBTÍTULO
+//doc.setFont("helvetica", "normal");
+//doc.setFontSize(11);
+//doc.text("Presupuesto Profesional", pageWidth / 2, 33, { align: "center" });
+
+
+// -----------------------------------------------------
+// BLOQUE DERECHA - TITULO + NUMERO + FECHA
+// -----------------------------------------------------
+doc.setFont("helvetica", "bold");
+doc.setFontSize(12);
+doc.text("Presupuesto", pageWidth - 12, 12, { align: "right" });
+
+doc.setFont("helvetica", "normal");
+doc.setFontSize(10);
+
+// Número debajo del título "Presupuesto"
+doc.text(`Nº: ${budget.number}`, pageWidth - 12, 18, { align: "right" });
+
+// Fecha en la linea siguiente
+doc.text(
+  `Fecha: ${new Date(budget.createdAt).toLocaleDateString("es-AR")}`,
+  pageWidth - 12,
+  24,
+  { align: "right" }
+);
+
 
   // CLIENTE
   y = 48;
