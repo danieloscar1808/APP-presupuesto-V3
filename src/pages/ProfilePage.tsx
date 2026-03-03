@@ -11,7 +11,7 @@ import { Save, Building2, User, Phone, Mail, MapPin, CreditCard } from 'lucide-r
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState<Profile>({
-    id: "profile", // ID FIJO — evita borrado
+    id: "profile",
     name: '',
     businessName: '',
     taxId: '',
@@ -184,71 +184,42 @@ const ProfilePage = () => {
         </Button>
 
         {/* Importar Backup */}
-<Button
-  variant="outline"
-  className="w-full"
-  onClick={() => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = ".json";
 
-    input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (!file) return;
+            input.onchange = async (e) => {
+              const file = (e.target as HTMLInputElement).files?.[0];
+              if (!file) return;
 
-<<<<<<< HEAD
-      try {
-        const text = await file.text();
-        const data = JSON.parse(text);
+              try {
+                const text = await file.text();
+                const data = JSON.parse(text);
 
-        // Importador real (Dexie / IndexedDB)
-        const { importBackup } = await import("@/lib/storage");
+                const { importBackup } = await import("@/lib/storage");
+                await importBackup(data);
 
-        await importBackup(data);
+                toast.success("Backup restaurado. Recargando...");
 
-        toast.success("Backup restaurado. Recargando...");
+                setTimeout(() => {
+                  window.location.reload();
+                }, 800);
 
-        // Para móviles / PWA
-        setTimeout(() => {
-          window.location.reload();
-        }, 800);
+              } catch (err) {
+                console.error(err);
+                toast.error("Error al importar el backup");
+              }
+            };
 
-      } catch (err) {
-        console.error(err);
-        toast.error("Error al importar el backup");
-      }
-=======
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const data = JSON.parse(reader.result as string);
-
-          if (data.profile)
-            localStorage.setItem("presupuestos_profile", JSON.stringify(data.profile));
-          if (data.clients)
-            localStorage.setItem("presupuestos_clients", JSON.stringify(data.clients));
-          if (data.budgets)
-            localStorage.setItem("presupuestos_budgets", JSON.stringify(data.budgets));
-          if (data.catalog)
-            localStorage.setItem("presupuestos_catalog", JSON.stringify(data.catalog));
-
-          localStorage.setItem("lastBackup", JSON.stringify(data));
-
-          toast.success("Backup restaurado correctamente. Recarga la página.");
-        } catch {
-          toast.error("Archivo inválido");
-        }
-      };
-
-      reader.readAsText(file);
->>>>>>> main
-    };
-
-    input.click();
-  }}
->
-  Importar Backup
-</Button>
+            input.click();
+          }}
+        >
+          Importar Backup
+        </Button>
       </div>
 
     </PageLayout>

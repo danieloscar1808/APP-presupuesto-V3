@@ -2,13 +2,41 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig(({ mode }) => ({
   base: "/APP-presupuesto-V3/",
-  
+
   plugins: [
     react(),
     mode === "development" && componentTagger(),
+    VitePWA({
+      registerType: "autoUpdate",
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+      },
+      manifest: {
+        name: "Presupuesto V3",
+        short_name: "Presupuesto",
+        start_url: "/APP-presupuesto-V3/",
+        display: "standalone",
+        background_color: "#ffffff",
+        theme_color: "#1f3d63",
+        icons: [
+          {
+            src: "/APP-presupuesto-V3/icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "/APP-presupuesto-V3/icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      },
+    }),
   ].filter(Boolean),
 
   resolve: {
@@ -19,6 +47,6 @@ export default defineConfig(({ mode }) => ({
 
   build: {
     outDir: "docs",
-    emptyOutDir: true,   // ← Esto limpia docs automáticamente
+    emptyOutDir: true,
   },
 }));
