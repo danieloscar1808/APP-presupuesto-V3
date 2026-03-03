@@ -192,10 +192,11 @@ const ProfilePage = () => {
     input.type = "file";
     input.accept = ".json";
 
-    input.onchange = async (e) => {
+    input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
+<<<<<<< HEAD
       try {
         const text = await file.text();
         const data = JSON.parse(text);
@@ -216,6 +217,31 @@ const ProfilePage = () => {
         console.error(err);
         toast.error("Error al importar el backup");
       }
+=======
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result as string);
+
+          if (data.profile)
+            localStorage.setItem("presupuestos_profile", JSON.stringify(data.profile));
+          if (data.clients)
+            localStorage.setItem("presupuestos_clients", JSON.stringify(data.clients));
+          if (data.budgets)
+            localStorage.setItem("presupuestos_budgets", JSON.stringify(data.budgets));
+          if (data.catalog)
+            localStorage.setItem("presupuestos_catalog", JSON.stringify(data.catalog));
+
+          localStorage.setItem("lastBackup", JSON.stringify(data));
+
+          toast.success("Backup restaurado correctamente. Recarga la página.");
+        } catch {
+          toast.error("Archivo inválido");
+        }
+      };
+
+      reader.readAsText(file);
+>>>>>>> main
     };
 
     input.click();
