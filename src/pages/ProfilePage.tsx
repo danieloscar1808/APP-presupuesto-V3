@@ -185,41 +185,54 @@ const ProfilePage = () => {
 
         {/* Importar Backup */}
         <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => {
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = ".json";
+  variant="outline"
+  className="w-full"
+  onClick={() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
 
-            input.onchange = async (e) => {
-              const file = (e.target as HTMLInputElement).files?.[0];
-              if (!file) return;
+    input.onchange = async (event) => {
+      try {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (!file) {
+          toast.error("No seleccionaste ningún archivo");
+          return;
+        }
 
-              try {
-                const text = await file.text();
-                const data = JSON.parse(text);
+        // Lectura compatible con móviles
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try {
+            const text = reader.result as string;
+            const data = JSON.parse(text);
 
-                const { importBackup } = await import("@/lib/storage");
-                await importBackup(data);
+            const { importBackup } = await import("@/lib/storage");
+            await importBackup(data);
 
-                toast.success("Backup restaurado. Recargando...");
+            toast.success("Backup restaurado. Recargando...");
 
-                setTimeout(() => {
-                  window.location.reload();
-                }, 800);
+            setTimeout(() => {
+              window.location.reload();
+            }, 800);
+          } catch (err) {
+            console.error(err);
+            toast.error("Error al procesar el backup");
+          }
+        };
 
-              } catch (err) {
-                console.error(err);
-                toast.error("Error al importar el backup");
-              }
-            };
+        reader.readAsText(file);
+      } catch (err) {
+        console.error(err);
+        toast.error("Error al leer el archivo");
+      }
+    };
 
-            input.click();
-          }}
-        >
-          Importar Backup
-        </Button>
+    input.click();
+  }}
+>
+  Importar Backup
+</Button>
       </div>
 
     </PageLayout>
