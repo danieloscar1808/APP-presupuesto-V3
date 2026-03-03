@@ -127,3 +127,43 @@ export async function generateBackup(): Promise<any> {
 
   return backup;
 }
+
+// -----------------------------------------------------
+// IMPORTAR BACKUP (RESTORE)
+// -----------------------------------------------------
+export async function importBackup(backup: any): Promise<void> {
+  if (!backup) return;
+
+  // Vaciar todas las tablas
+  await db.profile.clear();
+  await db.clients.clear();
+  await db.budgets.clear();
+  await db.catalog.clear();
+
+  // Restaurar perfil (con id fijo "profile")
+  if (backup.profile) {
+    const fixedProfile = { ...backup.profile, id: "profile" };
+    await db.profile.put(fixedProfile);
+  }
+
+  // Restaurar clientes
+  if (Array.isArray(backup.clients)) {
+    for (const c of backup.clients) {
+      if (c.id) await db.clients.put(c);
+    }
+  }
+
+  // Restaurar presupuestos
+  if (Array.isArray(backup.budgets)) {
+    for (const b of backup.budgets) {
+      if (b.id) await db.budgets.put(b);
+    }
+  }
+
+  // Restaurar catálogo
+  if (Array.isArray(backup.catalog)) {
+    for (const item of backup.catalog) {
+      if (item.id) await db.catalog.put(item);
+    }
+  }
+}
