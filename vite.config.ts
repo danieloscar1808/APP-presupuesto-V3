@@ -10,12 +10,19 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === "development" && componentTagger(),
+
+    // --- PWA CONFIG ---
     VitePWA({
       registerType: "autoUpdate",
+
+      // Service Worker
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
+        maximumFileSizeToCacheInBytes: 20 * 1024 * 1024, // 20 MB
       },
+
+      // Manifest
       manifest: {
         name: "Presupuesto V3",
         short_name: "Presupuesto",
