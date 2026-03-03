@@ -70,6 +70,8 @@ export interface Budget {
      quantity: number;
      totalPower: number;
    };
+   // descripcion del trabajo electrico
+   electricWorkDescription?: string;
 }
 
 // AC Specific

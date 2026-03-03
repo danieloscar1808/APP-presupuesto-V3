@@ -98,6 +98,37 @@ export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
   doc.text(`Nombre: ${budget.clientName || ""}`, 10, y);
   y += 10;
 
+// -----------------------------------------------------
+// DESCRIPCIÓN DEL TRABAJO (solo eléctrica)
+// -----------------------------------------------------
+if (budget.category === "electric" && budget.electricWorkDescription) {
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(30, 58, 95); // mismo azul del header
+  doc.text("Descripción del trabajo a realizar", 14, y);
+
+  y += 5;
+
+  doc.setFillColor(245, 247, 250);
+  doc.roundedRect(14, y, pageWidth - 28, 30, 3, 3, "F");
+
+  y += 8;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(60, 60, 60);
+
+  const textLines = doc.splitTextToSize(
+    budget.electricWorkDescription,
+    pageWidth - 40
+  );
+
+  doc.text(textLines, 20, y);
+
+  y += textLines.length * 5 + 12;
+}
+
+
   // -----------------------------------------------------
   // TABLA DE ITEMS
   // -----------------------------------------------------
