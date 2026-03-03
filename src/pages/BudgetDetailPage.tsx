@@ -147,16 +147,48 @@ const BudgetDetailPage = () => {
         </span>
       </div>
 
-      {/* CLIENT INFO */}
-      <div className="card-elevated p-4 mb-4">
-        <h3 className="text-sm text-muted-foreground mb-1">Cliente</h3>
-        <p className="font-medium text-foreground">{budget.clientName}</p>
-        <p className="text-sm text-muted-foreground">
-          {format(new Date(budget.createdAt), "d 'de' MMMM, yyyy", {
-            locale: es,
-          })}
-        </p>
-      </div>
+      {/* CLIENTE */}
+<div className="card-elevated p-4 space-y-2">
+  <h3 className="font-semibold text-primary">Cliente</h3>
+  <p className="text-foreground">{budget.clientName}</p>
+</div>
+
+{/* TIPO DE INSTALACIÓN */}
+<div className="card-elevated p-4 space-y-2">
+  <h3 className="font-semibold text-primary">Tipo de Instalación</h3>
+  <p className="text-foreground">
+    {CATEGORY_LABELS[budget.category]}
+  </p>
+</div>
+
+{/* DETALLES POR CATEGORÍA */}
+{budget.category === "ac" && budget.acEquipment && (
+  <div className="card-elevated p-4 space-y-2">
+    <h3 className="font-semibold text-primary">Datos del Equipo</h3>
+    <p>Capacidad: {budget.acEquipment.capacity} frigorías</p>
+    <p>Tecnología: {budget.acEquipment.technology}</p>
+    <p>Estado: {budget.acEquipment.status}</p>
+  </div>
+)}
+
+{budget.category === "solar" && budget.solarSystem && (
+  <div className="card-elevated p-4 space-y-2">
+    <h3 className="font-semibold text-primary">Datos del Sistema FV</h3>
+    <p>Tipo de sistema: {budget.solarSystem.systemType}</p>
+    <p>Panel: {budget.solarSystem.panelType} - {budget.solarSystem.panelPower} W</p>
+    <p>Cantidad de paneles: {budget.solarSystem.quantity}</p>
+    <p>Potencia total: {budget.solarSystem.totalPower} W</p>
+  </div>
+)}
+
+{budget.category === "electric" && budget.electricWorkDescription && (
+  <div className="card-elevated p-4 space-y-2">
+    <h3 className="font-semibold text-primary">Descripción del Trabajo</h3>
+    <p className="whitespace-pre-line text-foreground">
+      {budget.electricWorkDescription}
+    </p>
+  </div>
+)}
 
       {/* ITEMS */}
       <div className="card-elevated p-4 mb-4">
