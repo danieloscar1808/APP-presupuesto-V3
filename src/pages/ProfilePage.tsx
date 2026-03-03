@@ -184,7 +184,7 @@ const ProfilePage = () => {
         </Button>
 
         {/* Importar Backup */}
-        <Button
+<Button
   variant="outline"
   className="w-full"
   onClick={() => {
@@ -196,27 +196,26 @@ const ProfilePage = () => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
-      const reader = new FileReader();
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
 
-      reader.onload = async () => {
-        try {
-          const data = JSON.parse(reader.result as string);
+        // Importador real (Dexie / IndexedDB)
+        const { importBackup } = await import("@/lib/storage");
 
-          // >>> USAR IMPORTBACKUP REAL <<<
-          const { importBackup } = await import("@/lib/storage");
+        await importBackup(data);
 
-          await importBackup(data);
+        toast.success("Backup restaurado. Recargando...");
 
-          toast.success("Backup restaurado correctamente. Recargando...");
-          setTimeout(() => window.location.reload(), 800);
+        // Para móviles / PWA
+        setTimeout(() => {
+          window.location.reload();
+        }, 800);
 
-        } catch (err) {
-          console.error(err);
-          toast.error("Archivo inválido");
-        }
-      };
-
-      reader.readAsText(file);
+      } catch (err) {
+        console.error(err);
+        toast.error("Error al importar el backup");
+      }
     };
 
     input.click();
