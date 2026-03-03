@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => ({
 
       // Service Worker
       workbox: {
-        skipWaiting: true,
-        clientsClaim: true,
+        skipWaiting: false,
+        clientsClaim: false,
         maximumFileSizeToCacheInBytes: 20 * 1024 * 1024, // 20 MB
       },
 
