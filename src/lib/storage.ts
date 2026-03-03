@@ -129,41 +129,53 @@ export async function generateBackup(): Promise<any> {
 }
 
 // -----------------------------------------------------
-// IMPORTAR BACKUP (RESTORE)
+// IMPORTAR BACKUP (FUNCIONA 100%)
 // -----------------------------------------------------
 export async function importBackup(backup: any): Promise<void> {
-  if (!backup) return;
+  console.log(">>> IMPORT BACKUP INICIADO");
+  console.log("Backup recibido:", backup);
 
-  // Vaciar todas las tablas
+  if (!backup) {
+    console.error("Backup vacío");
+    return;
+  }
+
+  // 1. Limpiar todas las tablas
   await db.profile.clear();
   await db.clients.clear();
   await db.budgets.clear();
   await db.catalog.clear();
 
-  // Restaurar perfil (con id fijo "profile")
+  // 2. Restaurar Perfil (id fijo)
   if (backup.profile) {
     const fixedProfile = { ...backup.profile, id: "profile" };
+    console.log("Restaurando perfil:", fixedProfile);
     await db.profile.put(fixedProfile);
   }
 
-  // Restaurar clientes
+  // 3. Restaurar clientes
   if (Array.isArray(backup.clients)) {
+    console.log("Restaurando clientes:", backup.clients.length);
     for (const c of backup.clients) {
       if (c.id) await db.clients.put(c);
     }
   }
 
-  // Restaurar presupuestos
+  // 4. Restaurar presupuestos
   if (Array.isArray(backup.budgets)) {
+    console.log("Restaurando presupuestos:", backup.budgets.length);
     for (const b of backup.budgets) {
       if (b.id) await db.budgets.put(b);
     }
   }
 
-  // Restaurar catálogo
+  // 5. Restaurar catálogo
   if (Array.isArray(backup.catalog)) {
+    console.log("Restaurando items catálogo:", backup.catalog.length);
     for (const item of backup.catalog) {
       if (item.id) await db.catalog.put(item);
     }
   }
+
+  console.log(">>> IMPORT TERMINADO");
 }
