@@ -1,77 +1,102 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { PageLayout } from '@/components/PageLayout';
-import { Client } from '@/types';
-import { getClients, saveClient, deleteClient } from '@/lib/storage';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { PageLayout } from "@/components/PageLayout";
+import { Client } from "@/types";
+import {
+  getClients,
+  saveClient,
+  deleteClient,
+} from "@/lib/storage";
+
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { toast } from 'sonner';
-import { v4 as uuid } from 'uuid';
-import { Plus, Search, User, Phone, Mail, Trash2, Edit } from 'lucide-react';
+} from "@/components/ui/dialog";
+
+import { toast } from "sonner";
+import { v4 as uuid } from "uuid";
+import {
+  Plus,
+  Search,
+  User,
+  Phone,
+  Mail,
+  Trash2,
+  Edit,
+} from "lucide-react";
 
 const ClientsPage = () => {
   const navigate = useNavigate();
   const [clients, setClients] = useState<Client[]>([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
   });
 
-  // CARGA INICIAL ASÍNCRONA
+  // ---------------------------------------------------------
+  // CARGAR CLIENTES DESDE INDEXEDDB
+  // ---------------------------------------------------------
   useEffect(() => {
-    const load = async () => {
-      const data = await getClients();
-      setClients(data);
-    };
-    load();
+    loadClients();
   }, []);
 
-  // helper para recargar clientes
   const loadClients = async () => {
-    const data = await getClients();
-    setClients(data);
+    const list = await getClients();
+    setClients(list);
   };
 
+  // FILTRO
   const filteredClients = clients.filter(
     (c) =>
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.phone.includes(search)
   );
 
+  // ---------------------------------------------------------
+  // DIALOG - NUEVO CLIENTE
+  // ---------------------------------------------------------
   const openNewDialog = () => {
     setEditingClient(null);
-    setFormData({ name: '', phone: '', email: '', address: '' });
+    setFormData({ name: "", phone: "", email: "", address: "" });
     setIsDialogOpen(true);
   };
 
+  // ---------------------------------------------------------
+  // DIALOG - EDITAR CLIENTE
+  // ---------------------------------------------------------
   const openEditDialog = (client: Client) => {
     setEditingClient(client);
     setFormData({
       name: client.name,
       phone: client.phone,
-      email: client.email || '',
-      address: client.address || '',
+      email: client.email,
+      address: client.address,
     });
     setIsDialogOpen(true);
   };
 
+  // ---------------------------------------------------------
+  // GUARDAR CLIENTE (NUEVO O EDITADO)
+  // ---------------------------------------------------------
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.name || !formData.phone) {
-      toast.error('Nombre y telefono son requeridos');
+      toast.error("Nombre y teléfono son requeridos");
       return;
     }
 
@@ -81,27 +106,37 @@ const ClientsPage = () => {
       phone: formData.phone,
       email: formData.email,
       address: formData.address,
-      createdAt: editingClient?.createdAt || new Date().toISOString(),
+      createdAt:
+        editingClient?.createdAt || new Date().toISOString(),
     };
 
     await saveClient(client);
     await loadClients();
 
     setIsDialogOpen(false);
-    toast.success(editingClient ? 'Cliente actualizado' : 'Cliente agregado');
+    toast.success(
+      editingClient ? "Cliente actualizado" : "Cliente agregado"
+    );
   };
 
+  // ---------------------------------------------------------
+  // ELIMINAR CLIENTE
+  // ---------------------------------------------------------
   const handleDelete = async (id: string) => {
-    if (confirm('Eliminar este cliente?')) {
-      await deleteClient(id);
-      await loadClients();
-      toast.success('Cliente eliminado');
-    }
+    if (!confirm("¿Eliminar este cliente?")) return;
+
+    await deleteClient(id);
+    await loadClients();
+
+    toast.success("Cliente eliminado");
   };
 
+  // ---------------------------------------------------------
+  // RENDER
+  // ---------------------------------------------------------
   return (
     <PageLayout title="Clientes">
-      {/* Search and Add */}
+      {/* SEARCH */}
       <div className="flex gap-3 mb-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -112,17 +147,24 @@ const ClientsPage = () => {
             className="pl-10"
           />
         </div>
+
         <Button onClick={openNewDialog} className="btn-accent shrink-0">
           <Plus className="w-4 h-4" />
         </Button>
       </div>
 
-      {/* Client List */}
+      {/* LISTA */}
       {filteredClients.length === 0 ? (
         <div className="card-elevated p-8 text-center">
           <User className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
-          <p className="text-muted-foreground">No hay clientes registrados</p>
-          <Button variant="link" onClick={openNewDialog} className="mt-2 text-primary">
+          <p className="text-muted-foreground">
+            No hay clientes registrados
+          </p>
+          <Button
+            variant="link"
+            onClick={openNewDialog}
+            className="mt-2 text-primary"
+          >
             Agregar primer cliente
           </Button>
         </div>
@@ -137,12 +179,17 @@ const ClientsPage = () => {
                       {client.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
+
                   <div className="min-w-0">
-                    <h3 className="font-medium text-foreground">{client.name}</h3>
+                    <h3 className="font-medium text-foreground">
+                      {client.name}
+                    </h3>
+
                     <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
                       <Phone className="w-3 h-3" />
                       <span>{client.phone}</span>
                     </div>
+
                     {client.email && (
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Mail className="w-3 h-3" />
@@ -151,6 +198,7 @@ const ClientsPage = () => {
                     )}
                   </div>
                 </div>
+
                 <div className="flex gap-1">
                   <Button
                     variant="ghost"
@@ -160,6 +208,7 @@ const ClientsPage = () => {
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
+
                   <Button
                     variant="ghost"
                     size="icon"
@@ -175,66 +224,68 @@ const ClientsPage = () => {
         </div>
       )}
 
-      {/* Dialog */}
+      {/* DIALOGO */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-sm mx-4">
           <DialogHeader>
             <DialogTitle>
-              {editingClient ? 'Editar Cliente' : 'Nuevo Cliente'}
+              {editingClient ? "Editar Cliente" : "Nuevo Cliente"}
             </DialogTitle>
           </DialogHeader>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="clientName">Nombre *</Label>
+              <Label>Nombre *</Label>
               <Input
-                id="clientName"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nombre del cliente"
-                className="mt-1"
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
               />
             </div>
+
             <div>
-              <Label htmlFor="clientPhone">Telefono *</Label>
+              <Label>Teléfono *</Label>
               <Input
-                id="clientPhone"
                 type="tel"
                 value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+54 11 1234-5678"
-                className="mt-1"
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
               />
             </div>
+
             <div>
-              <Label htmlFor="clientEmail">Email</Label>
+              <Label>Email</Label>
               <Input
-                id="clientEmail"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="cliente@ejemplo.com"
-                className="mt-1"
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
               />
             </div>
+
             <div>
-              <Label htmlFor="clientAddress">Direccion</Label>
+              <Label>Dirección</Label>
               <Input
-                id="clientAddress"
                 value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="Direccion del cliente"
-                className="mt-1"
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
               />
             </div>
-            <div className="flex gap-3 pt-2">
+
+            <div className="flex gap-3">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsDialogOpen(false)}
                 className="flex-1"
+                onClick={() => setIsDialogOpen(false)}
               >
                 Cancelar
               </Button>
+
               <Button type="submit" className="flex-1 btn-gradient">
                 Guardar
               </Button>

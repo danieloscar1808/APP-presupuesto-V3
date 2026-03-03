@@ -18,22 +18,24 @@ const Index = () => {
   });
 
   useEffect(() => {
-    async function loadData() {
+    async function load() {
+      // Cargar perfil
       const p = await getProfile();
       setProfile(p);
 
+      // Cargar presupuestos y clientes
       const budgets = await getBudgets();
       const clients = await getClients();
 
-      // Ordenar presupuestos
+      // Ordenar presupuestos recientes
       const sorted = [...budgets].sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
+
       setRecentBudgets(sorted.slice(0, 3));
 
-      // Calcular estadísticas
-      const totalAmount = budgets.reduce((sum, b) => sum + b.total, 0);
+      // Stats
+      const totalAmount = budgets.reduce((sum, b) => sum + (b.total || 0), 0);
 
       setStats({
         clients: clients.length,
@@ -42,9 +44,10 @@ const Index = () => {
       });
     }
 
-    loadData();
+    load();
   }, []);
 
+  // Si NO hay perfil todavía
   if (!profile) {
     return (
       <PageLayout>
@@ -74,7 +77,7 @@ const Index = () => {
             </h1>
           </div>
 
-          {/* Stats */}
+          {/* Quick stats */}
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
               <Users className="w-5 h-5 mx-auto mb-1 text-primary-foreground/80" />
@@ -99,16 +102,14 @@ const Index = () => {
         </div>
       }
     >
+
       {/* Botón nuevo presupuesto */}
-      <Button
-        onClick={() => navigate('/budgets/new')}
-        className="w-full btn-accent h-14 text-base mb-6"
-      >
+      <Button onClick={() => navigate('/budgets/new')} className="w-full btn-accent h-14 text-base mb-6">
         <Plus className="w-5 h-5 mr-2" />
         Nuevo Presupuesto
       </Button>
 
-      {/* Presupuestos recientes */}
+      {/* Recent budgets */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-foreground">Presupuestos Recientes</h2>

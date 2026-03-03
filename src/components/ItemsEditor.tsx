@@ -1,31 +1,35 @@
- import { useState, useEffect } from 'react';
- import { BudgetItem, BudgetCategory, CatalogItem } from '@/types';
- import { getCatalogItems } from '@/lib/storage';
+import { useState, useEffect } from 'react';
+import { BudgetItem, BudgetCategory, CatalogItem } from '@/types';
+import { getCatalogItems } from '@/lib/storage';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
 import { v4 as uuid } from 'uuid';
 
- import {
-   Select,
-   SelectContent,
-   SelectItem,
-   SelectTrigger,
-   SelectValue,
- } from '@/components/ui/select';
- 
- interface ItemsEditorProps {
-   items: BudgetItem[];
-   onChange: (items: BudgetItem[]) => void;
-   category?: BudgetCategory;
- }
- 
- export const ItemsEditor = ({ items, onChange, category }: ItemsEditorProps) => {
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+interface ItemsEditorProps {
+  items: BudgetItem[];
+  onChange: (items: BudgetItem[]) => void;
+  category?: BudgetCategory;
+}
+
+export const ItemsEditor = ({ items, onChange, category }: ItemsEditorProps) => {
   const [newItem, setNewItem] = useState({ description: '', quantity: 1, unitPrice: 0 });
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([]);
 
   useEffect(() => {
-    setCatalogItems(getCatalogItems());
+    const load = async () => {
+      const result = await getCatalogItems();   // await necesario
+      setCatalogItems(result);
+    };
+    load();
   }, []);
 
   // Filter catalog items by category or general
@@ -46,7 +50,7 @@ import { v4 as uuid } from 'uuid';
 
   const addItem = () => {
     if (!newItem.description || newItem.unitPrice <= 0) return;
-    
+
     const item: BudgetItem = {
       id: uuid(),
       description: newItem.description,
@@ -54,7 +58,7 @@ import { v4 as uuid } from 'uuid';
       unitPrice: newItem.unitPrice,
       total: newItem.quantity * newItem.unitPrice,
     };
-    
+
     onChange([...items, item]);
     setNewItem({ description: '', quantity: 1, unitPrice: 0 });
   };
@@ -79,7 +83,7 @@ import { v4 as uuid } from 'uuid';
   return (
     <div className="space-y-4">
       <label className="text-sm font-medium text-foreground">Materiales e Items</label>
-      
+
       {/* Item list */}
       <div className="space-y-2">
         {items.map((item) => (
@@ -100,6 +104,7 @@ import { v4 as uuid } from 'uuid';
                 <Trash2 className="w-4 h-4" />
               </Button>
             </div>
+
             <div className="flex gap-2">
               <div className="w-20">
                 <Input
@@ -111,6 +116,7 @@ import { v4 as uuid } from 'uuid';
                 />
                 <span className="text-xs text-muted-foreground">Cant.</span>
               </div>
+
               <div className="flex-1">
                 <Input
                   type="number"
@@ -121,6 +127,7 @@ import { v4 as uuid } from 'uuid';
                 />
                 <span className="text-xs text-muted-foreground">Precio Unit.</span>
               </div>
+
               <div className="w-28 text-right">
                 <p className="h-10 flex items-center justify-end font-medium text-foreground">
                   ${item.total.toLocaleString('es-AR')}
@@ -135,10 +142,7 @@ import { v4 as uuid } from 'uuid';
       {/* Add new item */}
       <div className="card-elevated p-3 border-dashed space-y-2">
         {availableCatalogItems.length > 0 && (
-          <Select
-            value=""
-            onValueChange={handleCatalogSelect}
-          >
+          <Select value="" onValueChange={handleCatalogSelect}>
             <SelectTrigger>
               <SelectValue placeholder="Seleccionar del catalogo..." />
             </SelectTrigger>
@@ -151,11 +155,13 @@ import { v4 as uuid } from 'uuid';
             </SelectContent>
           </Select>
         )}
+
         <Input
           placeholder="Descripcion del item o material"
           value={newItem.description}
           onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
         />
+
         <div className="flex gap-2">
           <div className="w-20">
             <Input
@@ -166,6 +172,7 @@ import { v4 as uuid } from 'uuid';
               className="text-center"
             />
           </div>
+
           <div className="flex-1">
             <Input
               type="number"
@@ -176,6 +183,7 @@ import { v4 as uuid } from 'uuid';
               className="text-right"
             />
           </div>
+
           <Button onClick={addItem} className="btn-accent shrink-0">
             <Plus className="w-4 h-4 mr-1" />
             Agregar

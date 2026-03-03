@@ -14,7 +14,7 @@ class AppDB extends Dexie {
     super('PresupuestoDB');
 
     this.version(1).stores({
-      profile: 'id',
+      profile: '&id',       // clave fija
       clients: 'id, name',
       budgets: 'id, clientId',
       catalog: 'id, name'
@@ -28,13 +28,12 @@ export const db = new AppDB();
 // PROFILE
 // -----------------------------------------------------
 export const getProfile = async (): Promise<Profile | null> => {
-  const data = await db.profile.toArray();
-  return data[0] || null;
+  return await db.profile.get("profile") || null;
 };
 
 export const saveProfile = async (profile: Profile): Promise<void> => {
-  await db.profile.clear();
-  await db.profile.put(profile, profile.id);
+  profile.id = "profile";  // clave fija
+  await db.profile.put(profile);
 };
 
 // -----------------------------------------------------
@@ -84,7 +83,7 @@ export const updateBudgetStatus = async (id: string, status: Budget['status']): 
     budget.sentAt = new Date().toISOString();
   }
 
-  await db.budgets.put(budget, id);
+  await db.budgets.put(budget);
 };
 
 // -----------------------------------------------------
@@ -106,3 +105,25 @@ export const getCatalogItemByName = async (name: string): Promise<CatalogItem | 
   const items = await db.catalog.toArray();
   return items.find(i => i.name.toLowerCase() === name.toLowerCase());
 };
+
+// -----------------------------------------------------
+// BACKUP
+// -----------------------------------------------------
+export async function generateBackup(): Promise<any> {
+  const profile = await getProfile();
+  const clients = await getClients();
+  const budgets = await getBudgets();
+  const catalog = await getCatalogItems();
+
+  const backup = {
+    profile,
+    clients,
+    budgets,
+    catalog,
+    timestamp: new Date().toISOString(),
+  };
+
+  localStorage.setItem("lastBackup", JSON.stringify(backup));
+
+  return backup;
+}

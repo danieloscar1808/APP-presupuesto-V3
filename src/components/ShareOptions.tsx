@@ -1,86 +1,146 @@
-import { Budget, Profile } from '@/types';
-import { downloadPDF } from '@/lib/pdfGenerator';
-import { updateBudgetStatus } from '@/lib/storage';
-import { Button } from '@/components/ui/button';
-import { Download, MessageCircle, Mail, Check } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Budget, Profile } from "@/types";
 
-interface ShareOptionsProps {
+import { Button } from "@/components/ui/button";
+import { updateBudgetStatus } from "@/lib/storage";
+import { downloadPDF } from "@/lib/pdfGenerator";
+
+import { toast } from "sonner";
+import { Send, FileDown, CheckCircle, XCircle, Mail, MessageCircle } from "lucide-react";
+
+interface Props {
   budget: Budget;
   profile: Profile;
   onStatusChange?: () => void;
 }
 
-export const ShareOptions = ({ budget, profile, onStatusChange }: ShareOptionsProps) => {
-  const handleDownload = () => {
-    downloadPDF(budget, profile);
-    toast.success('PDF descargado correctamente');
+export const ShareOptions = ({ budget, profile, onStatusChange }: Props) => {
+  const [loading, setLoading] = useState(false);
+
+  // ---------------------------------------------------------
+  // GENERAR PDF
+  // ---------------------------------------------------------
+  const handleDownloadPDF = async () => {
+    try {
+      setLoading(true);
+      await downloadPDF(budget, profile);
+      toast.success("PDF descargado");
+    } catch (err) {
+      toast.error("Error generando PDF");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleWhatsApp = () => {
-    const message = encodeURIComponent(
-      `Hola ${budget.clientName}, le envio el presupuesto de ${budget.category === 'ac' ? 'instalacion de aire acondicionado' : budget.category === 'electric' ? 'instalacion electrica' : 'sistema fotovoltaico'}.\n\nTotal: $${budget.total.toLocaleString('es-AR')}\n\nSaludos,\n${profile.name}`
-    );
-    
-    // Download PDF first
-    downloadPDF(budget, profile);
-    
-    // Open WhatsApp
-    window.open(`https://wa.me/?text=${message}`, '_blank');
-    
-    // Update status
-    updateBudgetStatus(budget.id, 'sent');
-    onStatusChange?.();
-    toast.success('Presupuesto marcado como enviado');
+  // ---------------------------------------------------------
+  // ESTADOS DEL PRESUPUESTO
+  // ---------------------------------------------------------
+  const setStatus = async (status: Budget["status"]) => {
+    try {
+      setLoading(true);
+      await updateBudgetStatus(budget.id, status);
+      toast.success("Estado actualizado");
+
+      if (onStatusChange) onStatusChange();
+    } catch (err) {
+      toast.error("No se pudo actualizar el estado");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleEmail = () => {
-    const subject = encodeURIComponent(`Presupuesto - ${profile.businessName || profile.name}`);
-    const body = encodeURIComponent(
-      `Estimado/a ${budget.clientName},\n\nAdjunto encontrara el presupuesto solicitado.\n\nTotal: $${budget.total.toLocaleString('es-AR')}\n\nQuedo a disposicion para cualquier consulta.\n\nSaludos cordiales,\n${profile.name}\n${profile.phone}`
-    );
-    
-    // Download PDF first
-    downloadPDF(budget, profile);
-    
-    // Open email client
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
-    
-    // Update status
-    updateBudgetStatus(budget.id, 'sent');
-    onStatusChange?.();
-    toast.success('Presupuesto marcado como enviado');
+  // ---------------------------------------------------------
+  // WHATSAPP
+  // ---------------------------------------------------------
+  const sendWhatsApp = () => {
+    const message = `Hola ${budget.clientName}, te envío el presupuesto #${budget.number} por el trabajo solicitado. Total: $${budget.total.toLocaleString(
+      "es-AR"
+    )}.`;
+
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(url, "_blank");
   };
 
-  const markAsAccepted = () => {
-    updateBudgetStatus(budget.id, 'accepted');
-    onStatusChange?.();
-    toast.success('Presupuesto marcado como aceptado');
+  // ---------------------------------------------------------
+  // EMAIL (mailto)
+  // ---------------------------------------------------------
+  const sendEmail = () => {
+    const subject = `Presupuesto ${budget.number}`;
+    const body = `Hola ${budget.clientName},\n\nTe comparto el presupuesto solicitado.\n\nTotal: $${budget.total.toLocaleString(
+      "es-AR"
+    )}\n\nSaludos.\n${profile.name}`;
+
+    window.location.href = `mailto:?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
   };
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium text-foreground">Compartir Presupuesto</h3>
-      <div className="grid grid-cols-2 gap-3">
-        <Button variant="outline" onClick={handleDownload} className="h-auto py-3 flex-col gap-1">
-          <Download className="w-5 h-5" />
-          <span className="text-xs">Descargar PDF</span>
+      {/* DESCARGAR PDF */}
+      <Button
+        onClick={handleDownloadPDF}
+        disabled={loading}
+        className="w-full btn-accent"
+      >
+        <FileDown className="w-4 h-4 mr-2" />
+        Descargar PDF
+      </Button>
+
+      {/* WHATSAPP */}
+      <Button
+        onClick={sendWhatsApp}
+        disabled={loading}
+        className="w-full bg-green-600 hover:bg-green-700 text-white"
+      >
+        <MessageCircle className="w-4 h-4 mr-2" />
+        Enviar por WhatsApp
+      </Button>
+
+      {/* EMAIL */}
+      <Button
+        onClick={sendEmail}
+        disabled={loading}
+        variant="outline"
+        className="w-full"
+      >
+        <Mail className="w-4 h-4 mr-2" />
+        Enviar por Email
+      </Button>
+
+      {/* CAMBIAR ESTADO */}
+      <div className="grid grid-cols-2 gap-2 pt-2">
+        <Button
+          onClick={() => setStatus("accepted")}
+          disabled={loading}
+          className="btn-gradient w-full"
+        >
+          <CheckCircle className="w-4 h-4 mr-2" />
+          Aceptado
         </Button>
-        <Button onClick={handleWhatsApp} className="h-auto py-3 flex-col gap-1 bg-success hover:bg-success/90">
-          <MessageCircle className="w-5 h-5" />
-          <span className="text-xs">WhatsApp</span>
+
+        <Button
+          onClick={() => setStatus("rejected")}
+          disabled={loading}
+          variant="destructive"
+          className="w-full"
+        >
+          <XCircle className="w-4 h-4 mr-2" />
+          Rechazado
         </Button>
-        <Button variant="outline" onClick={handleEmail} className="h-auto py-3 flex-col gap-1">
-          <Mail className="w-5 h-5" />
-          <span className="text-xs">Email</span>
-        </Button>
-        {budget.status !== 'accepted' && (
-          <Button variant="outline" onClick={markAsAccepted} className="h-auto py-3 flex-col gap-1 text-success border-success/50">
-            <Check className="w-5 h-5" />
-            <span className="text-xs">Aceptado</span>
-          </Button>
-        )}
       </div>
+
+      {/* MARCAR COMO ENVIADO */}
+      {budget.status === "draft" && (
+        <Button
+          onClick={() => setStatus("sent")}
+          disabled={loading}
+          className="w-full mt-2"
+        >
+          <Send className="w-4 h-4 mr-2" />
+          Marcar como enviado
+        </Button>
+      )}
     </div>
   );
 };

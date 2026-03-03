@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
 import { PageLayout } from '@/components/PageLayout';
 import { Profile } from '@/types';
-import { getProfile, saveProfile } from '@/lib/storage';
+import { getProfile, saveProfile, generateBackup } from '@/lib/storage';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { v4 as uuid } from 'uuid';
 import { Save, Building2, User, Phone, Mail, MapPin, CreditCard } from 'lucide-react';
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState<Profile>({
-    id: uuid(),
+    id: "profile", // ID FIJO — evita borrado
     name: '',
     businessName: '',
     taxId: '',
@@ -21,39 +20,44 @@ const ProfilePage = () => {
     address: '',
   });
 
+  // Cargar perfil almacenado
   useEffect(() => {
-    const existing = getProfile();
-    if (existing) {
-      setProfile(existing);
+    async function load() {
+      const existing = await getProfile();
+      if (existing) {
+        setProfile(existing);
+      }
     }
+    load();
   }, []);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!profile.name || !profile.phone) {
-      toast.error('Nombre y telefono son requeridos');
-      return;
-    }
-    
-    saveProfile(profile);
-    toast.success('Perfil guardado correctamente');
-  };
 
   const updateField = (field: keyof Profile, value: string) => {
     setProfile((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!profile.name || !profile.phone) {
+      toast.error('Nombre y teléfono son requeridos');
+      return;
+    }
+
+    await saveProfile(profile);
+    toast.success('Perfil guardado correctamente');
+  };
+
   return (
     <PageLayout title="Perfil Profesional">
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Personal Info */}
+
+        {/* Datos Personales */}
         <div className="card-elevated p-4 space-y-4">
           <h2 className="font-medium text-foreground flex items-center gap-2">
             <User className="w-4 h-4" />
             Datos Personales
           </h2>
-          
+
           <div className="space-y-3">
             <div>
               <Label htmlFor="name">Nombre Completo *</Label>
@@ -65,9 +69,9 @@ const ProfilePage = () => {
                 className="mt-1"
               />
             </div>
-            
+
             <div>
-              <Label htmlFor="phone">Telefono *</Label>
+              <Label htmlFor="phone">Teléfono *</Label>
               <div className="relative mt-1">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -80,7 +84,7 @@ const ProfilePage = () => {
                 />
               </div>
             </div>
-            
+
             <div>
               <Label htmlFor="email">Email</Label>
               <div className="relative mt-1">
@@ -98,16 +102,16 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {/* Business Info */}
+        {/* Datos Comerciales */}
         <div className="card-elevated p-4 space-y-4">
           <h2 className="font-medium text-foreground flex items-center gap-2">
             <Building2 className="w-4 h-4" />
             Datos Comerciales
           </h2>
-          
+
           <div className="space-y-3">
             <div>
-              <Label htmlFor="businessName">Razon Social / Nombre Comercial</Label>
+              <Label htmlFor="businessName">Razón Social / Nombre Comercial</Label>
               <Input
                 id="businessName"
                 value={profile.businessName}
@@ -116,9 +120,9 @@ const ProfilePage = () => {
                 className="mt-1"
               />
             </div>
-            
+
             <div>
-              <Label htmlFor="taxId">CUIT / Identificacion Fiscal</Label>
+              <Label htmlFor="taxId">CUIT / Identificación Fiscal</Label>
               <div className="relative mt-1">
                 <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -130,9 +134,9 @@ const ProfilePage = () => {
                 />
               </div>
             </div>
-            
+
             <div>
-              <Label htmlFor="address">Direccion</Label>
+              <Label htmlFor="address">Dirección</Label>
               <div className="relative mt-1">
                 <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Textarea
@@ -152,6 +156,78 @@ const ProfilePage = () => {
           Guardar Perfil
         </Button>
       </form>
+
+      {/* BACKUP SECTION */}
+      <div className="card-elevated p-4 space-y-3 mt-6">
+        <h3 className="font-medium text-foreground">Backup de Datos</h3>
+        <p className="text-sm text-muted-foreground">
+          Guarda o restaura una copia completa de tus clientes, presupuestos, catálogo y perfil.
+        </p>
+
+        {/* Exportar Backup */}
+        <Button
+          className="btn-accent w-full"
+          onClick={async () => {
+            const backup = await generateBackup();
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `backup_${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+
+            URL.revokeObjectURL(url);
+          }}
+        >
+          Exportar Backup
+        </Button>
+
+        {/* Importar Backup */}
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = ".json";
+
+            input.onchange = (e) => {
+              const file = (e.target as HTMLInputElement).files?.[0];
+              if (!file) return;
+
+              const reader = new FileReader();
+              reader.onload = () => {
+                try {
+                  const data = JSON.parse(reader.result as string);
+
+                  if (data.profile)
+                    localStorage.setItem("presupuestos_profile", JSON.stringify(data.profile));
+                  if (data.clients)
+                    localStorage.setItem("presupuestos_clients", JSON.stringify(data.clients));
+                  if (data.budgets)
+                    localStorage.setItem("presupuestos_budgets", JSON.stringify(data.budgets));
+                  if (data.catalog)
+                    localStorage.setItem("presupuestos_catalog", JSON.stringify(data.catalog));
+
+                  localStorage.setItem("lastBackup", JSON.stringify(data));
+
+                  toast.success("Backup restaurado correctamente. Recarga la página.");
+                } catch {
+                  toast.error("Archivo inválido");
+                }
+              };
+
+              reader.readAsText(file);
+            };
+
+            input.click();
+          }}
+        >
+          Importar Backup
+        </Button>
+      </div>
+
     </PageLayout>
   );
 };
