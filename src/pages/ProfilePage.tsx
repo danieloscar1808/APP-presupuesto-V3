@@ -196,6 +196,28 @@ const ProfilePage = () => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
+<<<<<<< HEAD
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        // Importador real (Dexie / IndexedDB)
+        const { importBackup } = await import("@/lib/storage");
+
+        await importBackup(data);
+
+        toast.success("Backup restaurado. Recargando...");
+
+        // Para móviles / PWA
+        setTimeout(() => {
+          window.location.reload();
+        }, 800);
+
+      } catch (err) {
+        console.error(err);
+        toast.error("Error al importar el backup");
+      }
+=======
       const reader = new FileReader();
       reader.onload = () => {
         try {
@@ -219,6 +241,7 @@ const ProfilePage = () => {
       };
 
       reader.readAsText(file);
+>>>>>>> main
     };
 
     input.click();
