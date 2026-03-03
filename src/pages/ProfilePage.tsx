@@ -184,7 +184,7 @@ const ProfilePage = () => {
         </Button>
 
         {/* Importar Backup */}
-        <Button
+<Button
   variant="outline"
   className="w-full"
   onClick={() => {
@@ -192,26 +192,28 @@ const ProfilePage = () => {
     input.type = "file";
     input.accept = ".json";
 
-    input.onchange = async (e) => {
+    input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
       const reader = new FileReader();
-
-      reader.onload = async () => {
+      reader.onload = () => {
         try {
           const data = JSON.parse(reader.result as string);
 
-          // >>> USAR IMPORTBACKUP REAL <<<
-          const { importBackup } = await import("@/lib/storage");
+          if (data.profile)
+            localStorage.setItem("presupuestos_profile", JSON.stringify(data.profile));
+          if (data.clients)
+            localStorage.setItem("presupuestos_clients", JSON.stringify(data.clients));
+          if (data.budgets)
+            localStorage.setItem("presupuestos_budgets", JSON.stringify(data.budgets));
+          if (data.catalog)
+            localStorage.setItem("presupuestos_catalog", JSON.stringify(data.catalog));
 
-          await importBackup(data);
+          localStorage.setItem("lastBackup", JSON.stringify(data));
 
-          toast.success("Backup restaurado correctamente. Recargando...");
-          setTimeout(() => window.location.reload(), 800);
-
-        } catch (err) {
-          console.error(err);
+          toast.success("Backup restaurado correctamente. Recarga la página.");
+        } catch {
           toast.error("Archivo inválido");
         }
       };
