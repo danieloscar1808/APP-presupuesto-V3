@@ -185,47 +185,45 @@ const ProfilePage = () => {
 
         {/* Importar Backup */}
         <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => {
-            const input = document.createElement("input");
-            input.type = "file";
-            input.accept = ".json";
+  variant="outline"
+  className="w-full"
+  onClick={() => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
 
-            input.onchange = (e) => {
-              const file = (e.target as HTMLInputElement).files?.[0];
-              if (!file) return;
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
 
-              const reader = new FileReader();
-              reader.onload = () => {
-                try {
-                  const data = JSON.parse(reader.result as string);
+      const reader = new FileReader();
 
-                  if (data.profile)
-                    localStorage.setItem("presupuestos_profile", JSON.stringify(data.profile));
-                  if (data.clients)
-                    localStorage.setItem("presupuestos_clients", JSON.stringify(data.clients));
-                  if (data.budgets)
-                    localStorage.setItem("presupuestos_budgets", JSON.stringify(data.budgets));
-                  if (data.catalog)
-                    localStorage.setItem("presupuestos_catalog", JSON.stringify(data.catalog));
+      reader.onload = async () => {
+        try {
+          const data = JSON.parse(reader.result as string);
 
-                  localStorage.setItem("lastBackup", JSON.stringify(data));
+          // >>> USAR IMPORTBACKUP REAL <<<
+          const { importBackup } = await import("@/lib/storage");
 
-                  toast.success("Backup restaurado correctamente. Recarga la página.");
-                } catch {
-                  toast.error("Archivo inválido");
-                }
-              };
+          await importBackup(data);
 
-              reader.readAsText(file);
-            };
+          toast.success("Backup restaurado correctamente. Recargando...");
+          setTimeout(() => window.location.reload(), 800);
 
-            input.click();
-          }}
-        >
-          Importar Backup
-        </Button>
+        } catch (err) {
+          console.error(err);
+          toast.error("Archivo inválido");
+        }
+      };
+
+      reader.readAsText(file);
+    };
+
+    input.click();
+  }}
+>
+  Importar Backup
+</Button>
       </div>
 
     </PageLayout>
