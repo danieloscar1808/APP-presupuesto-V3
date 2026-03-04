@@ -178,21 +178,90 @@ const NewBudgetPage = () => {
           <div className="card-elevated p-4 space-y-3">
             <Label>Datos del Equipo</Label>
 
-            <Input
-              placeholder="Capacidad (frigorías)"
-              value={acCapacity}
-              onChange={(e) => setAcCapacity(e.target.value)}
-            />
-            <Input
-              placeholder="Tecnología (Inverter, On/Off, etc.)"
-              value={acTechnology}
-              onChange={(e) => setAcTechnology(e.target.value)}
-            />
-            <Input
-              placeholder="Estado del equipo"
-              value={acStatus}
-              onChange={(e) => setAcStatus(e.target.value)}
-            />
+            {category === "ac" && (
+  <div className="card-elevated p-4 space-y-4">
+    <Label>Datos del Equipo</Label>
+
+    {/* CAPACIDAD */}
+    <div className="space-y-2">
+      <Label className="text-sm">Capacidad (frigorías)</Label>
+
+      <div className="flex gap-2">
+        <Select onValueChange={(value) => setAcCapacity(value)}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Elegir" />
+          </SelectTrigger>
+          <SelectContent>
+            {CAPACITIES.map((c) => (
+              <SelectItem key={c} value={c}>
+                {c}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Input
+          placeholder="o escribir"
+          value={acCapacity}
+          onChange={(e) => setAcCapacity(e.target.value)}
+        />
+      </div>
+    </div>
+
+    {/* TECNOLOGÍA */}
+    <div className="space-y-2">
+      <Label className="text-sm">Tecnología</Label>
+
+      <div className="flex gap-2">
+        <Select onValueChange={(value) => setAcTechnology(value)}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Elegir" />
+          </SelectTrigger>
+          <SelectContent>
+            {TECHNOLOGIES.map((t) => (
+              <SelectItem key={t} value={t}>
+                {t}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Input
+          placeholder="o escribir"
+          value={acTechnology}
+          onChange={(e) => setAcTechnology(e.target.value)}
+        />
+      </div>
+    </div>
+
+    {/* ESTADO */}
+    <div className="space-y-2">
+      <Label className="text-sm">Estado del equipo</Label>
+
+      <div className="flex gap-2">
+        <Select onValueChange={(value) => setAcStatus(value)}>
+          <SelectTrigger className="w-56">
+            <SelectValue placeholder="Elegir" />
+          </SelectTrigger>
+          <SelectContent>
+            {STATUS_OPTIONS.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Input
+          placeholder="o escribir"
+          value={acStatus}
+          onChange={(e) => setAcStatus(e.target.value)}
+        />
+      </div>
+    </div>
+
+  </div>
+)}
           </div>
         )}
 
