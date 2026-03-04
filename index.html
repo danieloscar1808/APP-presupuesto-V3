@@ -6,14 +6,16 @@
   <meta charset="UTF-8" />
 
   <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
   <title>Presupuestos Pro</title>
 
   <meta name="theme-color" content="#1f3d63" />
 
+  <!-- Manifest PWA -->
   <link rel="manifest" href="./manifest.json" />
 
+  <!-- Botón instalar -->
   <style>
 
     #install-button {
@@ -32,76 +34,71 @@
       z-index: 9999;
     }
 
+    #install-button:hover {
+      background: #1d4ed8;
+    }
+
   </style>
 
 </head>
 
 <body>
 
-<div id="root"></div>
+  <!-- React root -->
+  <div id="root"></div>
 
-<button id="install-button">Instalar Aplicación</button>
+  <!-- Botón instalar PWA -->
+  <button id="install-button">Instalar Aplicación</button>
 
-<!-- VITE APP -->
-<script type="module" src="/src/main.tsx"></script>
+  <!-- Vite entry -->
+  <script type="module" src="/src/main.tsx"></script>
 
-<script>
+  <!-- Control instalación -->
+  <script>
 
-let deferredPrompt
-const installButton = document.getElementById("install-button")
+    let deferredPrompt;
+    const installButton = document.getElementById("install-button");
 
-/* INSTALAR APP */
+    window.addEventListener("beforeinstallprompt", (e) => {
 
-window.addEventListener("beforeinstallprompt", (e)=>{
+      e.preventDefault();
 
-  e.preventDefault()
+      deferredPrompt = e;
 
-  deferredPrompt = e
+      if (installButton) {
+        installButton.style.display = "block";
+      }
 
-  installButton.style.display = "block"
+    });
 
-})
+    if (installButton) {
 
-installButton?.addEventListener("click", async ()=>{
+      installButton.addEventListener("click", async () => {
 
-  if(!deferredPrompt) return
+        if (!deferredPrompt) return;
 
-  deferredPrompt.prompt()
+        deferredPrompt.prompt();
 
-  await deferredPrompt.userChoice
+        await deferredPrompt.userChoice;
 
-  deferredPrompt = null
+        deferredPrompt = null;
 
-  installButton.style.display = "none"
+        installButton.style.display = "none";
 
-})
+      });
 
-window.addEventListener("appinstalled", ()=>{
+    }
 
-  installButton.style.display = "none"
+    window.addEventListener("appinstalled", () => {
 
-})
+      if (installButton) {
+        installButton.style.display = "none";
+      }
 
-/* SERVICE WORKER */
+    });
 
-if("serviceWorker" in navigator){
-
-window.addEventListener("load", ()=>{
-
-navigator.serviceWorker
-.register("/APP-presupuesto-V3/service-worker.js")
-.then(reg=>{
-
-console.log("SW registrado")
-
-})
-.catch(err=>console.log("SW error",err))
-
-})
-
-}
-
-</script>
+  </script>
 
 </body>
+
 </html>
