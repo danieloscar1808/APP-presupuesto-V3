@@ -196,83 +196,56 @@ const NewBudgetPage = () => {
 
     {/* CAPACIDAD */}
     <div className="space-y-2">
-      <Label className="text-sm">Capacidad (frigorías)</Label>
+  <Label>Capacidad (frigorías)</Label>
 
-      <div className="flex gap-2">
-        <Select onValueChange={(value) => setAcCapacity(value)}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Elegir" />
-          </SelectTrigger>
-          <SelectContent>
-            {CAPACITIES.map((c) => (
-              <SelectItem key={c} value={c}>
-                {c}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+  <Input
+    list="capacities"
+    placeholder="Seleccione o escriba"
+    value={acCapacity}
+    onChange={(e) => setAcCapacity(e.target.value)}
+  />
 
-        <Input
-          placeholder="o escribir"
-          value={acCapacity}
-          onChange={(e) => setAcCapacity(e.target.value)}
-        />
-      </div>
-    </div>
+  <datalist id="capacities">
+    {CAPACITIES.map((c) => (
+      <option key={c} value={c} />
+    ))}
+  </datalist>
+</div>
 
     {/* TECNOLOGÍA */}
     <div className="space-y-2">
-      <Label className="text-sm">Tecnología</Label>
+  <Label>Tecnología</Label>
 
-      <div className="flex gap-2">
-        <Select onValueChange={(value) => setAcTechnology(value)}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Elegir" />
-          </SelectTrigger>
-          <SelectContent>
-            {TECHNOLOGIES.map((t) => (
-              <SelectItem key={t} value={t}>
-                {t}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+  <Input
+    list="technologies"
+    value={acTechnology}
+    onChange={(e) => setAcTechnology(e.target.value)}
+  />
 
-        <Input
-          placeholder="o escribir"
-          value={acTechnology}
-          onChange={(e) => setAcTechnology(e.target.value)}
-        />
-      </div>
-    </div>
+  <datalist id="technologies">
+    {TECHNOLOGIES.map((t) => (
+      <option key={t} value={t} />
+    ))}
+  </datalist>
+</div>
 
     {/* ESTADO */}
     <div className="space-y-2">
-      <Label className="text-sm">Estado del equipo</Label>
+  <Label>Estado del equipo</Label>
 
-      <div className="flex gap-2">
-        <Select onValueChange={(value) => setAcStatus(value)}>
-          <SelectTrigger className="w-56">
-            <SelectValue placeholder="Elegir" />
-          </SelectTrigger>
-          <SelectContent>
-            {STATUS_OPTIONS.map((s) => (
-              <SelectItem key={s} value={s}>
-                {s}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+  <Input
+    list="status"
+    value={acStatus}
+    onChange={(e) => setAcStatus(e.target.value)}
+  />
 
-        <Input
-          placeholder="o escribir"
-          value={acStatus}
-          onChange={(e) => setAcStatus(e.target.value)}
-        />
-      </div>
-    </div>
+  <datalist id="status">
+    {STATUS_OPTIONS.map((s) => (
+      <option key={s} value={s} />
+    ))}
+  </datalist>
+</div>
 
-  </div>
 )}
           </div>
         )}
