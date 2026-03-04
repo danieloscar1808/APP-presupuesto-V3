@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+
   <meta charset="UTF-8" />
 
   <meta name="viewport"
@@ -11,157 +12,96 @@
 
   <meta name="theme-color" content="#1f3d63" />
 
-  <!-- MANIFEST -->
   <link rel="manifest" href="./manifest.json" />
 
-  <!-- BOTÓN INSTALAR -->
   <style>
+
     #install-button {
       display: none;
       position: fixed;
       bottom: 20px;
       right: 20px;
       padding: 12px 18px;
-      background-color: #2563eb;
+      background: #2563eb;
       color: white;
       border: none;
       border-radius: 8px;
       font-size: 14px;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 8px rgba(0,0,0,.2);
       z-index: 9999;
     }
 
-    #install-button:hover {
-      background-color: #1d4ed8;
-    }
   </style>
+
   <script type="module" crossorigin src="/APP-presupuesto-V3/assets/index-D5nbUg_d.js"></script>
 <link rel="manifest" href="/APP-presupuesto-V3/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/APP-presupuesto-V3/registerSW.js"></script></head>
 
 <body>
 
-  <!-- ROOT REACT -->
-  <div id="root"></div>
+<div id="root"></div>
 
-  <!-- BOTÓN INSTALAR -->
-  <button id="install-button">Instalar Aplicación</button>
+<button id="install-button">Instalar Aplicación</button>
 
-  <!-- SCRIPT PRINCIPAL VITE -->
+<!-- VITE APP -->
 
-  <!-- CONTROL INSTALACIÓN + SERVICE WORKER -->
-  <script>
+<script>
 
-    let deferredPrompt = null;
-    const installButton = document.getElementById("install-button");
+let deferredPrompt
+const installButton = document.getElementById("install-button")
 
-    /* =========================
-       INSTALACIÓN PWA
-    ========================= */
+/* INSTALAR APP */
 
-    window.addEventListener("beforeinstallprompt", (e) => {
+window.addEventListener("beforeinstallprompt", (e)=>{
 
-      e.preventDefault();
+  e.preventDefault()
 
-      deferredPrompt = e;
+  deferredPrompt = e
 
-      if (installButton) {
-        installButton.style.display = "block";
-      }
+  installButton.style.display = "block"
 
-    });
+})
 
-    if (installButton) {
+installButton?.addEventListener("click", async ()=>{
 
-      installButton.addEventListener("click", async () => {
+  if(!deferredPrompt) return
 
-        if (!deferredPrompt) return;
+  deferredPrompt.prompt()
 
-        deferredPrompt.prompt();
+  await deferredPrompt.userChoice
 
-        await deferredPrompt.userChoice;
+  deferredPrompt = null
 
-        deferredPrompt = null;
+  installButton.style.display = "none"
 
-        installButton.style.display = "none";
+})
 
-      });
+window.addEventListener("appinstalled", ()=>{
 
-    }
+  installButton.style.display = "none"
 
-    window.addEventListener("appinstalled", () => {
+})
 
-      if (installButton) {
-        installButton.style.display = "none";
-      }
+/* SERVICE WORKER */
 
-    });
+if("serviceWorker" in navigator){
 
-    /* =========================
-       SERVICE WORKER
-    ========================= */
+window.addEventListener("load", ()=>{
 
-    if ("serviceWorker" in navigator) {
+navigator.serviceWorker
+.register("/APP-presupuesto-V3/service-worker.js")
+.then(reg=>{
 
-      window.addEventListener("load", () => {
+console.log("SW registrado")
 
-        navigator.serviceWorker
-          .register("/APP-presupuesto-V3/service-worker.js")
+})
+.catch(err=>console.log("SW error",err))
 
-          .then((registration) => {
+})
 
-            console.log("Service Worker registrado correctamente");
+}
 
-            if (registration.waiting) {
-              registration.waiting.postMessage({ type: "SKIP_WAITING" });
-            }
-
-            registration.onupdatefound = () => {
-
-              const newWorker = registration.installing;
-
-              if (!newWorker) return;
-
-              newWorker.onstatechange = () => {
-
-                if (newWorker.state === "installed") {
-
-                  if (navigator.serviceWorker.controller) {
-
-                    console.log("Nueva versión detectada");
-
-                    newWorker.postMessage({ type: "SKIP_WAITING" });
-
-                  }
-
-                }
-
-              };
-
-            };
-
-          })
-
-          .catch(error => {
-
-            console.error("Error registrando Service Worker:", error);
-
-          });
-
-      });
-
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-
-        console.log("Nueva versión activada");
-
-        window.location.reload();
-
-      });
-
-    }
-
-  </script>
+</script>
 
 </body>
-
 </html>

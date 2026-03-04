@@ -4,24 +4,24 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
-export default defineConfig(({base: "/APP-presupuesto-V3/",
+export default defineConfig(({ mode }) => ({
+
+  base: "/APP-presupuesto-V3/",
 
   plugins: [
+
     react(),
+
     mode === "development" && componentTagger(),
 
-    // --- PWA CONFIG ---
     VitePWA({
       registerType: "autoUpdate",
 
-      // Service Worker
       workbox: {
         skipWaiting: true,
         clientsClaim: true,
-        maximumFileSizeToCacheInBytes: 20 * 1024 * 1024, // 20 MB
       },
 
-      // Manifest
       manifest: {
         name: "Presupuesto V3",
         short_name: "Presupuesto",
@@ -29,6 +29,7 @@ export default defineConfig(({base: "/APP-presupuesto-V3/",
         display: "standalone",
         background_color: "#ffffff",
         theme_color: "#1f3d63",
+
         icons: [
           {
             src: "/APP-presupuesto-V3/icon-192.png",
@@ -39,20 +40,22 @@ export default defineConfig(({base: "/APP-presupuesto-V3/",
             src: "/APP-presupuesto-V3/icon-512.png",
             sizes: "512x512",
             type: "image/png",
-          },
-        ],
-      },
-    }),
+          }
+        ]
+      }
+    })
+
   ].filter(Boolean),
 
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
+      "@": path.resolve(__dirname, "./src")
+    }
   },
 
   build: {
     outDir: "docs",
-    emptyOutDir: true,
-  },
+    emptyOutDir: true
+  }
+
 }));
