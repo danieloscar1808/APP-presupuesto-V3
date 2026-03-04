@@ -1,20 +1,21 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 
   <title>Presupuestos Pro</title>
 
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#1f3d63" />
 
-  <!-- MANIFEST CORRECTO PARA BASE /APP-presupuesto-V3/ -->
+  <!-- MANIFEST -->
   <link rel="manifest" href="./manifest.json" />
 
-  <!-- ESTILOS SPLASH Y BOTÓN -->
+  <!-- BOTÓN INSTALAR -->
   <style>
-  
-    /* BOTÓN INSTALAR */
     #install-button {
       display: none;
       position: fixed;
@@ -27,7 +28,7 @@
       border-radius: 8px;
       font-size: 14px;
       cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       z-index: 9999;
     }
 
@@ -39,7 +40,7 @@
 
 <body>
 
-   <!-- REACT ROOT -->
+  <!-- ROOT REACT -->
   <div id="root"></div>
 
   <!-- BOTÓN INSTALAR -->
@@ -48,82 +49,119 @@
   <!-- SCRIPT PRINCIPAL VITE -->
   <script type="module" src="/src/main.tsx"></script>
 
-  <!-- CONTROL SPLASH + INSTALACIÓN + ACTUALIZACIÓN -->
+  <!-- CONTROL INSTALACIÓN + SERVICE WORKER -->
   <script>
+
     let deferredPrompt = null;
-    const installButton = document.getElementById('install-button');
+    const installButton = document.getElementById("install-button");
 
     /* =========================
        INSTALACIÓN PWA
     ========================= */
-    window.addEventListener('beforeinstallprompt', (e) => {
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+
       e.preventDefault();
+
       deferredPrompt = e;
 
       if (installButton) {
-        installButton.style.display = 'block';
+        installButton.style.display = "block";
       }
+
     });
 
     if (installButton) {
-      installButton.addEventListener('click', async () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          await deferredPrompt.userChoice;
-          deferredPrompt = null;
-          installButton.style.display = 'none';
-        }
+
+      installButton.addEventListener("click", async () => {
+
+        if (!deferredPrompt) return;
+
+        deferredPrompt.prompt();
+
+        await deferredPrompt.userChoice;
+
+        deferredPrompt = null;
+
+        installButton.style.display = "none";
+
       });
+
     }
 
-    window.addEventListener('appinstalled', () => {
+    window.addEventListener("appinstalled", () => {
+
       if (installButton) {
-        installButton.style.display = 'none';
+        installButton.style.display = "none";
       }
+
     });
 
     /* =========================
-       SERVICE WORKER + ACTUALIZACIÓN AUTOMÁTICA
+       SERVICE WORKER
     ========================= */
-    if ("serviceWorker" in navigator && import.meta.env.PROD) {
-  navigator.serviceWorker.register("/APP-presupuesto-V3/service-worker.js");
-    }
-        .then((registration) => {
 
-          console.log("Service Worker registrado correctamente");
+    if ("serviceWorker" in navigator) {
 
-          if (registration.waiting) {
-            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-          }
+      window.addEventListener("load", () => {
 
-          registration.onupdatefound = () => {
+        navigator.serviceWorker
+          .register("/APP-presupuesto-V3/service-worker.js")
 
-            const newWorker = registration.installing;
+          .then((registration) => {
 
-            if (!newWorker) return;
+            console.log("Service Worker registrado correctamente");
 
-            newWorker.onstatechange = () => {
+            if (registration.waiting) {
+              registration.waiting.postMessage({ type: "SKIP_WAITING" });
+            }
 
-              if (newWorker.state === 'installed') {
+            registration.onupdatefound = () => {
 
-                if (navigator.serviceWorker.controller) {
-                  console.log("Nueva versión detectada");
-                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+              const newWorker = registration.installing;
+
+              if (!newWorker) return;
+
+              newWorker.onstatechange = () => {
+
+                if (newWorker.state === "installed") {
+
+                  if (navigator.serviceWorker.controller) {
+
+                    console.log("Nueva versión detectada");
+
+                    newWorker.postMessage({ type: "SKIP_WAITING" });
+
+                  }
+
                 }
-              }
-            };
-          };
-        })
-        .catch(error => {
-          console.error("Error registrando SW:", error);
-        });
 
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log("Nueva versión activada");
-        window.location.reload();
+              };
+
+            };
+
+          })
+
+          .catch(error => {
+
+            console.error("Error registrando Service Worker:", error);
+
+          });
+
       });
+
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+
+        console.log("Nueva versión activada");
+
+        window.location.reload();
+
+      });
+
     }
+
   </script>
 
 </body>
+
 </html>
