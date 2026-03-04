@@ -16,6 +16,18 @@ import { ItemsEditor } from "@/components/ItemsEditor";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
 
+const CAPACITIES = ["2300","2600","3000","3500","4000","4500","6000"];
+const TECHNOLOGIES = ["Inverter","On/Off"];
+const STATUS_OPTIONS = [
+  "Instalación Nueva",
+  "Desinstalación",
+  "Reinstalación",
+  "Desinstalación/Reinstalación",
+];
+
+const SOLAR_TYPES = ["On Grid","Off Grid","Híbrido"];
+const PANEL_TYPES = ["Policristalino","Monocristalino"];
+
 const NewBudgetPage = () => {
   const navigate = useNavigate();
 
