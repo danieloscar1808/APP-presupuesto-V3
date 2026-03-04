@@ -4,133 +4,191 @@ import { useNavigate } from "react-router-dom";
 import { PageLayout } from "@/components/PageLayout";
 import { Client, Budget, BudgetCategory } from "@/types";
 
-import { getClients, saveBudget, getProfile } from "@/lib/storage";
+import { getClients, saveBudget } from "@/lib/storage";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { ItemsEditor } from "@/components/ItemsEditor";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
 
+/* -------------------------------- */
+/* LISTAS                           */
+/* -------------------------------- */
+
 const CAPACITIES = ["2300","2600","3000","3500","4000","4500","6000"];
+
 const TECHNOLOGIES = ["Inverter","On/Off"];
+
 const STATUS_OPTIONS = [
   "Instalación Nueva",
   "Desinstalación",
   "Reinstalación",
-  "Desinstalación/Reinstalación",
+  "Desinstalación/Reinstalación"
 ];
 
 const SOLAR_TYPES = ["On Grid","Off Grid","Híbrido"];
+
 const PANEL_TYPES = ["Policristalino","Monocristalino"];
 
+
+/* -------------------------------- */
+/* GENERADOR DE NÚMERO              */
+/* -------------------------------- */
+
+const generarNumeroPresupuesto = () => {
+
+  const ahora = new Date();
+
+  const year = ahora.getFullYear();
+  const month = String(ahora.getMonth() + 1).padStart(2,"0");
+
+  const key = `${year}${month}`;
+
+  const ultimo = Number(localStorage.getItem(`presupuesto_${key}`) || 0);
+
+  const nuevo = ultimo + 1;
+
+  localStorage.setItem(`presupuesto_${key}`,String(nuevo));
+
+  return `${key}-${String(nuevo).padStart(3,"0")}`;
+
+};
+
+
+/* -------------------------------- */
+/* COMPONENTE                       */
+/* -------------------------------- */
+
 const NewBudgetPage = () => {
+
   const navigate = useNavigate();
 
-  // ------------------------------
-  // Estados principales
-  // ------------------------------
-  const [clients, setClients] = useState<Client[]>([]);
-  const [clientId, setClientId] = useState("");
-  const [clientName, setClientName] = useState("");
+  const [clients,setClients] = useState<Client[]>([]);
+  const [clientId,setClientId] = useState("");
+  const [clientName,setClientName] = useState("");
 
-  const [category, setCategory] = useState<BudgetCategory>("ac");
+  const [category,setCategory] = useState<BudgetCategory>("ac");
 
-  const [items, setItems] = useState([]);
-  const [laborCost, setLaborCost] = useState(0);
-  const [taxRate, setTaxRate] = useState(0);
-  const [discount, setDiscount] = useState(0);
-  const [notes, setNotes] = useState("");
+  const [items,setItems] = useState<any[]>([]);
+  const [laborCost,setLaborCost] = useState(0);
+  const [taxRate,setTaxRate] = useState(0);
+  const [discount,setDiscount] = useState(0);
+  const [notes,setNotes] = useState("");
 
-  const [validityDays, setValidityDays] = useState(7);
-  const [warranty, setWarranty] = useState("6 meses");
-  const [paymentTerms, setPaymentTerms] = useState("Efectivo / Transferencia");
+  const [validityDays,setValidityDays] = useState(7);
+  const [warranty,setWarranty] = useState("6 meses");
+  const [paymentTerms,setPaymentTerms] = useState("Efectivo / Transferencia");
 
-  // ------------------------------
-  // Campos "AC"
-  // ------------------------------
-  const [acCapacity, setAcCapacity] = useState("");
-  const [acTechnology, setAcTechnology] = useState("");
-  const [acStatus, setAcStatus] = useState("");
+  /* AC */
 
-  // ------------------------------
-  // Campos "Electric"
-  // ------------------------------
-  const [electricWorkDescription, setElectricWorkDescription] = useState("");
+  const [acCapacity,setAcCapacity] = useState("");
+  const [acTechnology,setAcTechnology] = useState("");
+  const [acStatus,setAcStatus] = useState("");
 
-  // ------------------------------
-  // Campos "Solar"
-  // ------------------------------
-  const [solarType, setSolarType] = useState("");
-  const [solarPanelType, setSolarPanelType] = useState("");
-  const [solarPanelPower, setSolarPanelPower] = useState("");
-  const [solarQty, setSolarQty] = useState<number>(0);
+  /* ELECTRIC */
 
-  // ------------------------------
-  // Cargar clientes
-  // ------------------------------
-  useEffect(() => {
+  const [electricWorkDescription,setElectricWorkDescription] = useState("");
+
+  /* SOLAR */
+
+  const [solarType,setSolarType] = useState("");
+  const [solarPanelType,setSolarPanelType] = useState("");
+  const [solarPanelPower,setSolarPanelPower] = useState("");
+  const [solarQty,setSolarQty] = useState<number>(0);
+
+
+  /* CARGAR CLIENTES */
+
+  useEffect(()=>{
+
     getClients().then(setClients);
-  }, []);
 
-  // ------------------------------
-  // Selección automática de nombre
-  // ------------------------------
-  useEffect(() => {
-    if (clientId) {
-      const cli = clients.find((c) => c.id === clientId);
+  },[]);
+
+
+  /* AUTO NOMBRE CLIENTE */
+
+  useEffect(()=>{
+
+    if(clientId){
+
+      const cli = clients.find(c=>c.id === clientId);
       setClientName(cli ? cli.name : "");
-    }
-  }, [clientId, clients]);
 
-  // ------------------------------
-  // Guardar presupuesto
-  // ------------------------------
+    }
+
+  },[clientId,clients]);
+
+
+  /* GUARDAR */
+
   const handleSubmit = async () => {
-    if (!clientId) {
-      toast.error("Debe seleccionar un cliente.");
+
+    if(!clientId){
+
+      toast.error("Debe seleccionar un cliente");
       return;
+
     }
 
-    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+    const numeroPresupuesto = generarNumeroPresupuesto();
+
+    const subtotal = items.reduce((sum,item)=> sum + item.total,0);
     const taxAmount = (subtotal + laborCost) * (taxRate / 100);
     const total = subtotal + laborCost + taxAmount - discount;
 
     const budget: Budget = {
+
       id: uuid(),
-      number: "",
+      number: numeroPresupuesto,
+
       clientId,
       clientName,
       category,
+
       items,
+
       laborCost,
       subtotal,
       taxRate,
       taxAmount,
       discount,
       total,
+
       notes,
       validityDays,
       warranty,
       paymentTerms,
-      status: "draft",
-      createdAt: new Date().toISOString(),
 
-      // AC
+      status:"draft",
+
+      createdAt:new Date().toISOString(),
+
       acEquipment:
         category === "ac"
-          ? { capacity: acCapacity, technology: acTechnology, status: acStatus }
+          ? {
+              capacity: acCapacity,
+              technology: acTechnology,
+              status: acStatus
+            }
           : undefined,
 
-      // Electric
       electricWorkDescription:
-        category === "electric" ? electricWorkDescription : "",
+        category === "electric"
+          ? electricWorkDescription
+          : "",
 
-      // Solar
       solarSystem:
         category === "solar"
           ? {
@@ -138,225 +196,239 @@ const NewBudgetPage = () => {
               panelType: solarPanelType,
               panelPower: solarPanelPower,
               quantity: solarQty,
-              totalPower: Number(solarPanelPower) * Number(solarQty),
+              totalPower: Number(solarPanelPower) * Number(solarQty)
             }
-          : undefined,
+          : undefined
+
     };
 
     await saveBudget(budget);
+
     toast.success("Presupuesto creado correctamente");
+
     navigate("/budgets");
+
   };
 
+
   return (
+
     <PageLayout title="Nuevo Presupuesto">
+
       <div className="space-y-6">
+
         {/* CLIENTE */}
+
         <div className="card-elevated p-4 space-y-3">
+
           <Label>Cliente</Label>
+
           <Select value={clientId} onValueChange={setClientId}>
+
             <SelectTrigger>
-              <SelectValue placeholder="Seleccionar cliente" />
+              <SelectValue placeholder="Seleccionar cliente"/>
             </SelectTrigger>
+
             <SelectContent>
-              {clients.map((c) => (
+
+              {clients.map(c=>(
                 <SelectItem key={c.id} value={c.id}>
                   {c.name}
                 </SelectItem>
               ))}
+
             </SelectContent>
+
           </Select>
+
         </div>
 
-        {/* CATEGORÍA */}
+
+        {/* CATEGORIA */}
+
         <div className="card-elevated p-4 space-y-3">
-          <Label>Tipo de Instalación</Label>
+
+          <Label>Tipo de instalación</Label>
+
           <Select value={category} onValueChange={setCategory}>
+
             <SelectTrigger>
-              <SelectValue />
+              <SelectValue/>
             </SelectTrigger>
+
             <SelectContent>
-              <SelectItem value="ac">Aire Acondicionado</SelectItem>
-              <SelectItem value="electric">Instalación Eléctrica</SelectItem>
-              <SelectItem value="solar">Sistema Fotovoltaico</SelectItem>
+
+              <SelectItem value="ac">Aire acondicionado</SelectItem>
+              <SelectItem value="electric">Instalación eléctrica</SelectItem>
+              <SelectItem value="solar">Sistema fotovoltaico</SelectItem>
+
             </SelectContent>
+
           </Select>
+
         </div>
 
-        {/* CAMPOS DINÁMICOS SEGÚN CATEGORÍA */}
 
         {/* AC */}
+
         {category === "ac" && (
-          <div className="card-elevated p-4 space-y-3">
-            <Label>Datos del Equipo</Label>
 
-            {category === "ac" && (
-  <div className="card-elevated p-4 space-y-4">
-    <Label>Datos del Equipo</Label>
+          <div className="card-elevated p-4 space-y-4">
 
-    {/* CAPACIDAD */}
-    <div className="space-y-2">
-  <Label>Capacidad (frigorías)</Label>
+            <Label>Datos del equipo</Label>
 
-  <Input
-    list="capacities"
-    placeholder="Seleccione o escriba"
-    value={acCapacity}
-    onChange={(e) => setAcCapacity(e.target.value)}
-  />
+            <Select value={acCapacity} onValueChange={setAcCapacity}>
+              <SelectTrigger>
+                <SelectValue placeholder="Capacidad"/>
+              </SelectTrigger>
+              <SelectContent>
+                {CAPACITIES.map(c=>(
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-  <datalist id="capacities">
-    {CAPACITIES.map((c) => (
-      <option key={c} value={c} />
-    ))}
-  </datalist>
-</div>
+            <Select value={acTechnology} onValueChange={setAcTechnology}>
+              <SelectTrigger>
+                <SelectValue placeholder="Tecnología"/>
+              </SelectTrigger>
+              <SelectContent>
+                {TECHNOLOGIES.map(t=>(
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-    {/* TECNOLOGÍA */}
-    <div className="space-y-2">
-  <Label>Tecnología</Label>
+            <Select value={acStatus} onValueChange={setAcStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Estado"/>
+              </SelectTrigger>
+              <SelectContent>
+                {STATUS_OPTIONS.map(s=>(
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-  <Input
-    list="technologies"
-    value={acTechnology}
-    onChange={(e) => setAcTechnology(e.target.value)}
-  />
-
-  <datalist id="technologies">
-    {TECHNOLOGIES.map((t) => (
-      <option key={t} value={t} />
-    ))}
-  </datalist>
-</div>
-
-    {/* ESTADO */}
-    <div className="space-y-2">
-  <Label>Estado del equipo</Label>
-
-  <Input
-    list="status"
-    value={acStatus}
-    onChange={(e) => setAcStatus(e.target.value)}
-  />
-
-  <datalist id="status">
-    {STATUS_OPTIONS.map((s) => (
-      <option key={s} value={s} />
-    ))}
-  </datalist>
-</div>
-
-)}
           </div>
+
         )}
 
+
         {/* ELECTRIC */}
+
         {category === "electric" && (
+
           <div className="card-elevated p-4 space-y-3">
-            <Label>Descripción del trabajo eléctrico</Label>
+
+            <Label>Descripción del trabajo</Label>
 
             <Textarea
               value={electricWorkDescription}
-              onChange={(e) => setElectricWorkDescription(e.target.value)}
-              placeholder="Ejemplo: recableado, circuito independiente, colocación de llaves térmicas, tableros, puesta a tierra, canalizaciones..."
-              className="min-h-[100px]"
+              onChange={(e)=>setElectricWorkDescription(e.target.value)}
+              className="min-h-[120px]"
             />
 
-            <p className="text-xs text-muted-foreground">
-              Esto aparecerá en el PDF del presupuesto.
-            </p>
           </div>
+
         )}
 
+
         {/* SOLAR */}
+
         {category === "solar" && (
+
           <div className="card-elevated p-4 space-y-3">
-            <Label>Datos del Sistema Solar</Label>
+
+            <Label>Datos del sistema</Label>
+
+            <Select value={solarType} onValueChange={setSolarType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Tipo de sistema"/>
+              </SelectTrigger>
+              <SelectContent>
+                {SOLAR_TYPES.map(t=>(
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={solarPanelType} onValueChange={setSolarPanelType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Tipo de panel"/>
+              </SelectTrigger>
+              <SelectContent>
+                {PANEL_TYPES.map(p=>(
+                  <SelectItem key={p} value={p}>{p}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <Input
-              placeholder="Tipo de sistema (On Grid / Off Grid / Híbrido)"
-              value={solarType}
-              onChange={(e) => setSolarType(e.target.value)}
-            />
-
-            <Input
-              placeholder="Tipo de panel"
-              value={solarPanelType}
-              onChange={(e) => setSolarPanelType(e.target.value)}
-            />
-
-            <Input
-              placeholder="Potencia del panel (W)"
+              placeholder="Potencia panel (W)"
               value={solarPanelPower}
-              onChange={(e) => setSolarPanelPower(e.target.value)}
+              onChange={(e)=>setSolarPanelPower(e.target.value)}
             />
 
             <Input
               type="number"
-              placeholder="Cantidad de paneles"
+              placeholder="Cantidad paneles"
               value={solarQty}
-              onChange={(e) => setSolarQty(Number(e.target.value))}
+              onChange={(e)=>setSolarQty(Number(e.target.value))}
             />
+
           </div>
+
         )}
 
-        {/* ITEMS DEL PRESUPUESTO */}
+
+        {/* ITEMS */}
+
         <ItemsEditor
           items={items}
           category={category}
           onChange={setItems}
         />
 
-        {/* COSTOS Y DETALLES */}
-        <div className="card-elevated p-4 space-y-3">
-          <Label>Mano de Obra</Label>
-          <Input
-            type="number"
-            value={laborCost}
-            onChange={(e) => setLaborCost(Number(e.target.value))}
-          />
 
-          <Label>IVA (%)</Label>
-          <Input
-            type="number"
-            value={taxRate}
-            onChange={(e) => setTaxRate(Number(e.target.value))}
-          />
+        {/* COSTOS */}
+
+        <div className="card-elevated p-4 space-y-3">
+
+          <Label>Mano de obra</Label>
+          <Input type="number" value={laborCost} onChange={(e)=>setLaborCost(Number(e.target.value))}/>
+
+          <Label>IVA %</Label>
+          <Input type="number" value={taxRate} onChange={(e)=>setTaxRate(Number(e.target.value))}/>
 
           <Label>Descuento</Label>
-          <Input
-            type="number"
-            value={discount}
-            onChange={(e) => setDiscount(Number(e.target.value))}
-          />
+          <Input type="number" value={discount} onChange={(e)=>setDiscount(Number(e.target.value))}/>
 
           <Label>Notas</Label>
-          <Textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Comentarios adicionales..."
-          />
+          <Textarea value={notes} onChange={(e)=>setNotes(e.target.value)}/>
 
-          <Label>Validez (días)</Label>
-          <Input
-            type="number"
-            value={validityDays}
-            onChange={(e) => setValidityDays(Number(e.target.value))}
-          />
+          <Label>Validez</Label>
+          <Input type="number" value={validityDays} onChange={(e)=>setValidityDays(Number(e.target.value))}/>
 
           <Label>Garantía</Label>
-          <Input value={warranty} onChange={(e) => setWarranty(e.target.value)} />
+          <Input value={warranty} onChange={(e)=>setWarranty(e.target.value)}/>
 
           <Label>Forma de pago</Label>
-          <Input value={paymentTerms} onChange={(e) => setPaymentTerms(e.target.value)} />
+          <Input value={paymentTerms} onChange={(e)=>setPaymentTerms(e.target.value)}/>
+
         </div>
+
 
         <Button className="btn-accent w-full" onClick={handleSubmit}>
           Guardar Presupuesto
         </Button>
+
       </div>
+
     </PageLayout>
+
   );
+
 };
 
 export default NewBudgetPage;
