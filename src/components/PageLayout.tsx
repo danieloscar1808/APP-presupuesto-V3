@@ -12,7 +12,7 @@ export const PageLayout = ({ children, title, headerContent }: PageLayoutProps) 
   return (
     <div className="min-h-screen bg-background pb-20">
       {(title || headerContent) && (
-        <header className="header-gradient text-primary-foreground px-4 pt-4 pb-6 safe-top">
+        <header className="header-gradient text-primary-foreground px-4 pt-4 pb-6 safe-top sticky top-0 z-40">
           <div className="max-w-lg mx-auto">
             {title && <h1 className="text-xl font-semibold">{title}</h1>}
             {headerContent}
