@@ -8,11 +8,7 @@ export default {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx,js,jsx,css}"],
   prefix: "",
-  safelist: [
-  { 
-  pattern: /./, // Esto le impide purgar variables globales
-  },
-   ],
+ 
   theme: {
     container: {
       center: true,

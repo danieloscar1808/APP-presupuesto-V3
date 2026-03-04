@@ -15,12 +15,11 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
 
     VitePWA({
-      registerType: "autoUpdate",
+  registerType: "autoUpdate",
 
-      workbox: {
-        skipWaiting: true,
-        clientsClaim: true,
-      },
+  workbox: {
+    maximumFileSizeToCacheInBytes: 20 * 1024 * 1024
+  },
 
       manifest: {
         name: "Presupuesto V3",
