@@ -69,40 +69,12 @@ const Index = () => {
 
   return (
     <PageLayout
-      headerContent={
-        <div className="space-y-4">
-          <div>
-            <h1 className="font-semibold text-primary-foreground text-2xl text-center">
-              {profile.businessName || profile.name}
-            </h1>
-          </div>
-
-          {/* Quick stats */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
-              <Users className="w-5 h-5 mx-auto mb-1 text-primary-foreground/80" />
-              <p className="text-lg font-semibold text-primary-foreground">{stats.clients}</p>
-              <p className="text-xs text-primary-foreground/70">Clientes</p>
-            </div>
-
-            <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
-              <FileText className="w-5 h-5 mx-auto mb-1 text-primary-foreground/80" />
-              <p className="text-lg font-semibold text-primary-foreground">{stats.budgets}</p>
-              <p className="text-xs text-primary-foreground/70">Presupuestos</p>
-            </div>
-
-            <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
-              <TrendingUp className="w-5 h-5 mx-auto mb-1 text-primary-foreground/80" />
-              <p className="text-lg font-semibold text-primary-foreground">
-                ${(stats.total / 1000).toFixed(0)}K
-              </p>
-              <p className="text-xs text-primary-foreground/70">Total</p>
-            </div>
-          </div>
-        </div>
+  headerContent={
+    <h1 className="font-semibold text-primary-foreground text-2xl text-center">
+      {profile.businessName || profile.name}
+    </h1>
       }
     >
-
       {/* Botón nuevo presupuesto */}
       <Button onClick={() => navigate('/budgets/new')} className="w-full btn-accent h-14 text-base mb-6">
         <Plus className="w-5 h-5 mr-2" />
