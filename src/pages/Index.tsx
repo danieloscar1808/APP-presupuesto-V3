@@ -70,7 +70,7 @@ const Index = () => {
   return (
     <PageLayout
   headerContent={
-    <h1 className="font-semibold text-primary-foreground text-2xl text-center">
+    <h1 className="text-xl font-semibold text-primary-foreground text-center">
       {profile.businessName || profile.name}
     </h1>
       }
