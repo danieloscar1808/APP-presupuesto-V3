@@ -13,10 +13,18 @@ export const PageLayout = ({ children, title, headerContent }: PageLayoutProps) 
     <div className="min-h-screen bg-background pb-20">
       {(title || headerContent) && (
         <header className="header-gradient text-primary-foreground px-4 pt-4 pb-6 safe-top fixed top-0 left-0 right-0 z-40">
-          <div className="max-w-lg mx-auto">
-            {title && <h1 className="text-xl font-semibold">{title}</h1>}
-            {headerContent}
+          <div className="max-w-lg mx-auto flex items-center justify-between gap-3">
+          {title && (
+            <h1 className="text-xl font-semibold truncate">
+          {title}
+          </h1>
+        )}
+          {headerContent && (
+          <div className="flex-shrink-0">
+          {headerContent}
           </div>
+        )}
+        </div>
         </header>
       )}
       <main className="px-4 py-4 max-w-lg mx-auto animate-fade-in mt-24">
