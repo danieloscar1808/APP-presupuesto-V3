@@ -68,13 +68,8 @@ const Index = () => {
   }
 
   return (
-    <PageLayout
-  headerContent={
-    <h1 className="text-xl font-semibold text-primary-foreground text-center">
-      {profile.businessName || profile.name}
-    </h1>
-      }
-    >
+    <PageLayout title="Inicio">
+    
       {/* Botón nuevo presupuesto */}
       <Button onClick={() => navigate('/budgets/new')} className="w-full btn-accent h-14 text-base mb-6">
         <Plus className="w-5 h-5 mr-2" />
