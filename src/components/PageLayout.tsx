@@ -10,7 +10,7 @@ interface PageLayoutProps {
 
 export const PageLayout = ({ children, title, headerContent }: PageLayoutProps) => {
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pt-24 pb-20">
       {(title || headerContent) && (
         <header className="header-gradient text-primary-foreground px-4 pt-4 pb-6 safe-top fixed top-0 left-0 right-0 z-40">
           <div className="max-w-lg mx-auto flex items-center justify-between gap-3">
@@ -27,7 +27,7 @@ export const PageLayout = ({ children, title, headerContent }: PageLayoutProps) 
         </div>
         </header>
       )}
-      <main className="px-4 py-4 max-w-lg mx-auto animate-fade-in mt-24">
+      <main className="px-4 py-4 mt-28 max-w-lg mx-auto animate-fade-in">
         {children}
       </main>
       <BottomNavigation />
