@@ -63,8 +63,14 @@ const CatalogPage = () => {
   }, []);
 
   const loadItems = async () => {
+
     const data = await getCatalogItems();
-    setItems(data);
+
+    const sorted = data.sort((a, b) =>
+    a.name.localeCompare(b.name, "es", { sensitivity: "base" })
+    );
+
+    setItems(sorted);
   };
 
   // ---------------------------------------------------------
