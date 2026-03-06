@@ -10,7 +10,7 @@ interface PageLayoutProps {
 
 export const PageLayout = ({ children, title, headerContent }: PageLayoutProps) => {
   return (
-    <div className="min-h-screen bg-background pt-16 pb-20">
+    <div className="min-h-screen bg-background pt-14 pb-20">
       {(title || headerContent) && (
         <header className="header-gradient text-primary-foreground px-4 pt-4 pb-3 safe-top fixed top-0 left-0 right-0 z-40">
 

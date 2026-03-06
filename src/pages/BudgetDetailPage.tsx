@@ -106,13 +106,13 @@ const BudgetDetailPage = () => {
   return (
     <PageLayout>
       {/* HEADER */}
-      <div className="sticky top-0 z-50 flex items-center gap-3 mb-4 bg-background py-2">
+      <div className="sticky top-0 z-50 flex items-center gap-3 bg-background py-3 px-2">
         <Button variant="ghost" size="icon" onClick={() => navigate("/budgets")}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
 
         <div className="flex-1">
-          <h1 className="font-bold text-lg text-foreground">Presupuesto #{budget.number}</h1>
+        <h1 className="font-bold text-lg text-foreground whitespace-nowrap">Presupuesto #{budget.number}</h1>
         </div>
 
         <Button
