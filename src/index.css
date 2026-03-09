@@ -5,7 +5,7 @@
 @layer base {
   :root {
     /* Fondo principal - anaranjado */
-    --background: 30 70% 92%;
+    --background: 31 71% 92%;
     --foreground: 215 25% 15%;
 
     /* Cards - blanco puro con elevacion */
