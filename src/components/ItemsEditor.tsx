@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BudgetItem, BudgetCategory, CatalogItem } from '@/types';
-import { getCatalogItems } from '@/lib/storage';
+import { getCatalogItems, saveCatalogItem, getCatalogItemByName } from '@/lib/storage';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
@@ -14,6 +14,20 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+// ------------------------------------------------------
+// Función que ordena un catálogo alfabéticamente
+// ------------------------------------------------------
+function sortCatalog(items) {
+
+  // slice() crea una copia del array para no modificar el original
+  return items.slice().sort((a, b) =>
+
+    // localeCompare permite ordenar correctamente en español
+    a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+
+  );
+}
+
 interface ItemsEditorProps {
   items: BudgetItem[];
   onChange: (items: BudgetItem[]) => void;
@@ -23,19 +37,31 @@ interface ItemsEditorProps {
 export const ItemsEditor = ({ items, onChange, category }: ItemsEditorProps) => {
   const [newItem, setNewItem] = useState({ description: '', quantity: 1, unitPrice: 0 });
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([]);
+ 
+
 
   useEffect(() => {
-    const load = async () => {
-      const result = await getCatalogItems();   // await necesario
-      setCatalogItems(result);
-    };
-    load();
-  }, []);
 
-  // Filter catalog items by category or general
+  const load = async () => {
+
+    // obtiene los items guardados
+    const result = await getCatalogItems();
+
+    // ordena el catálogo
+    const sortedCatalog = sortCatalog(result);
+
+    // guarda el catálogo ordenado
+    setCatalogItems(sortedCatalog);
+
+  };
+
+  load();
+
+}, []);
+
   const availableCatalogItems = catalogItems.filter(
-    item => item.category === 'general' || item.category === category
-  );
+  item => item.category === 'general' || item.category === category
+);
 
   const handleCatalogSelect = (catalogItemName: string) => {
     const catalogItem = catalogItems.find(i => i.name === catalogItemName);
@@ -48,37 +74,57 @@ export const ItemsEditor = ({ items, onChange, category }: ItemsEditorProps) => 
     }
   };
 
-  const addItem = () => {
-    if (!newItem.description || newItem.unitPrice <= 0) return;
+  const addItem = async () => {
 
-    const item: BudgetItem = {
+  // evitar items vacíos
+  if (!newItem.description) return;
+
+  // ---------------------------------
+  // crear item del presupuesto
+  // ---------------------------------
+  const item: BudgetItem = {
+    id: uuid(),
+    description: newItem.description,
+    quantity: newItem.quantity,
+    unitPrice: newItem.unitPrice
+  };
+
+  // agregar al presupuesto
+  onChange([...items, item]);
+
+  // ---------------------------------
+  // guardar también en el catálogo
+  // ---------------------------------
+
+  const existing = await getCatalogItemByName(newItem.description);
+
+  if (!existing) {
+
+    const catalogItem: CatalogItem = {
       id: uuid(),
-      description: newItem.description,
-      quantity: newItem.quantity,
-      unitPrice: newItem.unitPrice,
-      total: newItem.quantity * newItem.unitPrice,
+      name: newItem.description,
+      price: newItem.unitPrice,
+      category: category || "general"
     };
 
-    onChange([...items, item]);
-    setNewItem({ description: '', quantity: 1, unitPrice: 0 });
-  };
+    await saveCatalogItem(catalogItem);
 
-  const removeItem = (id: string) => {
-    onChange(items.filter((i) => i.id !== id));
-  };
+    // recargar catálogo para que aparezca inmediatamente
+    const updatedCatalog = await getCatalogItems();
+    setCatalogItems(sortCatalog(updatedCatalog));
 
-  const updateItem = (id: string, field: keyof BudgetItem, value: string | number) => {
-    onChange(
-      items.map((item) => {
-        if (item.id !== id) return item;
-        const updated = { ...item, [field]: value };
-        updated.total = updated.quantity * updated.unitPrice;
-        return updated;
-      })
-    );
-  };
+  }
 
-  const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+  // limpiar el formulario
+  setNewItem({
+    description: "",
+    quantity: 1,
+    unitPrice: 0
+  });
+
+};
+
+  const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice,0);
 
   return (
     <div className="space-y-4">
@@ -130,7 +176,7 @@ export const ItemsEditor = ({ items, onChange, category }: ItemsEditorProps) => 
 
               <div className="w-28 text-right">
                 <p className="h-10 flex items-center justify-end font-medium text-foreground">
-                  ${item.total.toLocaleString('es-AR')}
+                  ${(item.quantity * item.unitPrice).toLocaleString('es-AR')}
                 </p>
                 <span className="text-xs text-muted-foreground">Total</span>
               </div>
@@ -149,7 +195,7 @@ export const ItemsEditor = ({ items, onChange, category }: ItemsEditorProps) => 
             <SelectContent>
               {availableCatalogItems.map((item) => (
                 <SelectItem key={item.id} value={item.name}>
-                  {item.name} - ${item.price.toLocaleString('es-AR')}
+                  {item.name} - ${(item.price || 0).toLocaleString('es-AR')}
                 </SelectItem>
               ))}
             </SelectContent>

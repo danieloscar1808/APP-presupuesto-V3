@@ -139,25 +139,42 @@ const CatalogPage = () => {
   // AGREGAR ÍTEM
   // ---------------------------------------------------------
   const handleAddItem = async () => {
-    if (!newItem.name.trim() || newItem.price <= 0) {
-      toast.error("Ingrese nombre y precio válido");
-      return;
-    }
 
-    const item: CatalogItem = {
+  if (!newItem.description) return;
+
+  // -----------------------------
+  // crear item del presupuesto
+  // -----------------------------
+  const item: BudgetItem = {
+    id: uuid(),
+    description: newItem.description,
+    quantity: newItem.quantity,
+    unitPrice: newItem.unitPrice
+  };
+
+  // agregar al presupuesto
+  onChange([...items, item]);
+
+  // -------------------------------------------------
+  // guardar también en el catálogo si no existe
+  // -------------------------------------------------
+
+  const existing = await getCatalogItemByName(newItem.description);
+
+  if (!existing) {
+
+    const catalogItem: CatalogItem = {
       id: uuid(),
-      name: newItem.name.trim(),
-      price: newItem.price,
-      category: newItem.category,
-      createdAt: new Date().toISOString(),
+      name: newItem.description,
+      price: newItem.unitPrice,
+      category: category || "general"
     };
 
-    await saveCatalogItem(item);
-    await loadItems();
+    await saveCatalogItem(catalogItem);
 
-    setNewItem({ name: "", price: 0, category: "general" });
-    toast.success("Ítem agregado");
-  };
+  }
+
+};
 
   // ---------------------------------------------------------
   // GUARDAR ÍTEM EDITADO

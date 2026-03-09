@@ -144,10 +144,9 @@ const NewBudgetPage = () => {
 
     const numeroPresupuesto = generarNumeroPresupuesto();
 
-    const subtotal = items.reduce((sum,item)=> sum + item.total,0);
+    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice,0);
     const taxAmount = (subtotal + laborCost) * (taxRate / 100);
-    const total = subtotal + laborCost + taxAmount - discount;
-
+    const total =Number(subtotal || 0) +Number(laborCost || 0) +Number(taxAmount || 0) -Number(discount || 0);
     const budget: Budget = {
 
       id: uuid(),

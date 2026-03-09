@@ -150,12 +150,16 @@ doc.text(
   }
 
   // TABLA DE ITEMS
-  const tableData = budget.items.map((i) => [
+  const tableData = budget.items.map((i) => {
+  const itemTotal = (Number(i.quantity) || 0) * (Number(i.unitPrice) || 0);
+
+  return [
     i.quantity,
     i.description,
-    `$${i.unitPrice.toLocaleString("es-AR")}`,
-    `$${i.total.toLocaleString("es-AR")}`,
-  ]);
+    `$${Number(i.unitPrice || 0).toLocaleString("es-AR")}`,
+    `$${itemTotal.toLocaleString("es-AR")}`,
+  ];
+});
 
   autoTable(doc, {
     startY: y,
@@ -181,31 +185,22 @@ doc.text(
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
 
-  doc.text(`Subtotal materiales: $${budget.subtotal.toLocaleString("es-AR")}`, 12, y);
-  y += 6;
+  doc.text(`Subtotal materiales: $${Number(budget.subtotal || 0).toLocaleString("es-AR")}`,12,y);y += 6;
 
-  doc.text(`Mano de Obra: $${budget.laborCost.toLocaleString("es-AR")}`, 12, y);
-  y += 6;
+  doc.text(`Mano de Obra: $${Number(budget.laborCost || 0).toLocaleString("es-AR")}`,12,y);y += 6;
 
   if (budget.taxRate > 0) {
-    doc.text(`IVA (${budget.taxRate}%): $${budget.taxAmount.toLocaleString("es-AR")}`, 12, y);
-    y += 6;
+    doc.text(`IVA (${budget.taxRate}%): $${Number(budget.taxAmount || 0).toLocaleString("es-AR")}`,12,y);y += 6;
   }
 
   if (budget.discount > 0) {
-    doc.text(`Descuento: -$${budget.discount.toLocaleString("es-AR")}`, 12, y);
-    y += 6;
+    doc.text(`Descuento: -$${Number(budget.discount || 0).toLocaleString("es-AR")}`,12,y);y += 6;
   }
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(13);
   y += 4;
-  doc.text(
-    `TOTAL: $${budget.total.toLocaleString("es-AR",{ minimumFractionDigits: 2 })}`,
-    12,
-    y
-  );
-  y += 15;
+  doc.text(`TOTAL: $${Number(budget.total || 0).toLocaleString("es-AR", { minimumFractionDigits: 2 })}`,12,y);y += 15;
 
   // CONDICIONES
   doc.setFont("helvetica", "bold");

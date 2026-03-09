@@ -201,7 +201,7 @@ const BudgetDetailPage = () => {
               </span>
 
               <span className="text-muted-foreground">
-                ${item.total.toLocaleString("es-AR")}
+                ${(item.quantity * item.unitPrice).toLocaleString("es-AR")}
               </span>
             </div>
           ))}
