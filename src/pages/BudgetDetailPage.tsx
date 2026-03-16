@@ -111,9 +111,16 @@ const openInvoiceApp = () => {
 
   if (!budget) return;
 
-  const url =
-  `https://danieloscar1808.github.io/APP-facturacion-V1/?presupuesto=${budget.id}`;
+  const openInvoiceApp = () => {
 
+  if (!budget) return;
+
+  const url =
+  `https://danieloscar1808.github.io/APP-facturacion-V1/` +
+  `?id=${budget.id}` +
+  `&cliente=${encodeURIComponent(budget.clientName)}` +
+  `&total=${budget.total}` +
+  `&categoria=${budget.category}`;
   window.open(url, "_blank");
 
 };
