@@ -103,6 +103,21 @@ const BudgetDetailPage = () => {
     rejected: "bg-destructive/10 text-destructive",
   };
 
+  // ----------------------------------------------------
+// ABRIR APP DE FACTURACIÓN
+// ----------------------------------------------------
+
+const openInvoiceApp = () => {
+
+  if (!budget) return;
+
+  const url =
+  `https://danieloscar1808.github.io/APP-facturacion-V1/?presupuesto=${budget.id}`;
+
+  window.open(url, "_blank");
+
+};
+
   return (
     <PageLayout>
       {/* HEADER */}
@@ -281,6 +296,18 @@ const BudgetDetailPage = () => {
           onStatusChange={loadData}
         />
       </div>
+
+      {/* FACTURAR */}
+      <div className="mt-4">
+      <Button
+      className="w-full btn-gradient"
+      onClick={openInvoiceApp}
+      >
+        Generar Factura
+      </Button>
+      </div>
+
+     
     </PageLayout>
   );
 };
