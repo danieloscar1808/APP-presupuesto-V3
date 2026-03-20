@@ -254,3 +254,38 @@
     display: none;
   }
 }
+
+@media print {
+
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html, body {
+    width: 210mm;
+    height: 297mm;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area, .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 210mm;
+    min-height: 297mm;
+    padding: 10mm;
+    box-sizing: border-box;
+  }
+
+}

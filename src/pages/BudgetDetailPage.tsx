@@ -134,6 +134,7 @@ const generarFactura = async () => {
       })
     });
 
+
     const data = await response.json();
 
     console.log("Factura generada:", data);
@@ -149,6 +150,105 @@ const generarFactura = async () => {
     console.error("Error al generar factura", error);
   }
   };
+
+  const imprimirFactura = () => {
+  const contenido = facturaRef.current;
+
+  if (!contenido) return;
+
+  const ventana = window.open("", "_blank");
+
+  ventana.document.write(`
+<html>
+  <head>
+    <title>Factura</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+      }
+
+      .factura {
+        width: 800px;
+        margin: 30px auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      .section {
+        margin-bottom: 20px;
+      }
+
+      .section h2 {
+        margin-bottom: 5px;
+        font-size: 16px;
+      }
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+
+      th {
+        background: #f0f0f0;
+      }
+
+      .total {
+        text-align: right;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+
+      .footer {
+        margin-top: 20px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="factura">
+      ${contenido.innerHTML}
+    </div>
+  </body>
+</html>
+  `);
+
+  ventana.document.close();
+  ventana.focus();
+  ventana.print();
+  ventana.close();
+};
+
 
   return (
     <PageLayout>
@@ -341,9 +441,21 @@ const generarFactura = async () => {
 
       {/* FACTURA */}
       {factura && profile && budget &&(
-      <div ref={facturaRef} className="mt-4">
+      <>
+      <div ref={facturaRef} className="mt-4 print-area">
       <FacturaView factura={factura} profile={profile} budget={budget}/>
       </div>
+
+      {/* BOTÓN PDF */}
+      <div className="mt-2">
+      <Button
+        className="w-full"
+        onClick={imprimirFactura}
+      >
+        Descargar / Imprimir PDF
+      </Button>
+      </div>
+      </>
       )}
            
     </PageLayout>
