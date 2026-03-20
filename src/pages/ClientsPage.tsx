@@ -45,6 +45,8 @@ const ClientsPage = () => {
     phone: "",
     email: "",
     address: "",
+    docType: "DNI",
+    docNumber: "",
   });
 
   // ---------------------------------------------------------
@@ -71,7 +73,7 @@ const ClientsPage = () => {
   // ---------------------------------------------------------
   const openNewDialog = () => {
     setEditingClient(null);
-    setFormData({ name: "", phone: "", email: "", address: "" });
+    setFormData({ name: "", phone: "", email: "", address: "",docType: "DNI",docNumber: "", });
     setIsDialogOpen(true);
   };
 
@@ -85,6 +87,8 @@ const ClientsPage = () => {
       phone: client.phone,
       email: client.email,
       address: client.address,
+      docType: client.docType || "DNI",
+      docNumber: client.docNumber || ""
     });
     setIsDialogOpen(true);
   };
@@ -106,6 +110,8 @@ const ClientsPage = () => {
       phone: formData.phone,
       email: formData.email,
       address: formData.address,
+      docType: formData.docType,
+      docNumber: formData.docNumber,
       createdAt:
         editingClient?.createdAt || new Date().toISOString(),
     };
@@ -275,6 +281,40 @@ const ClientsPage = () => {
                 }
               />
             </div>
+
+            <div>
+  <Label>Documento</Label>
+
+  <div className="flex gap-2">
+    
+    <select
+      value={formData.docType}
+      onChange={(e) =>
+        setFormData({ ...formData, docType: e.target.value })
+      }
+      className="border rounded px-2 py-1"
+    >
+      <option value="DNI">DNI</option>
+      <option value="CUIT">CUIT</option>
+    </select>
+
+    <Input
+      placeholder="Número"
+      value={formData.docNumber}
+      onChange={(e) => {
+        const value = e.target.value.replace(/\D/g, "");
+
+        if (
+          (formData.docType === "DNI" && value.length <= 8) ||
+          (formData.docType === "CUIT" && value.length <= 11)
+        ) {
+          setFormData({ ...formData, docNumber: value });
+        }
+      }}
+    />
+
+  </div>
+</div>
 
             <div className="flex gap-3">
               <Button

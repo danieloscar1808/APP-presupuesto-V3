@@ -14,6 +14,12 @@ import { ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
+import FacturaView from "@/components/FacturaView";
+
+import { useRef } from "react";
+
+
+
 const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -21,6 +27,9 @@ const BudgetDetailPage = () => {
   const [budget, setBudget] = useState<Budget | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [factura, setFactura] = useState(null);
+  const [clientAddress, setClientAddress] = useState("");
+  const facturaRef = useRef(null);
 
   // ----------------------------------------------------
   // LOAD DATA
@@ -86,6 +95,8 @@ const BudgetDetailPage = () => {
     );
   }
 
+      console.log("PROFILE:", profile);
+
   // ----------------------------------------------------
   // STATUS LABELS
   // ----------------------------------------------------
@@ -97,33 +108,47 @@ const BudgetDetailPage = () => {
   };
 
   const statusStyles: Record<Budget["status"], string> = {
-    draft: "bg-muted text-muted-foreground",
-    sent: "status-sent",
-    accepted: "status-accepted",
-    rejected: "bg-destructive/10 text-destructive",
-  };
+  draft: "bg-muted text-muted-foreground",
+  sent: "status-sent",
+  accepted: "status-accepted",
+  rejected: "bg-destructive/10 text-destructive",
+};
 
-  // ----------------------------------------------------
+// ----------------------------------------------------
 // ABRIR APP DE FACTURACIÓN
 // ----------------------------------------------------
 
-const openInvoiceApp = () => {
-
+const generarFactura = async () => {
   if (!budget) return;
 
-  const openInvoiceApp = () => {
+  try {
+    const response = await fetch("http://127.0.0.1:3000/api/factura", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        cliente: budget.clientName,
+        total: budget.total,
+        descripcion: "Trabajo de instalación"
+      })
+    });
 
-  if (!budget) return;
+    const data = await response.json();
 
-  const url =
-  `https://danieloscar1808.github.io/APP-facturacion-V1/` +
-  `?id=${budget.id}` +
-  `&cliente=${encodeURIComponent(budget.clientName)}` +
-  `&total=${budget.total}` +
-  `&categoria=${budget.category}`;
-  window.open(url, "_blank");
+    console.log("Factura generada:", data);
 
-};
+    setFactura(data);
+
+    // scroll automático
+    setTimeout(() => {
+    facturaRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+
+  } catch (error) {
+    console.error("Error al generar factura", error);
+  }
+  };
 
   return (
     <PageLayout>
@@ -308,13 +333,19 @@ const openInvoiceApp = () => {
       <div className="mt-4">
       <Button
       className="w-full btn-gradient"
-      onClick={openInvoiceApp}
+      onClick={generarFactura}
       >
         Generar Factura
       </Button>
       </div>
 
-     
+      {/* FACTURA */}
+      {factura && profile && budget &&(
+      <div ref={facturaRef} className="mt-4">
+      <FacturaView factura={factura} profile={profile} budget={budget}/>
+      </div>
+      )}
+           
     </PageLayout>
   );
 };

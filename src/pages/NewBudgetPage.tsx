@@ -77,6 +77,9 @@ const NewBudgetPage = () => {
   const [clients,setClients] = useState<Client[]>([]);
   const [clientId,setClientId] = useState("");
   const [clientName,setClientName] = useState("");
+  const [clientDocType, setClientDocType] = useState("");
+  const [clientDocNumber, setClientDocNumber] = useState("");
+  const [clientAddress, setClientAddress] = useState("");
 
   const [category,setCategory] = useState<BudgetCategory>("ac");
 
@@ -119,16 +122,16 @@ const NewBudgetPage = () => {
 
   /* AUTO NOMBRE CLIENTE */
 
-  useEffect(()=>{
+  useEffect(() => {
+  if (clientId) {
+    const cli = clients.find(c => c.id === clientId);
 
-    if(clientId){
-
-      const cli = clients.find(c=>c.id === clientId);
-      setClientName(cli ? cli.name : "");
-
-    }
-
-  },[clientId,clients]);
+    setClientName(cli ? cli.name : "");
+    setClientDocType(cli?.docType || "");
+    setClientDocNumber(cli?.docNumber || "");
+    setClientAddress(cli?.address || "");
+  }
+}, [clientId, clients]);
 
 
   /* GUARDAR */
@@ -154,6 +157,9 @@ const NewBudgetPage = () => {
 
       clientId,
       clientName,
+      clientDocType,
+      clientDocNumber,
+      clientAddress,
       category,
 
       items,
@@ -266,7 +272,6 @@ const NewBudgetPage = () => {
           </Select>
 
         </div>
-
 
         {/* AC */}
 
