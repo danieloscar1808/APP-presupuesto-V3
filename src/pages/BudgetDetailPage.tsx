@@ -122,7 +122,7 @@ const generarFactura = async () => {
   if (!budget) return;
 
   try {
-    const response = await fetch("http://127.0.0.1:3000/api/factura", {
+    const response = await fetch("https://facturacion-server-backend.onrender.com//api/factura", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
