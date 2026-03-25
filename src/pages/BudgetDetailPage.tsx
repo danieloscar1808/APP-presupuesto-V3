@@ -22,6 +22,8 @@ import html2pdf from "html2pdf.js";
 
 import { getClients } from "@/lib/storage";
 
+import { saveBudget } from "@/lib/storage";
+
 
 const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -64,6 +66,12 @@ const BudgetDetailPage = () => {
     setBudget(b);
     setProfile(p);
     setLoading(false);
+
+    const facturaGuardada = localStorage.getItem(`factura-${id}`);
+      if (facturaGuardada) {
+      setFactura(JSON.parse(facturaGuardada));
+      }
+        setLoading(false);
   };
 
   // ----------------------------------------------------
@@ -114,6 +122,7 @@ const BudgetDetailPage = () => {
     sent: "Enviado",
     accepted: "Aceptado",
     rejected: "Rechazado",
+    Facturado: "Facturado",
   };
 
   const statusStyles: Record<Budget["status"], string> = {
@@ -149,16 +158,28 @@ const generarFactura = async () => {
     console.log("Factura generada:", data);
 
     setFactura(data);
+    localStorage.setItem(`factura-${budget.id}`, JSON.stringify(data)); // Guardar factura en localStorage
+
+    // 🟢 actualizar estado del presupuesto
+    const updatedBudget = {
+      ...budget,
+      status: "facturado"
+      };
+
+      await saveBudget(updatedBudget);
+      setBudget(updatedBudget);
 
     // scroll automático
     setTimeout(() => {
-    facturaRef.current?.scrollIntoView({ behavior: "smooth" });
+    facturaRef.current?.scrollIntoView({
+    behavior: "smooth",
+    block: "start" // 🔥 clave
+    });
     }, 100);
-
-  } catch (error) {
-    console.error("Error al generar factura", error);
-  }
-  };
+    } catch (error) {
+  console.error("Error al generar factura", error);
+}
+};
 
 const imprimirFactura = () => {
   const contenido = facturaRef.current;
@@ -438,17 +459,18 @@ Gracias por tu confianza.`;
       {/* FACTURAR */}
       <div className="mt-4">
       <Button
-      className="w-full btn-gradient"
-      onClick={generarFactura}
-      >
-        Generar Factura
+        className="w-full btn-gradient"
+        onClick={generarFactura}
+        disabled={!!factura}
+        >
+        {factura ? "Factura generada" : "Generar Factura"}
       </Button>
       </div>
 
       {/* FACTURA */}
       {factura && profile && budget &&(
       <>
-      <div ref={facturaRef} className="mt-4 print-area pb-32">
+      <div ref={facturaRef} className="mt-4 print-area pb-4">
       <FacturaView factura={factura} profile={profile} budget={budget}/>
       </div>
 
