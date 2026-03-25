@@ -448,7 +448,7 @@ Gracias por tu confianza.`;
       {/* FACTURA */}
       {factura && profile && budget &&(
       <>
-      <div ref={facturaRef} className="mt-4 print-area pb32">
+      <div ref={facturaRef} className="mt-4 print-area pb-32">
       <FacturaView factura={factura} profile={profile} budget={budget}/>
       </div>
 
