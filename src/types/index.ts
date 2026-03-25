@@ -53,7 +53,7 @@ export interface Budget {
   validityDays: number;
   warranty: string;
   paymentTerms: string;
-  status: 'draft' | 'sent' | 'accepted' | 'rejected';
+  status: 'draft' | 'sent' | 'accepted' | 'rejected'| 'facturado' | 'cancelado';
   createdAt: string;
   sentAt?: string;
    // AC Equipment Data
@@ -72,7 +72,11 @@ export interface Budget {
    };
    // descripcion del trabajo electrico
    electricWorkDescription?: string;
-}
+
+   // FACTURACIÓN
+  factura?: any;
+  notaCredito?: any;
+  }
 
 // AC Specific
 export interface ACDetails {

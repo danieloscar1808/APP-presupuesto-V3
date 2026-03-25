@@ -64,6 +64,10 @@ const BudgetDetailPage = () => {
     }
 
     setBudget(b);
+    if (b.factura) {
+    setFactura(b.factura);
+    }
+
     setProfile(p);
     setLoading(false);
 
@@ -122,7 +126,7 @@ const BudgetDetailPage = () => {
     sent: "Enviado",
     accepted: "Aceptado",
     rejected: "Rechazado",
-    Facturado: "Facturado",
+    facturado: "Facturado",
   };
 
   const statusStyles: Record<Budget["status"], string> = {
@@ -161,9 +165,10 @@ const generarFactura = async () => {
     localStorage.setItem(`factura-${budget.id}`, JSON.stringify(data)); // Guardar factura en localStorage
 
     // 🟢 actualizar estado del presupuesto
-    const updatedBudget = {
+    const updatedBudgetFacturado = {
       ...budget,
-      status: "facturado"
+      status: "facturado",
+      factura: data // Guardar datos de la factura en el presupuesto
       };
 
       await saveBudget(updatedBudget);
@@ -274,6 +279,46 @@ Te envío la factura correspondiente:
 Gracias por tu confianza.`;
   const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
   window.open(url, "_blank");
+};
+
+const cancelarFactura = async () => {
+  if (!factura || !budget) return;
+
+  const confirmar = confirm("¿Deseás cancelar esta factura? Se generará una Nota de Crédito.");
+  if (!confirmar) return;
+
+  try {
+    const response = await fetch("https://facturacion-server-backend.onrender.com/api/nota-credito", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        facturaId: factura.id,
+        cliente: budget.clientName,
+        total: budget.total
+      })
+    });
+
+    const data = await response.json();
+
+    console.log("Nota de crédito generada:", data);
+
+    // ✅ UN SOLO OBJETO CORRECTO
+    const updatedBudgetCancelado = {
+      ...budget,
+      status: "cancelado",
+      notaCredito: data
+    };
+
+    await saveBudget(updatedBudgetCancelado);
+    setBudget(updatedBudgetCancelado);
+
+    alert("Factura cancelada correctamente");
+
+  } catch (error) {
+    console.error("Error al cancelar factura", error);
+  }
 };
 
 
@@ -474,21 +519,47 @@ Gracias por tu confianza.`;
       <FacturaView factura={factura} profile={profile} budget={budget}/>
       </div>
 
+      {/* NOTA DE CRÉDITO */}
+      {budget.notaCredito && (
+      <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+      <h2 className="font-bold text-red-600 text-lg mb-2">
+        Nota de Crédito C
+      </h2>
+      <p><strong>Número:</strong> {budget.notaCredito.numero}</p>
+      <p><strong>Factura asociada:</strong> {budget.notaCredito.facturaOriginal}</p>
+      <p><strong>Total:</strong> ${budget.notaCredito.total}</p>
+      </div>
+      )}
+
+      {budget.status === "cancelado" && (
+      <div className="text-center text-red-600 font-bold mt-2">
+        ⚠️ Factura anulada mediante Nota de Crédito
+      </div>
+      )}
+
       {/* BOTÓN PDF */}
       <div className="mt-2">
       <Button
         className="w-full"
         onClick={descargarPDF}
-      >
-        Descargar Factura
+        >
+           Descargar Factura
       </Button>
 
       <Button
-      className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
-      onClick={enviarWhatsApp}
-      >
-       Enviar por WhatsApp
+        className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
+        onClick={enviarWhatsApp}
+        >
+          Enviar por WhatsApp
       </Button>
+
+      <Button
+        className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
+        onClick={cancelarFactura}
+        >
+          Cancelar Factura
+      </Button>
+
       </div>
       </>
       )}

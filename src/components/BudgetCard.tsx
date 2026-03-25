@@ -15,6 +15,7 @@ const statusLabels: Record<Budget['status'], string> = {
   accepted: 'Aceptado',
   rejected: 'Rechazado',
   facturado: 'Facturado',
+  cancelado: 'Cancelado',
 };
 
 const statusStyles: Record<Budget['status'], string> = {
@@ -23,6 +24,7 @@ const statusStyles: Record<Budget['status'], string> = {
   accepted: 'status-accepted',
   rejected: 'bg-destructive/10 text-destructive',
   facturado: 'bg-green-600 text-white',
+  cancelado: 'bg-red-600 text-white',
 };
 
 export const BudgetCard = ({ budget, onClick }: BudgetCardProps) => {
