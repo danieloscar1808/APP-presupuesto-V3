@@ -20,6 +20,8 @@ import { useRef } from "react";
 
 import html2pdf from "html2pdf.js";
 
+import { getClients } from "@/lib/storage";
+
 
 const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,6 +32,7 @@ const BudgetDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [factura, setFactura] = useState(null);
   const [clientAddress, setClientAddress] = useState("");
+  const [client, setClient] = useState<any>(null);
   const facturaRef = useRef(null);
 
   // ----------------------------------------------------
@@ -46,6 +49,11 @@ const BudgetDetailPage = () => {
 
     const b = await getBudgetById(id);
     const p = await getProfile();
+
+    const clients = await getClients();
+    const clienteEncontrado = clients.find(c => c.id === b.clientId);
+
+    setClient(clienteEncontrado);
 
     if (!b) {
       toast.error("Presupuesto no encontrado");
@@ -206,18 +214,47 @@ const descargarPDF = () => {
   html2pdf().set(opt).from(elemento).save();
 };
 
+
+const formatearTelefono = (telefono: string) => {
+  if (!telefono) return "";
+
+  // sacar todo lo que no sea número
+  let limpio = telefono.replace(/\D/g, "");
+
+  // si empieza con 0 → lo sacamos
+  if (limpio.startsWith("0")) {
+    limpio = limpio.substring(1);
+  }
+
+  // si no tiene código país → lo agregamos
+  if (!limpio.startsWith("54")) {
+    limpio = "54" + limpio;
+  }
+
+  // agregar 9 para celulares (Argentina)
+  if (!limpio.startsWith("549")) {
+    limpio = limpio.replace(/^54/, "549");
+  }
+
+  return limpio;
+};
+
 const enviarWhatsApp = () => {
-  if (!budget) return;
-  // 👉 IMPORTANTE: número sin +, sin espacios, sin guiones
-  const telefono = "54911XXXXXXXX"; 
+  if (!budget || !client) return;
+  const telefono = formatearTelefono(client.phone || "");
+  if (!telefono) {
+    alert("El cliente no tiene teléfono cargado");
+    return;
+  }
   const mensaje = `Hola ${budget.clientName},
-Te envío la factura:
-Factura N° ${budget.number}
-Total: $${budget.total.toLocaleString("es-AR")}
-Gracias!`;
-const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
+Te envío la factura correspondiente:
+🧾 Factura N° ${budget.number}
+💲 Total: $${budget.total.toLocaleString("es-AR")}
+Gracias por tu confianza.`;
+  const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
   window.open(url, "_blank");
 };
+
 
   return (
     <PageLayout>
@@ -411,7 +448,7 @@ const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURICom
       {/* FACTURA */}
       {factura && profile && budget &&(
       <>
-      <div ref={facturaRef} className="mt-4 print-area">
+      <div ref={facturaRef} className="mt-4 print-area pb32">
       <FacturaView factura={factura} profile={profile} budget={budget}/>
       </div>
 
