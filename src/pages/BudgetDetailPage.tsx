@@ -18,6 +18,7 @@ import FacturaView from "@/components/FacturaView";
 
 import { useRef } from "react";
 
+import html2pdf from "html2pdf.js";
 
 
 const BudgetDetailPage = () => {
@@ -151,104 +152,72 @@ const generarFactura = async () => {
   }
   };
 
-  const imprimirFactura = () => {
+const imprimirFactura = () => {
   const contenido = facturaRef.current;
 
   if (!contenido) return;
 
   const ventana = window.open("", "_blank");
 
+  // 🔥 CLONAMOS LOS ESTILOS DEL DOCUMENTO ORIGINAL
+  const estilos = Array.from(document.styleSheets)
+    .map((styleSheet) => {
+      try {
+        return Array.from(styleSheet.cssRules)
+          .map((rule) => rule.cssText)
+          .join("");
+      } catch (e) {
+        return "";
+      }
+    })
+    .join("\n");
+
   ventana.document.write(`
-<html>
-  <head>
-    <title>Factura</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
-      }
-
-      .factura {
-        width: 800px;
-        margin: 30px auto;
-        background: #fff;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      }
-
-      h1 {
-        margin: 0;
-        font-size: 24px;
-      }
-
-      .header {
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-      }
-
-      .section {
-        margin-bottom: 20px;
-      }
-
-      .section h2 {
-        margin-bottom: 5px;
-        font-size: 16px;
-      }
-
-      .row {
-        display: flex;
-        justify-content: space-between;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-      }
-
-      th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-
-      th {
-        background: #f0f0f0;
-      }
-
-      .total {
-        text-align: right;
-        font-size: 18px;
-        font-weight: bold;
-        margin-top: 10px;
-      }
-
-      .footer {
-        margin-top: 20px;
-        font-size: 14px;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="factura">
-      ${contenido.innerHTML}
-    </div>
-  </body>
-</html>
+    <html>
+      <head>
+        <title>Factura</title>
+        <style>${estilos}</style>
+      </head>
+      <body>
+        ${contenido.outerHTML}
+      </body>
+    </html>
   `);
 
   ventana.document.close();
-  ventana.focus();
-  ventana.print();
-  ventana.close();
+
+  ventana.onload = () => {
+    ventana.focus();
+    ventana.print();
+    ventana.close();
+  };
 };
 
+const descargarPDF = () => {
+  const elemento = facturaRef.current;
+  if (!elemento) return;
+  const opt = {
+    margin:       10,
+    filename:     `Factura-${budget?.number}.pdf`,
+    image:        { type: "jpeg", quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: "mm", format: "a4", orientation: "portrait" }
+  };
+  html2pdf().set(opt).from(elemento).save();
+};
+
+const enviarWhatsApp = () => {
+  if (!budget) return;
+  // 👉 IMPORTANTE: número sin +, sin espacios, sin guiones
+  const telefono = "54911XXXXXXXX"; 
+  const mensaje = `Hola ${budget.clientName},
+Te envío la factura:
+Factura N° ${budget.number}
+Total: $${budget.total.toLocaleString("es-AR")}
+Gracias!`;
+const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
+  window.open(url, "_blank");
+};
 
   return (
     <PageLayout>
@@ -450,9 +419,16 @@ const generarFactura = async () => {
       <div className="mt-2">
       <Button
         className="w-full"
-        onClick={imprimirFactura}
+        onClick={descargarPDF}
       >
-        Descargar / Imprimir PDF
+        Descargar Factura
+      </Button>
+
+      <Button
+      className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
+      onClick={enviarWhatsApp}
+      >
+       Enviar por WhatsApp
       </Button>
       </div>
       </>

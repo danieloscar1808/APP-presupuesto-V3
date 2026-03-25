@@ -73,4 +73,13 @@
     overflow: hidden;
   }
 
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .card-elevated {
+    box-shadow: none !important;
+    border: none !important;
+  }
 }
