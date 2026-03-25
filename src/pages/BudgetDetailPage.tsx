@@ -116,6 +116,8 @@ const BudgetDetailPage = () => {
     );
   }
 
+      console.log("BUDGET COMPLETO:", budget);
+
       console.log("PROFILE:", profile);
 
   // ----------------------------------------------------
@@ -156,10 +158,18 @@ const generarFactura = async () => {
       })
     });
 
-
     const data = await response.json();
 
     console.log("Factura generada:", data);
+
+    const updatedBudgetFactura = {
+      ...budget,
+      status: "facturado",
+      factura: data
+    };
+
+    await saveBudget(updatedBudgetFactura);
+    setBudget(updatedBudgetFactura);
 
     setFactura(data);
     localStorage.setItem(`factura-${budget.id}`, JSON.stringify(data)); // Guardar factura en localStorage
@@ -171,8 +181,8 @@ const generarFactura = async () => {
       factura: data // Guardar datos de la factura en el presupuesto
       };
 
-      await saveBudget(updatedBudget);
-      setBudget(updatedBudget);
+      await saveBudget(updatedBudgetFactura);
+      setBudget(updatedBudgetFactura);
 
     // scroll automático
     setTimeout(() => {
@@ -294,13 +304,17 @@ const cancelarFactura = async () => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        facturaId: factura.id,
+        facturaId: factura.numero,
         cliente: budget.clientName,
         total: budget.total
       })
     });
 
     const data = await response.json();
+    console.log("FACTURA:", factura);
+    console.log("FACTURA NUMERO:", factura?.numero);
+    console.log("FACTURA ID:", factura?.id);
+    console.log("NC DATA:", data);
 
     console.log("Nota de crédito generada:", data);
 
@@ -308,7 +322,10 @@ const cancelarFactura = async () => {
     const updatedBudgetCancelado = {
       ...budget,
       status: "cancelado",
-      notaCredito: data
+      notaCredito: {
+      ...data,
+      facturaOriginal: factura.numero || factura.id || budget.number
+      }
     };
 
     await saveBudget(updatedBudgetCancelado);
@@ -519,17 +536,7 @@ const cancelarFactura = async () => {
       <FacturaView factura={factura} profile={profile} budget={budget}/>
       </div>
 
-      {/* NOTA DE CRÉDITO */}
-      {budget.notaCredito && (
-      <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
-      <h2 className="font-bold text-red-600 text-lg mb-2">
-        Nota de Crédito C
-      </h2>
-      <p><strong>Número:</strong> {budget.notaCredito.numero}</p>
-      <p><strong>Factura asociada:</strong> {budget.notaCredito.facturaOriginal}</p>
-      <p><strong>Total:</strong> ${budget.notaCredito.total}</p>
-      </div>
-      )}
+      
 
       {budget.status === "cancelado" && (
       <div className="text-center text-red-600 font-bold mt-2">
@@ -559,8 +566,19 @@ const cancelarFactura = async () => {
         >
           Cancelar Factura
       </Button>
-
       </div>
+
+      {/* NOTA DE CRÉDITO */}
+      {budget.notaCredito && (
+      <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+      <h2 className="font-bold text-red-600 text-lg mb-2">
+        Nota de Crédito C
+      </h2>
+      <p><strong>Número:</strong> {budget.notaCredito.numero}</p>
+      <p><strong>Factura asociada:</strong> {budget.notaCredito.facturaOriginal}</p>
+      <p><strong>Total:</strong> ${budget.notaCredito.total}</p>
+      </div>
+      )}
       </>
       )}
            
