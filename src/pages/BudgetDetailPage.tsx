@@ -24,6 +24,8 @@ import { getClients } from "@/lib/storage";
 
 import { saveBudget } from "@/lib/storage";
 
+import { generarNumeroAFIP } from "@/lib/utils";
+
 
 const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -145,6 +147,12 @@ const BudgetDetailPage = () => {
 const generarFactura = async () => {
   if (!budget) return;
 
+  // 🔥 BLOQUEO COMPLETO (FACTURADO + CANCELADO)
+  if (budget.status === "facturado" || budget.status === "cancelado") {
+    alert("Este presupuesto ya tiene una factura asociada");
+    return;
+  }
+
   try {
     const response = await fetch("https://facturacion-server-backend.onrender.com/api/factura", {
       method: "POST",
@@ -160,35 +168,45 @@ const generarFactura = async () => {
 
     const data = await response.json();
 
-    console.log("Factura generada:", data);
+    //console.log("Factura generada:", data);
+    
+    // 🔥 NUMERACIÓN AFIP
+    const numAFIP = generarNumeroAFIP("factura");
 
+    // 🔥 AGREGAMOS EL NUMERO A LA FACTURA
+    const dataConNumero = {
+    ...data,
+    numero: numAFIP.numeroCompleto,
+    puntoVenta: numAFIP.puntoVenta,
+    numeroComprobante: numAFIP.numero
+    };
+
+    console.log("FACTURA FINAL:", dataConNumero);
+
+    // 🔥 UN SOLO OBJETO (sin duplicados)
     const updatedBudgetFactura = {
       ...budget,
       status: "facturado",
-      factura: data
+      factura: dataConNumero
     };
 
     await saveBudget(updatedBudgetFactura);
     setBudget(updatedBudgetFactura);
 
-    setFactura(data);
-    localStorage.setItem(`factura-${budget.id}`, JSON.stringify(data)); // Guardar factura en localStorage
+    // 🔥 estado local
+    setFactura(dataConNumero);
 
-    // 🟢 actualizar estado del presupuesto
-    const updatedBudgetFacturado = {
-      ...budget,
-      status: "facturado",
-      factura: data // Guardar datos de la factura en el presupuesto
-      };
-
-      await saveBudget(updatedBudgetFactura);
-      setBudget(updatedBudgetFactura);
+    // 🔥 persistencia extra (opcional)
+    localStorage.setItem(
+      `factura-${budget.id}`,
+      JSON.stringify(dataConNumero)
+    );
 
     // scroll automático
     setTimeout(() => {
     facturaRef.current?.scrollIntoView({
     behavior: "smooth",
-    block: "start" // 🔥 clave
+    block: "start" 
     });
     }, 100);
     } catch (error) {
@@ -294,7 +312,7 @@ Gracias por tu confianza.`;
 const cancelarFactura = async () => {
   if (!factura || !budget) return;
 
-  const confirmar = confirm("¿Deseás cancelar esta factura? Se generará una Nota de Crédito.");
+  const confirmar = confirm("¿Deseás cancelar esta factura?");
   if (!confirmar) return;
 
   try {
@@ -311,20 +329,30 @@ const cancelarFactura = async () => {
     });
 
     const data = await response.json();
-    console.log("FACTURA:", factura);
-    console.log("FACTURA NUMERO:", factura?.numero);
-    console.log("FACTURA ID:", factura?.id);
-    console.log("NC DATA:", data);
 
-    console.log("Nota de crédito generada:", data);
+    // 🔥 NUMERO AFIP NC
+    const numNC = generarNumeroAFIP("nc");
 
-    // ✅ UN SOLO OBJETO CORRECTO
+    const dataConNumero = {
+  ...data,
+  numero: numNC.numeroCompleto,        
+  puntoVenta: numNC.puntoVenta,
+  numeroComprobante: numNC.numero,
+  total: Math.round(budget.total)
+};
+console.log("NC GENERADA:", dataConNumero);
+
+    // ✅ LOG CORRECTO (después de declarar)
+    console.log("NC FINAL:", dataConNumero);
+
+    // 🔥 ACTUALIZAR PRESUPUESTO
     const updatedBudgetCancelado = {
       ...budget,
       status: "cancelado",
+      factura: budget.factura,
       notaCredito: {
-      ...data,
-      facturaOriginal: factura.numero || factura.id || budget.number
+        ...dataConNumero,
+        facturaOriginal: factura?.numero
       }
     };
 
@@ -521,11 +549,15 @@ const cancelarFactura = async () => {
       {/* FACTURAR */}
       <div className="mt-4">
       <Button
-        className="w-full btn-gradient"
-        onClick={generarFactura}
-        disabled={!!factura}
-        >
-        {factura ? "Factura generada" : "Generar Factura"}
+      className="w-full btn-gradient"
+      onClick={generarFactura}
+      disabled={budget.status === "facturado" || budget.status === "cancelado"}
+      >
+      {budget.status === "facturado"
+        ? "Factura generada"
+         : budget.status === "cancelado"
+         ? "Factura cancelada"
+         : "Generar Factura"}
       </Button>
       </div>
 
@@ -568,20 +600,33 @@ const cancelarFactura = async () => {
       </Button>
       </div>
 
-      {/* NOTA DE CRÉDITO */}
-      {budget.notaCredito && (
-      <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
-      <h2 className="font-bold text-red-600 text-lg mb-2">
-        Nota de Crédito C
-      </h2>
-      <p><strong>Número:</strong> {budget.notaCredito.numero}</p>
-      <p><strong>Factura asociada:</strong> {budget.notaCredito.facturaOriginal}</p>
-      <p><strong>Total:</strong> ${budget.notaCredito.total}</p>
-      </div>
-      )}
-      </>
-      )}
-           
+     {/* NOTA DE CRÉDITO */}
+{budget.notaCredito && (
+  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+    <h2 className="font-bold text-red-600 text-lg mb-2">
+      Nota de Crédito C
+    </h2>
+
+    <p>
+      <strong>Número:</strong> {budget.notaCredito.numero}
+    </p>
+
+    <p>
+      <strong>Factura asociada:</strong>{" "}
+      {budget.notaCredito.facturaOriginal || "No disponible"}
+    </p>
+
+    <p>
+      <strong>Total:</strong>{" "}
+      {"$" + budget.notaCredito.total.toLocaleString("es-AR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}
+    </p>
+  </div>
+)}
+ </> 
+)}          
     </PageLayout>
   );
 };

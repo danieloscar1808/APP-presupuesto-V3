@@ -6,24 +6,21 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 //Generación de numero de presupuestos ascendente
-function generarNumeroPresupuesto() {
-  // Fecha actual
-  const ahora = new Date();
-  const year = ahora.getFullYear();
-  const month = String(ahora.getMonth() + 1).padStart(2, "0");
+export function generarNumeroAFIP(tipo: "factura" | "nc") {
+  const puntoVenta = "00001";
 
-  // Clave por año-mes
-  const key = `${year}${month}`;
+  const key = tipo === "factura" ? "factura_numero" : "nc_numero";
 
-  // Obtener valor guardado (por ej. localStorage)
-  const ultimo = Number(localStorage.getItem(`presupuesto_${key}`) || 0);
-
-  // Nuevo número secuencial
+  const ultimo = Number(localStorage.getItem(key) || 0);
   const nuevo = ultimo + 1;
 
-  // Guardarlo
-  localStorage.setItem(`presupuesto_${key}`, String(nuevo));
+  localStorage.setItem(key, String(nuevo));
 
-  // Formato final => AAAAMM-XXX
-  return `${key}-${String(nuevo).padStart(3, "0")}`;
+  const numeroComprobante = String(nuevo).padStart(8, "0");
+
+  return {
+    puntoVenta,
+    numero: numeroComprobante,
+    numeroCompleto: `${puntoVenta}-${numeroComprobante}`
+  };
 }
