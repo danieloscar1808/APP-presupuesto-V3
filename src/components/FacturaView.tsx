@@ -6,6 +6,8 @@ type Props = {
 
 const FacturaView = ({ factura, profile, budget }: Props) => {
 
+ console.log("FACTURA EN VIEW:", factura); 
+
  const formatDoc = (type: string, value: string) => {
     if (type === "CUIT" && value.length === 11) {
       return `${value.slice(0,2)}-${value.slice(2,10)}-${value.slice(10)}`;
@@ -22,7 +24,7 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
       <div className="flex justify-between items-start border-b pb-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Factura C</h1>
-          <p className="text-sm text-gray-600">N° {factura.numeroFactura}</p>
+          <p className="text-sm text-gray-600">N° {factura.numero}</p>
           <p className="text-sm text-gray-500">Presupuesto N° {budget.number}</p>
         </div>
 

@@ -13,18 +13,11 @@ import { es } from "date-fns/locale";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-
 import FacturaView from "@/components/FacturaView";
-
 import { useRef } from "react";
-
 import html2pdf from "html2pdf.js";
-
 import { getClients } from "@/lib/storage";
-
 import { saveBudget } from "@/lib/storage";
-
-import { generarNumeroAFIP } from "@/lib/utils";
 
 
 const BudgetDetailPage = () => {
@@ -168,20 +161,18 @@ const generarFactura = async () => {
 
     const data = await response.json();
 
-    //console.log("Factura generada:", data);
-    
-    // 🔥 NUMERACIÓN AFIP
-    const numAFIP = generarNumeroAFIP("factura");
-
-    // 🔥 AGREGAMOS EL NUMERO A LA FACTURA
     const dataConNumero = {
-    ...data,
-    numero: numAFIP.numeroCompleto,
-    puntoVenta: numAFIP.puntoVenta,
-    numeroComprobante: numAFIP.numero
+    numero: data.numero, // 🔥 ESTE ES EL FIX
+    cliente: data.cliente,
+    total: Math.round(data.total),
+    CAE: data.CAE,
+    vencimiento: data.vencimiento
     };
 
-    console.log("FACTURA FINAL:", dataConNumero);
+    console.log("RESPUESTA BACKEND FACTURA:", data);
+    console.log("NUMERO:", data.numero);
+    console.log("FACTURA BACKEND RAW:", data.numeroFactura);
+    console.log("FACTURA GUARDADA EN BUDGET:", dataConNumero);
 
     // 🔥 UN SOLO OBJETO (sin duplicados)
     const updatedBudgetFactura = {
@@ -191,7 +182,11 @@ const generarFactura = async () => {
     };
 
     await saveBudget(updatedBudgetFactura);
-    setBudget(updatedBudgetFactura);
+    
+    setBudget({
+  ...updatedBudgetFactura,
+    factura: { ...dataConNumero } // 🔥 CLAVE
+    });
 
     // 🔥 estado local
     setFactura(dataConNumero);
@@ -322,24 +317,23 @@ const cancelarFactura = async () => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        facturaId: factura.numero,
-        cliente: budget.clientName,
-        total: budget.total
+      facturaNumero: factura.numero,
+      total: factura.total
       })
     });
 
     const data = await response.json();
+    console.log("RESPUESTA NC:", data);
 
     // 🔥 NUMERO AFIP NC
-    const numNC = generarNumeroAFIP("nc");
-
-    const dataConNumero = {
-  ...data,
-  numero: numNC.numeroCompleto,        
-  puntoVenta: numNC.puntoVenta,
-  numeroComprobante: numNC.numero,
-  total: Math.round(budget.total)
+   const dataConNumero = {
+  numero: data.numero, // 🔥 FORZAMOS
+  cliente: data.cliente,
+  total: Math.round(data.total),
+  CAE: data.CAE,
+  vencimiento: data.vencimiento
 };
+
 console.log("NC GENERADA:", dataConNumero);
 
     // ✅ LOG CORRECTO (después de declarar)
@@ -352,7 +346,7 @@ console.log("NC GENERADA:", dataConNumero);
       factura: budget.factura,
       notaCredito: {
         ...dataConNumero,
-        facturaOriginal: factura?.numero
+        facturaAsociada: data.facturaAsociada
       }
     };
 
@@ -501,7 +495,7 @@ console.log("NC GENERADA:", dataConNumero);
             <span>Total</span>
             <span className="text-primary">
               ${budget.total.toLocaleString("es-AR", {
-                minimumFractionDigits: 2,
+                minimumFractionDigits: 0,
               })}
             </span>
           </div>
@@ -613,14 +607,14 @@ console.log("NC GENERADA:", dataConNumero);
 
     <p>
       <strong>Factura asociada:</strong>{" "}
-      {budget.notaCredito.facturaOriginal || "No disponible"}
+      {budget.notaCredito.facturaAsociada || "No disponible"}
     </p>
 
     <p>
       <strong>Total:</strong>{" "}
       {"$" + budget.notaCredito.total.toLocaleString("es-AR", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
       })}
     </p>
   </div>
