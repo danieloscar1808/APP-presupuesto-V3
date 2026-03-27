@@ -172,7 +172,7 @@ const generarFactura = async () => {
 
     const data = await response.json();
 
-    console.log("DATA BACKEND FACTURA:", data); // 👈 ACÁ
+    console.log("DATA BACKEND FACTURA:", data);
 
 
 
@@ -320,13 +320,11 @@ Gracias por tu confianza.`;
 };
 
 const cancelarFactura = async () => {
- // 🔥 BLOQUEO 1: ya cancelada
   if (budget.notaCredito) {
-    alert("Esta factura ya fue cancelada con una nota de crédito");
+    alert("Esta factura ya fue cancelada");
     return;
   }
 
-  // 🔥 BLOQUEO 2: no hay factura válida
   if (!budget.factura) {
     alert("No hay factura para cancelar");
     return;
@@ -336,45 +334,35 @@ const cancelarFactura = async () => {
   if (!confirmar) return;
 
   try {
-    const response = await fetch("https://facturacion-server-backend.onrender.com/api/nota-credito", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-      facturaNumero: factura.numero,
-      total: factura.total
-      })
-    });
+    const response = await fetch(
+      "https://facturacion-server-backend.onrender.com/api/nota-credito",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          facturaNumero: budget.factura.numero,
+          total: budget.factura.total
+        })
+      }
+    );
 
     const data = await response.json();
-    console.log("RESPUESTA NC:", data);
 
-    // 🔥 NUMERO AFIP NC
-   const dataConNumero = {
-  numero: data.numero, // 🔥 FORZAMOS
-  cliente: data.cliente,
-  total: Math.round(data.total),
-  CAE: data.CAE,
-  vencimiento: data.vencimiento
-};
-
-console.log("NC GENERADA:", dataConNumero);
-
-    // ✅ LOG CORRECTO (después de declarar)
-    console.log("NC FINAL:", dataConNumero);
-
-    // 🔥 ACTUALIZAR PRESUPUESTO
-    const updatedBudgetCancelado = {
-      ...budget,
-      status: "cancelado",
-      factura: budget.factura,
-      notaCredito: {
-        ...dataConNumero,
-        facturaAsociada: data.facturaAsociada
-      }
+    const dataConNumero = {
+      numero: data.numero,
+      facturaAsociada: data.facturaAsociada,
+      total: Math.round(Number(data.total || 0))
     };
 
+    const updatedBudgetCancelado = {
+      ...budget,
+      notaCredito: dataConNumero,
+      status: "cancelado"
+    };
+
+    // ✅ TODO ADENTRO DEL TRY
     await saveBudget(updatedBudgetCancelado);
     setBudget(updatedBudgetCancelado);
 
