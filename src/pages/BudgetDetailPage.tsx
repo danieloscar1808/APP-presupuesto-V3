@@ -159,14 +159,22 @@ const generarFactura = async () => {
       },
       body: JSON.stringify({
         cliente: budget.clientName,
-        total: budget.total,
+        total: Number(budget.subtotal || 0) + Number(budget.laborCost || 0),
         descripcion: "Trabajo de instalación"
       })
     });
 
+    if (!response.ok) {
+    const errorText = await response.text();
+    console.error("ERROR BACKEND:", errorText);
+    return;
+    }
+
     const data = await response.json();
 
     console.log("DATA BACKEND FACTURA:", data); // 👈 ACÁ
+
+
 
     const dataConNumero = {
     numero: data.numero, // 🔥 ESTE ES EL FIX
