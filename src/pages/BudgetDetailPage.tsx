@@ -79,6 +79,12 @@ const BudgetDetailPage = () => {
   const handleDelete = async () => {
     if (!id) return;
 
+    // 🔒 BLOQUEO de boton si el presupuesto ya esta facturado
+    if (budget.factura || budget.status === "cancelado") {
+    alert("No se puede eliminar un presupuesto con factura o cancelado");
+    return;
+    }
+
     if (confirm("¿Eliminar este presupuesto?")) {
       await deleteBudget(id);
       toast.success("Presupuesto eliminado");
