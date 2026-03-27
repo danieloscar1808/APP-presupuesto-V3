@@ -141,6 +141,11 @@ const generarFactura = async () => {
   if (!budget) return;
 
   // 🔥 BLOQUEO COMPLETO (FACTURADO + CANCELADO)
+  if (budget.factura) {
+    alert("Este presupuesto ya tiene una factura generada");
+    return;
+  }
+
   if (budget.status === "facturado" || budget.status === "cancelado") {
     alert("Este presupuesto ya tiene una factura asociada");
     return;
@@ -161,10 +166,12 @@ const generarFactura = async () => {
 
     const data = await response.json();
 
+    console.log("DATA BACKEND FACTURA:", data); // 👈 ACÁ
+
     const dataConNumero = {
     numero: data.numero, // 🔥 ESTE ES EL FIX
     cliente: data.cliente,
-    total: Math.round(data.total),
+    total: Math.round(Number(data.total || 0)),
     CAE: data.CAE,
     vencimiento: data.vencimiento
     };
@@ -305,7 +312,17 @@ Gracias por tu confianza.`;
 };
 
 const cancelarFactura = async () => {
-  if (!factura || !budget) return;
+ // 🔥 BLOQUEO 1: ya cancelada
+  if (budget.notaCredito) {
+    alert("Esta factura ya fue cancelada con una nota de crédito");
+    return;
+  }
+
+  // 🔥 BLOQUEO 2: no hay factura válida
+  if (!budget.factura) {
+    alert("No hay factura para cancelar");
+    return;
+  }
 
   const confirmar = confirm("¿Deseás cancelar esta factura?");
   if (!confirmar) return;
@@ -595,8 +612,8 @@ console.log("NC GENERADA:", dataConNumero);
       </div>
 
      {/* NOTA DE CRÉDITO */}
-{budget.notaCredito && (
-  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+    {budget.notaCredito && (
+    <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
     <h2 className="font-bold text-red-600 text-lg mb-2">
       Nota de Crédito C
     </h2>
@@ -612,10 +629,8 @@ console.log("NC GENERADA:", dataConNumero);
 
     <p>
       <strong>Total:</strong>{" "}
-      {"$" + budget.notaCredito.total.toLocaleString("es-AR", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0
-      })}
+      {"$" + Number(budget.notaCredito.total || 0).toLocaleString("es-AR", {
+  })}
     </p>
   </div>
 )}

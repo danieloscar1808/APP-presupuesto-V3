@@ -72,7 +72,7 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
                  Materiales
                 </td>
                 <td className="p-2 border text-right">
-                ${budget.subtotal.toLocaleString("es-AR")}
+                ${Number(budget.subtotal || 0).toLocaleString("es-AR")}
                 </td>
                 </tr>
 
@@ -81,7 +81,7 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
                  Mano de obra
                 </td>
                 <td className="p-2 border text-right">
-                 ${budget.laborCost.toLocaleString("es-AR")}
+                 ${Number(budget.laborCost || 0).toLocaleString("es-AR")}
                 </td>
                 </tr>
             </tbody>
@@ -92,7 +92,7 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
       <div className="flex justify-end mb-6">
         <div className="text-right">
           <p className="text-lg font-bold">
-            Total: ${factura.total.toLocaleString("es-AR")}
+            Total: ${Number(factura.total || 0).toLocaleString("es-AR")}
           </p>
         </div>
       </div>
