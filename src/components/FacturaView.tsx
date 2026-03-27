@@ -18,7 +18,7 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
   if (!factura || !budget) return null;
 
   return (
-    <div className="bg-white text-black p-4 mt-2 rounded-xl shadow print:shadow-none max-h-[95vh] overflow-hidden">
+    <div className="bg-white text-black p-4 mt-2 rounded-xl shadow print:max-h-none overflow-y-auto">
 
       {/* HEADER */}
       <div className="flex justify-between items-start border-b pb-4 mb-6">
