@@ -30,9 +30,9 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
 
         <div className="text-right text-sm">
           <p><strong>Fecha:</strong> {new Date().toLocaleDateString()}</p>
-          <p><strong>Condición:</strong> Responsable Monotributo</p>
+          <p><strong>Condición:</strong> {budget?.ivaCondition || "Monotributista"}</p>        
+          </div>
         </div>
-      </div>
 
       {/* EMPRESA */}
       <div className="mb-6">
@@ -56,6 +56,57 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
         <p>Dirección: {budget.clientAddress}</p>
         )} 
         </div>
+
+        {/* DATOS FISCALES */}
+<div className="mb-6">
+  <h2 className="font-semibold text-lg">Datos Fiscales</h2>
+
+  <div className="text-sm space-y-1">
+
+    {/* CONDICIÓN IVA */}
+    <div className="flex justify-between">
+      <span className="text-gray-600">Condición IVA</span>
+      <span>{factura?.ivaCondition || "-"}</span>
+    </div>
+
+    {/* MONEDA */}
+    <div className="flex justify-between">
+      <span className="text-gray-600">Moneda</span>
+      <span>
+        {factura?.currency === "USD"
+          ? "Dólares Estadounidenses (USD)"
+          : "Pesos Argentinos (ARS)"}
+      </span>
+    </div>
+
+    {/* USD SOLO SI APLICA */}
+    {factura?.currency === "USD" && (
+      <>
+        <div className="flex justify-between">
+          <span className="text-gray-600">Tipo de cambio</span>
+          <span>{factura?.exchangeRate}</span>
+        </div>
+
+        <div className="flex justify-between">
+          <span className="text-gray-600">Total USD</span>
+          <span>
+            {factura?.totalUSD
+            ? Number(factura.totalUSD).toLocaleString("es-AR")
+            : "-"}
+        </span>
+        </div>
+
+        <div className="flex justify-between">
+          <span className="text-gray-600">Total ARS</span>
+          <span>
+            ${Number(factura?.total || 0).toLocaleString("es-AR")}
+          </span>
+        </div>
+      </>
+    )}
+
+  </div>
+</div>
 
       {/* TABLA DETALLE */}
       <div className="mb-6">
@@ -90,12 +141,37 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
 
       {/* TOTAL */}
       <div className="flex justify-end mb-6">
-        <div className="text-right">
-          <p className="text-lg font-bold">
-            Total: ${Number(factura.total || 0).toLocaleString("es-AR")}
-          </p>
-        </div>
-      </div>
+  <div className="text-right space-y-1">
+
+    {/* 👉 SOLO RESPONSABLE INSCRIPTO */}
+    {factura?.ivaCondition === "Responsable Inscripto" && (
+      <>
+        <p>
+          Subtotal: $
+          {Number(factura.subtotal || 0).toLocaleString("es-AR")}
+        </p>
+
+        <p>
+          IVA ({factura.ivaPercent}%): $
+          {Number(factura.iva || 0).toLocaleString("es-AR")}
+        </p>
+      </>
+    )}
+
+    {/* 👉 TOTAL (SIEMPRE) */}
+    <p className="text-lg font-bold">
+      Total: ${Number(factura.total || 0).toLocaleString("es-AR")}
+    </p>
+
+    {/* 👉 MENSAJE SOLO CF */}
+    {factura?.ivaCondition !== "Responsable Inscripto" && (
+      <p className="text-xs text-gray-500">
+        IVA incluido en el precio
+      </p>
+    )}
+
+  </div>
+</div>
 
       {/* CAE */}
       <div className="border-t pt-4 text-sm">

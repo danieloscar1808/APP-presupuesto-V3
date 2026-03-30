@@ -85,7 +85,6 @@ const NewBudgetPage = () => {
 
   const [items,setItems] = useState<any[]>([]);
   const [laborCost,setLaborCost] = useState(0);
-  const [taxRate,setTaxRate] = useState(0);
   const [discount,setDiscount] = useState(0);
   const [notes,setNotes] = useState("");
 
@@ -93,6 +92,7 @@ const NewBudgetPage = () => {
   const [warranty,setWarranty] = useState("6 meses");
   const [paymentTerms,setPaymentTerms] = useState("Efectivo / Transferencia");
 
+    
   /* AC */
 
   const [acCapacity,setAcCapacity] = useState("");
@@ -119,9 +119,7 @@ const NewBudgetPage = () => {
 
   },[]);
 
-
-  /* AUTO NOMBRE CLIENTE */
-
+   /* AUTO NOMBRE CLIENTE */
   useEffect(() => {
   if (clientId) {
     const cli = clients.find(c => c.id === clientId);
@@ -133,23 +131,21 @@ const NewBudgetPage = () => {
   }
 }, [clientId, clients]);
 
-
+ 
   /* GUARDAR */
-
   const handleSubmit = async () => {
-
     if(!clientId){
-
       toast.error("Debe seleccionar un cliente");
       return;
-
     }
 
-    const numeroPresupuesto = generarNumeroPresupuesto();
+     const numeroPresupuesto = generarNumeroPresupuesto();
 
     const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice,0);
-    const taxAmount = (subtotal + laborCost) * (taxRate / 100);
-    const total =Number(subtotal || 0) +Number(laborCost || 0) +Number(taxAmount || 0) -Number(discount || 0);
+    const total =
+    Number(subtotal || 0) +
+    Number(laborCost || 0) -
+    Number(discount || 0);
     const budget: Budget = {
 
       id: uuid(),
@@ -161,13 +157,11 @@ const NewBudgetPage = () => {
       clientDocNumber,
       clientAddress,
       category,
-
+     
       items,
 
       laborCost,
       subtotal,
-      taxRate,
-      taxAmount,
       discount,
       total,
 
@@ -399,26 +393,26 @@ const NewBudgetPage = () => {
 
         <div className="card-elevated p-4 space-y-3">
 
-          <Label>Mano de obra</Label>
-          <Input type="number" value={laborCost} onChange={(e)=>setLaborCost(Number(e.target.value))}/>
+      
+{/* RESTO ORIGINAL (NO MODIFICADO) */}
 
-          <Label>IVA %</Label>
-          <Input type="number" value={taxRate} onChange={(e)=>setTaxRate(Number(e.target.value))}/>
+<Label>Mano de obra</Label>
+<Input type="number" value={laborCost} onChange={(e)=>setLaborCost(Number(e.target.value))}/>
 
-          <Label>Descuento</Label>
-          <Input type="number" value={discount} onChange={(e)=>setDiscount(Number(e.target.value))}/>
+<Label>Descuento</Label>
+<Input type="number" value={discount} onChange={(e)=>setDiscount(Number(e.target.value))}/>
 
-          <Label>Notas</Label>
-          <Textarea value={notes} onChange={(e)=>setNotes(e.target.value)}/>
+<Label>Notas</Label>
+<Textarea value={notes} onChange={(e)=>setNotes(e.target.value)}/>
 
-          <Label>Validez</Label>
-          <Input type="number" value={validityDays} onChange={(e)=>setValidityDays(Number(e.target.value))}/>
+<Label>Validez</Label>
+<Input type="number" value={validityDays} onChange={(e)=>setValidityDays(Number(e.target.value))}/>
 
-          <Label>Garantía</Label>
-          <Input value={warranty} onChange={(e)=>setWarranty(e.target.value)}/>
+<Label>Garantía</Label>
+<Input value={warranty} onChange={(e)=>setWarranty(e.target.value)}/>
 
-          <Label>Forma de pago</Label>
-          <Input value={paymentTerms} onChange={(e)=>setPaymentTerms(e.target.value)}/>
+<Label>Forma de pago</Label>
+<Input value={paymentTerms} onChange={(e)=>setPaymentTerms(e.target.value)}/>
 
         </div>
 

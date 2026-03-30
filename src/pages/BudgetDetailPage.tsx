@@ -31,6 +31,19 @@ const BudgetDetailPage = () => {
   const [clientAddress, setClientAddress] = useState("");
   const [client, setClient] = useState<any>(null);
   const facturaRef = useRef(null);
+  const [showFiscalModal, setShowFiscalModal] = useState(false);
+
+  const [ivaCondition, setIvaCondition] = useState("Consumidor Final");
+  const [currency, setCurrency] = useState("ARS");
+  const [exchangeRate, setExchangeRate] = useState("");
+  const [ivaPercent, setIvaPercent] = useState(21);
+
+  
+  useEffect(() => {// AJUSTE AUTOMÁTICO DEL % DE IVA
+  if (ivaCondition === "Responsable Inscripto") {
+    setIvaPercent(21);
+  }
+}, [ivaCondition]);
 
   // ----------------------------------------------------
   // LOAD DATA
@@ -129,7 +142,9 @@ const BudgetDetailPage = () => {
     sent: "Enviado",
     accepted: "Aceptado",
     rejected: "Rechazado",
+    listo_para_facturar: "Listo para facturar",
     facturado: "Facturado",
+    cancelado: "Cancelado",
   };
 
   const statusStyles: Record<Budget["status"], string> = {
@@ -137,7 +152,12 @@ const BudgetDetailPage = () => {
   sent: "status-sent",
   accepted: "status-accepted",
   rejected: "bg-destructive/10 text-destructive",
+  listo_para_facturar: "bg-blue-100 text-blue-600",
+  facturado: "bg-green-600 text-white",
+  cancelado: "bg-red-600 text-white",
 };
+
+
 
 // ----------------------------------------------------
 // ABRIR APP DE FACTURACIÓN
@@ -158,6 +178,40 @@ const generarFactura = async () => {
   }
 
   try {
+
+   // -----------------------------------------
+// 🧠 CÁLCULO PROFESIONAL (NETO + IVA)
+// -----------------------------------------
+const subtotal =
+  Number(budget.subtotal || 0) +
+  Number(budget.laborCost || 0);
+
+let ivaAmount = 0;
+let totalFinal = subtotal;
+
+// 👉 IVA SIEMPRE (excepto exento)
+if (ivaCondition === "Exento") {
+  ivaAmount = 0;
+  totalFinal = subtotal;
+} else {
+  ivaAmount = subtotal * (ivaPercent / 100);
+  totalFinal = subtotal + ivaAmount;
+}
+
+// 👉 USD DESPUÉS DEL IVA
+let totalUSD = "";
+
+if (currency === "USD") {
+  const rate = Number(exchangeRate || 0);
+
+  if (rate > 0) {
+    totalUSD = String(Math.floor(totalFinal / rate));
+  }
+}
+
+    // -----------------------------------------
+    // 🔗 BACKEND
+    // -----------------------------------------
     const response = await fetch("https://facturacion-server-backend.onrender.com/api/factura", {
       method: "POST",
       headers: {
@@ -165,9 +219,16 @@ const generarFactura = async () => {
       },
       body: JSON.stringify({
         cliente: budget.clientName,
-        total: Number(budget.subtotal || 0) + Number(budget.laborCost || 0),
+        total: totalFinal,
+        subtotal,
+        iva: ivaAmount,
+        ivaPercent,
+        ivaCondition,
+        currency,
+        exchangeRate,
+        totalUSD,
         descripcion: "Trabajo de instalación"
-      })
+         })
     });
 
     if (!response.ok) {
@@ -183,9 +244,16 @@ const generarFactura = async () => {
 
 
     const dataConNumero = {
-    numero: data.numero, // 🔥 ESTE ES EL FIX
+    numero: data.numero, 
     cliente: data.cliente,
     total: Math.round(Number(data.total || 0)),
+    subtotal,
+    iva: ivaAmount,
+    ivaPercent,
+    ivaCondition,
+    currency,
+    exchangeRate,
+    totalUSD,
     CAE: data.CAE,
     vencimiento: data.vencimiento
     };
@@ -319,7 +387,7 @@ const enviarWhatsApp = () => {
   const mensaje = `Hola ${budget.clientName},
 Te envío la factura correspondiente:
 🧾 Factura N° ${budget.number}
-💲 Total: $${budget.total.toLocaleString("es-AR")}
+💲 Total (sin impuestos): $${budget.total.toLocaleString("es-AR")}
 Gracias por tu confianza.`;
   const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
   window.open(url, "_blank");
@@ -422,8 +490,8 @@ const cancelarFactura = async () => {
           {statusLabels[budget.status]}
         </span>
       </div>
-
-      {/* CLIENTE */}
+      
+{/* CLIENTE */}
 <div className="card-elevated p-4 space-y-2">
   <h3 className="font-semibold text-primary">Cliente</h3>
   <p className="text-foreground">{budget.clientName}</p>
@@ -511,7 +579,7 @@ const cancelarFactura = async () => {
           )}
 
           <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
-            <span>Total</span>
+            <span>Total (sin impuestos)</span>
             <span className="text-primary">
               ${budget.total.toLocaleString("es-AR", {
                 minimumFractionDigits: 0,
@@ -563,14 +631,14 @@ const cancelarFactura = async () => {
       <div className="mt-4">
       <Button
       className="w-full btn-gradient"
-      onClick={generarFactura}
+            onClick={() => setShowFiscalModal(true)}
       disabled={budget.status === "facturado" || budget.status === "cancelado"}
       >
       {budget.status === "facturado"
         ? "Factura generada"
          : budget.status === "cancelado"
          ? "Factura cancelada"
-         : "Generar Factura"}
+         : "Introducir datos fiscales"}
       </Button>
       </div>
 
@@ -638,6 +706,91 @@ const cancelarFactura = async () => {
 )}
  </> 
 )}          
+    
+ {showFiscalModal && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-xl w-full max-w-md space-y-4">
+
+      <h2 className="text-lg font-bold">Datos Fiscales</h2>
+
+      {/* IVA */}
+      <div>
+        <label className="text-sm">Condición frente al IVA</label>
+        <select
+          className="w-full border p-2 rounded"
+          value={ivaCondition}
+          onChange={(e) => setIvaCondition(e.target.value)}
+        >
+          <option>Consumidor Final</option>
+          <option>Responsable Inscripto</option>
+          <option>Monotributista</option>
+          <option>Exento</option>
+        </select>
+      </div>
+
+      {/* MONEDA */}
+      <div>
+        <label className="text-sm">Moneda</label>
+        <select
+          className="w-full border p-2 rounded"
+          value={currency}
+          onChange={(e) => setCurrency(e.target.value)}
+        >
+          <option value="ARS">Pesos</option>
+          <option value="USD">USD</option>
+        </select>
+      </div>
+
+      {ivaCondition === "Responsable Inscripto" && (
+  <div>
+    <label className="text-sm">IVA (%)</label>
+    <input
+      type="number"
+      className="w-full border p-2 rounded"
+      value={ivaPercent}
+      onChange={(e) => setIvaPercent(Number(e.target.value))}
+      placeholder="Ej: 21 o 10.5"
+    />
+  </div>
+)}
+
+      {/* USD */}
+      {currency === "USD" && (
+        <div>
+          <label className="text-sm">Tipo de cambio</label>
+          <input
+            className="w-full border p-2 rounded"
+            value={exchangeRate}
+            onChange={(e) => setExchangeRate(e.target.value)}
+          />
+        </div>
+      )}
+
+      {/* BOTONES */}
+      <div className="flex gap-2">
+        <Button
+          className="w-full"
+          variant="outline"
+          onClick={() => setShowFiscalModal(false)}
+        >
+          Cancelar
+        </Button>
+
+        <Button
+          className="w-full"
+          onClick={() => {
+            generarFactura(); // usamos tu función actual por ahora
+            setShowFiscalModal(false);
+          }}
+        >
+          Generar Factura
+        </Button>
+      </div>
+
+    </div>
+  </div>
+)}   
+    
     </PageLayout>
   );
 };

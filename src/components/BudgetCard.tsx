@@ -14,6 +14,7 @@ const statusLabels: Record<Budget['status'], string> = {
   sent: 'Enviado',
   accepted: 'Aceptado',
   rejected: 'Rechazado',
+  listo_para_facturar: "Listo para facturar",
   facturado: 'Facturado',
   cancelado: 'Cancelado',
 };
@@ -23,6 +24,7 @@ const statusStyles: Record<Budget['status'], string> = {
   sent: 'status-sent',
   accepted: 'status-accepted',
   rejected: 'bg-destructive/10 text-destructive',
+  listo_para_facturar: 'bg-blue-100 text-blue-600',
   facturado: 'bg-green-600 text-white',
   cancelado: 'bg-red-600 text-white',
 };

@@ -42,6 +42,11 @@ export interface Budget {
   clientId: string;
   clientName: string;
   category: BudgetCategory;
+  ivaCondition?: string;
+  currency?: string;
+  exchangeRate?: string;
+  totalUSD?: string;
+  totalARS?: string;
   items: BudgetItem[];
   laborCost: number;
   subtotal: number;
@@ -53,7 +58,7 @@ export interface Budget {
   validityDays: number;
   warranty: string;
   paymentTerms: string;
-  status: 'draft' | 'sent' | 'accepted' | 'rejected'| 'facturado' | 'cancelado';
+  status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'listo_para_facturar' | 'facturado' | 'cancelado';
   createdAt: string;
   sentAt?: string;
    // AC Equipment Data
