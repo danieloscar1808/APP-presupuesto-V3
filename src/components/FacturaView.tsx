@@ -24,13 +24,22 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
       <div className="flex justify-between items-start border-b pb-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Factura C</h1>
-          <p className="text-sm text-gray-600">N° {factura.numero}</p>
-          <p className="text-sm text-gray-500">Presupuesto N° {budget.number}</p>
+          <p className="text-sm text-gray-600">
+            Punto de Venta: {factura.numero?.split("-")[0]}
+          </p>
+
+          <p className="text-sm text-gray-600">
+            Comp. N°: {factura.numero?.split("-")[1]}
+          </p>
+
+          <p className="text-sm text-gray-500">
+          Ref: Presupuesto N° {budget.number}
+          </p>
         </div>
 
         <div className="text-right text-sm">
           <p><strong>Fecha:</strong> {new Date().toLocaleDateString()}</p>
-          <p><strong>Condición:</strong> {budget?.ivaCondition || "Monotributista"}</p>        
+          <p><strong>Condición:</strong> {factura?.ivaCondition || "Monotributista"}</p>       
           </div>
         </div>
 
@@ -48,13 +57,16 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
         <h2 className="font-semibold text-lg">Cliente</h2>
         <p>{factura.cliente}</p>
         {budget?.clientDocNumber && (
-        <p>
-        {budget.clientDocType}: {formatDoc(budget.clientDocType, budget.clientDocNumber)}
-        </p>
+        <p>{budget.clientDocType}: {formatDoc(budget.clientDocType, budget.clientDocNumber)}</p>
          )}
         {budget?.clientAddress && (
-        <p>Dirección: {budget.clientAddress}</p>
-        )} 
+  <>
+    <p>Dirección: {budget.clientAddress}</p>
+    <p>
+      Condición frente al IVA: {factura?.ivaCondition || "Consumidor Final"}
+    </p>
+  </>
+)}
         </div>
 
         {/* DATOS FISCALES */}
@@ -109,52 +121,81 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
 </div>
 
       {/* TABLA DETALLE */}
-      <div className="mb-6">
-        <table className="w-full text-sm border">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="text-left p-2 border">Descripción</th>
-              <th className="text-right p-2 border">Importe</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-                <td className="p-2 border">
-                 Materiales
-                </td>
-                <td className="p-2 border text-right">
-                ${Number(budget.subtotal || 0).toLocaleString("es-AR")}
-                </td>
-                </tr>
+<div className="mb-6">
+  <table className="w-full text-sm border">
+    <thead className="bg-gray-100">
+      <tr>
+        <th className="text-left p-2 border">Descripción</th>
+        <th className="text-right p-2 border">Importe</th>
+      </tr>
+    </thead>
 
-                <tr>
-                <td className="p-2 border">
-                 Mano de obra
-                </td>
-                <td className="p-2 border text-right">
-                 ${Number(budget.laborCost || 0).toLocaleString("es-AR")}
-                </td>
-                </tr>
-            </tbody>
-        </table>
-      </div>
+    <tbody>
+
+      <tr>
+        <td className="p-2 border">
+          Materiales
+        </td>
+        <td className="p-2 border text-right">
+          ${Number(budget?.subtotal || 0).toLocaleString("es-AR")}
+        </td>
+      </tr>
+
+      <tr>
+        <td className="p-2 border">
+          Mano de obra
+        </td>
+        <td className="p-2 border text-right">
+          ${Number(budget?.laborCost || 0).toLocaleString("es-AR")}
+        </td>
+      </tr>
+
+      {Number(budget?.discount || 0) > 0 && (
+        <tr>
+          <td className="p-2 border">
+            Descuento
+          </td>
+          <td className="p-2 border text-right">
+            {`-$${Number(budget?.discount || 0).toLocaleString("es-AR")}`}
+          </td>
+        </tr>
+      )}
+
+    </tbody>
+  </table>
+</div>
 
       {/* TOTAL */}
-      <div className="flex justify-end mb-6">
+  <div className="flex justify-end mb-6">
   <div className="text-right space-y-1">
 
-        {/* 👉 TOTAL (SIEMPRE) */}
-    <p className="text-lg font-bold">
-  Total: ${Number(factura.total || 0).toLocaleString("es-AR")}
-</p>
+    {/* SUBTOTAL */}
+    <p>
+      Subtotal: $
+      {(Number(budget?.subtotal || 0) + Number(budget?.laborCost || 0))
+        .toLocaleString("es-AR")}
+    </p>
 
-<p className="text-xs text-gray-500">
-  IVA incluido en el precio
-</p>
-    
+    {/* DESCUENTO */}
+    {Number(budget?.discount || 0) > 0 && (
+      <p className="text-red-600">
+        Descuento: -$
+        {Number(budget.discount).toLocaleString("es-AR")}
+      </p>
+    )}
+
+    {/* TOTAL FINAL */}
+    <p className="text-lg font-bold">
+      Total: ${Number(factura.total || 0).toLocaleString("es-AR")}
+    </p>
+
+    {/* LEYENDA */}
+    <p className="text-xs text-gray-500">
+      IVA incluido en el precio
+    </p>
 
   </div>
-</div>
+  </div>
 
       {/* CAE */}
       <div className="border-t pt-4 text-sm">
