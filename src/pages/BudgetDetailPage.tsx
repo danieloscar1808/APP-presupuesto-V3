@@ -319,7 +319,7 @@ const descargarPDF = () => {
   if (!elemento) return;
   const opt = {
     margin:       10,
-    filename:     `Factura-${budget?.number}.pdf`,
+    filename:     `Factura_${factura?.numero || "sin-numero"}_${budget?.clientName || "cliente"}.pdf`,
     image:        { type: "jpeg", quality: 0.98 },
     html2canvas:  { scale: 2 },
     jsPDF:        { unit: "mm", format: "a4", orientation: "portrait" }

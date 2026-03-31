@@ -248,3 +248,12 @@ export const downloadPDF = (budget: Budget, profile: Profile) => {
   const num = budget.number || "sin_numero";
   doc.save(`Presupuesto_${num}_${budget.clientName}.pdf`);
 };
+
+export const downloadFacturaPDF = (factura: any, profile: any) => {
+  const doc = generateFacturaPDF(factura, profile);
+
+  const num = factura?.numero || "sin_numero";
+  const cliente = factura?.cliente || "cliente";
+
+  doc.save(`Factura_${num}_${cliente.replace(/\s/g, "_")}.pdf`);
+};
