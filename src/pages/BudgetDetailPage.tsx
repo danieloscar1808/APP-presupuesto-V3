@@ -172,7 +172,7 @@ const generarFactura = async () => {
   try {
       const totalFinal = Number(budget.total || 0);
       const subtotal = totalFinal;
-      const ivaAmount = 0;a
+      const ivaAmount = 0;
 
 // 👉 USD DESPUÉS DEL IVA
 let totalUSD = "";

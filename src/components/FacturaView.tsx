@@ -151,7 +151,7 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
 <p className="text-xs text-gray-500">
   IVA incluido en el precio
 </p>
-    )}
+    
 
   </div>
 </div>
