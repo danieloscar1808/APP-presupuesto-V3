@@ -143,31 +143,14 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
       <div className="flex justify-end mb-6">
   <div className="text-right space-y-1">
 
-    {/* 👉 SOLO RESPONSABLE INSCRIPTO */}
-    {factura?.ivaCondition === "Responsable Inscripto" && (
-      <>
-        <p>
-          Subtotal: $
-          {Number(factura.subtotal || 0).toLocaleString("es-AR")}
-        </p>
-
-        <p>
-          IVA ({factura.ivaPercent}%): $
-          {Number(factura.iva || 0).toLocaleString("es-AR")}
-        </p>
-      </>
-    )}
-
-    {/* 👉 TOTAL (SIEMPRE) */}
+        {/* 👉 TOTAL (SIEMPRE) */}
     <p className="text-lg font-bold">
-      Total: ${Number(factura.total || 0).toLocaleString("es-AR")}
-    </p>
+  Total: ${Number(factura.total || 0).toLocaleString("es-AR")}
+</p>
 
-    {/* 👉 MENSAJE SOLO CF */}
-    {factura?.ivaCondition !== "Responsable Inscripto" && (
-      <p className="text-xs text-gray-500">
-        IVA incluido en el precio
-      </p>
+<p className="text-xs text-gray-500">
+  IVA incluido en el precio
+</p>
     )}
 
   </div>

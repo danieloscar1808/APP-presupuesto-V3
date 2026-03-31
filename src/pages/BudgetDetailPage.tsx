@@ -32,18 +32,10 @@ const BudgetDetailPage = () => {
   const [client, setClient] = useState<any>(null);
   const facturaRef = useRef(null);
   const [showFiscalModal, setShowFiscalModal] = useState(false);
-
   const [ivaCondition, setIvaCondition] = useState("Consumidor Final");
   const [currency, setCurrency] = useState("ARS");
   const [exchangeRate, setExchangeRate] = useState("");
-  const [ivaPercent, setIvaPercent] = useState(21);
 
-  
-  useEffect(() => {// AJUSTE AUTOMÁTICO DEL % DE IVA
-  if (ivaCondition === "Responsable Inscripto") {
-    setIvaPercent(21);
-  }
-}, [ivaCondition]);
 
   // ----------------------------------------------------
   // LOAD DATA
@@ -178,25 +170,9 @@ const generarFactura = async () => {
   }
 
   try {
-
-   // -----------------------------------------
-// 🧠 CÁLCULO PROFESIONAL (NETO + IVA)
-// -----------------------------------------
-const subtotal =
-  Number(budget.subtotal || 0) +
-  Number(budget.laborCost || 0);
-
-let ivaAmount = 0;
-let totalFinal = subtotal;
-
-// 👉 IVA SIEMPRE (excepto exento)
-if (ivaCondition === "Exento") {
-  ivaAmount = 0;
-  totalFinal = subtotal;
-} else {
-  ivaAmount = subtotal * (ivaPercent / 100);
-  totalFinal = subtotal + ivaAmount;
-}
+      const totalFinal = Number(budget.total || 0);
+      const subtotal = totalFinal;
+      const ivaAmount = 0;a
 
 // 👉 USD DESPUÉS DEL IVA
 let totalUSD = "";
@@ -218,17 +194,17 @@ if (currency === "USD") {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        cliente: budget.clientName,
-        total: totalFinal,
-        subtotal,
-        iva: ivaAmount,
-        ivaPercent,
-        ivaCondition,
-        currency,
-        exchangeRate,
-        totalUSD,
-        descripcion: "Trabajo de instalación"
-         })
+      cliente: budget.clientName,
+      total: totalFinal,
+      subtotal: totalFinal,
+      iva: 0,
+      invoiceType: "C",
+      ivaCondition,
+      currency,
+      exchangeRate,
+      totalUSD,
+      descripcion: "Trabajo de instalación"
+      })
     });
 
     if (!response.ok) {
@@ -248,9 +224,6 @@ if (currency === "USD") {
     cliente: data.cliente,
     total: Math.round(Number(data.total || 0)),
     subtotal,
-    iva: ivaAmount,
-    ivaPercent,
-    ivaCondition,
     currency,
     exchangeRate,
     totalUSD,
@@ -387,7 +360,7 @@ const enviarWhatsApp = () => {
   const mensaje = `Hola ${budget.clientName},
 Te envío la factura correspondiente:
 🧾 Factura N° ${budget.number}
-💲 Total (sin impuestos): $${budget.total.toLocaleString("es-AR")}
+💲 Total ( impuestos incluidos): $${budget.total.toLocaleString("es-AR")}
 Gracias por tu confianza.`;
   const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
   window.open(url, "_blank");
@@ -563,14 +536,7 @@ const cancelarFactura = async () => {
             <span className="text-muted-foreground">Mano de Obra</span>
             <span>${budget.laborCost.toLocaleString("es-AR")}</span>
           </div>
-
-          {budget.taxRate > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">IVA ({budget.taxRate}%)</span>
-              <span>${budget.taxAmount.toLocaleString("es-AR")}</span>
-            </div>
-          )}
-
+         
           {budget.discount > 0 && (
             <div className="flex justify-between text-sm text-accent">
               <span>Descuento</span>
@@ -579,7 +545,7 @@ const cancelarFactura = async () => {
           )}
 
           <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
-            <span>Total (sin impuestos)</span>
+            <span>Total (impuestos incluidos)</span>
             <span className="text-primary">
               ${budget.total.toLocaleString("es-AR", {
                 minimumFractionDigits: 0,
@@ -713,58 +679,45 @@ const cancelarFactura = async () => {
 
       <h2 className="text-lg font-bold">Datos Fiscales</h2>
 
-      {/* IVA */}
       <div>
-        <label className="text-sm">Condición frente al IVA</label>
-        <select
-          className="w-full border p-2 rounded"
-          value={ivaCondition}
-          onChange={(e) => setIvaCondition(e.target.value)}
-        >
-          <option>Consumidor Final</option>
-          <option>Responsable Inscripto</option>
-          <option>Monotributista</option>
-          <option>Exento</option>
-        </select>
-      </div>
-
+  <label className="text-sm">Condición frente al IVA</label>
+  <select
+    className="w-full border p-2 rounded"
+    value={ivaCondition}
+    onChange={(e) => setIvaCondition(e.target.value)}
+  >
+    <option>Consumidor Final</option>
+    <option>Responsable Inscripto</option>
+    <option>Monotributista</option>
+    <option>Exento</option>
+  </select>
+  </div>
+      
       {/* MONEDA */}
       <div>
-        <label className="text-sm">Moneda</label>
-        <select
-          className="w-full border p-2 rounded"
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
-        >
-          <option value="ARS">Pesos</option>
-          <option value="USD">USD</option>
-        </select>
-      </div>
+  <label className="text-sm">Moneda</label>
+  <select
+  className="w-full border p-2 rounded"
+  value={currency}
+  onChange={(e) => setCurrency(e.target.value)}
+>
+  <option value="ARS">Pesos</option>
+  <option value="USD">USD</option>
+</select>
+</div>
 
-      {ivaCondition === "Responsable Inscripto" && (
+{/* TIPO DE CAMBIO */}
+{currency === "USD" && (
   <div>
-    <label className="text-sm">IVA (%)</label>
+    <label className="text-sm">Tipo de cambio</label>
     <input
-      type="number"
       className="w-full border p-2 rounded"
-      value={ivaPercent}
-      onChange={(e) => setIvaPercent(Number(e.target.value))}
-      placeholder="Ej: 21 o 10.5"
+      value={exchangeRate}
+      onChange={(e) => setExchangeRate(e.target.value)}
+      placeholder="Ej: 1000"
     />
   </div>
 )}
-
-      {/* USD */}
-      {currency === "USD" && (
-        <div>
-          <label className="text-sm">Tipo de cambio</label>
-          <input
-            className="w-full border p-2 rounded"
-            value={exchangeRate}
-            onChange={(e) => setExchangeRate(e.target.value)}
-          />
-        </div>
-      )}
 
       {/* BOTONES */}
       <div className="flex gap-2">
