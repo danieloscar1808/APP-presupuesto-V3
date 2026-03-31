@@ -69,19 +69,12 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
 )}
         </div>
 
-        {/* DATOS FISCALES */}
+        {/* DATOS del PAGO */}
 <div className="mb-6">
-  <h2 className="font-semibold text-lg">Datos Fiscales</h2>
+    <h2 className="font-semibold text-lg">Datos del Pago</h2>
+    <div className="text-sm space-y-1">
 
-  <div className="text-sm space-y-1">
-
-    {/* CONDICIÓN IVA */}
-    <div className="flex justify-between">
-      <span className="text-gray-600">Condición IVA</span>
-      <span>{factura?.ivaCondition || "-"}</span>
-    </div>
-
-    {/* MONEDA */}
+       {/* MONEDA */}
     <div className="flex justify-between">
       <span className="text-gray-600">Moneda</span>
       <span>
@@ -90,6 +83,12 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
           : "Pesos Argentinos (ARS)"}
       </span>
     </div>
+    
+        {/* FORMA DE PAGO */}
+        <div className="flex justify-between">
+        <span className="text-gray-600">Forma de pago</span>
+        <span>{factura?.formaPago || "Transferencia"}</span>
+        </div>  
 
     {/* USD SOLO SI APLICA */}
     {factura?.currency === "USD" && (
@@ -114,7 +113,7 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
             ${Number(factura?.total || 0).toLocaleString("es-AR")}
           </span>
         </div>
-      </>
+        </>
     )}
 
   </div>

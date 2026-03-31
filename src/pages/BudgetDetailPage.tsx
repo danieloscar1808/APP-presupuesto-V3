@@ -23,7 +23,6 @@ import { saveBudget } from "@/lib/storage";
 const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
   const [budget, setBudget] = useState<Budget | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,6 +34,7 @@ const BudgetDetailPage = () => {
   const [ivaCondition, setIvaCondition] = useState("Consumidor Final");
   const [currency, setCurrency] = useState("ARS");
   const [exchangeRate, setExchangeRate] = useState("");
+  const [formaPago, setFormaPago] = useState("Transferencia");
 
 
   // ----------------------------------------------------
@@ -203,6 +203,7 @@ if (currency === "USD") {
       currency,
       exchangeRate,
       totalUSD,
+      formaPago,
       descripcion: "Trabajo de instalación"
       })
     });
@@ -227,6 +228,7 @@ if (currency === "USD") {
     currency,
     exchangeRate,
     totalUSD,
+    formaPago,
     CAE: data.CAE,
     vencimiento: data.vencimiento
     };
@@ -694,16 +696,34 @@ const cancelarFactura = async () => {
   </div>
       
       {/* MONEDA */}
-      <div>
-  <label className="text-sm">Moneda</label>
+<div>
+      <label className="text-sm">Moneda</label>
+      <select
+      className="w-full border p-2 rounded"
+      value={currency}
+      onChange={(e) => setCurrency(e.target.value)}
+      >
+      <option value="ARS">Pesos</option>
+      <option value="USD">USD</option>
+      </select>
+</div>
+
+      {/* FORMA DE PAGO */}
+<div>
+  <label className="text-sm">Forma de pago</label>
   <select
-  className="w-full border p-2 rounded"
-  value={currency}
-  onChange={(e) => setCurrency(e.target.value)}
->
-  <option value="ARS">Pesos</option>
-  <option value="USD">USD</option>
-</select>
+    className="w-full border p-2 rounded"
+    value={formaPago}
+    onChange={(e) => setFormaPago(e.target.value)}
+  >
+    <option>Efectivo / Contado</option>
+    <option>Transferencia</option>
+    <option>Mercado Pago</option>
+    <option>Tarjeta de Débito</option>
+    <option>Tarjeta de Crédito</option>
+    <option>Cuenta Corriente</option>
+    <option>Otro</option>
+  </select>
 </div>
 
 {/* TIPO DE CAMBIO */}
