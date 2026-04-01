@@ -90,7 +90,7 @@ const NewBudgetPage = () => {
 
   const [validityDays,setValidityDays] = useState(7);
   const [warranty,setWarranty] = useState("6 meses");
-  const [paymentTerms,setPaymentTerms] = useState("Efectivo / Transferencia");
+  const [paymentTerms,setPaymentTerms] = useState("Efectivo / Transferencia / Mercado Pago / Tarjeta de crédito o débito (una cuota) / Cuenta Corriente");
 
     
   /* AC */
