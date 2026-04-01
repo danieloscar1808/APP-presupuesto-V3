@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 import { BottomNavigation } from './BottomNavigation';
+import { FABMenu } from "./ui/FABMenu";
+import FABAction from "./ui/FABAction";
 
 interface PageLayoutProps {
   children: ReactNode;
@@ -35,7 +37,8 @@ export const PageLayout = ({ children, title, headerContent }: PageLayoutProps) 
       <main className="px-4 py-4 max-w-lg mx-auto animate-fade-in">
         {children}
       </main>
-      <BottomNavigation />
+      <FABAction />
+      <FABMenu />
     </div>
   );
 };

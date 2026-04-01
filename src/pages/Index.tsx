@@ -6,6 +6,7 @@ import { Profile, Budget } from '@/types';
 import { Button } from '@/components/ui/button';
 import { BudgetCard } from '@/components/BudgetCard';
 import { Plus, FileText, Users, TrendingUp, Settings } from 'lucide-react';
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -75,6 +76,12 @@ const Index = () => {
         <Plus className="w-5 h-5 mr-2" />
         Nuevo Presupuesto
       </Button>
+
+      <Link to="/cierre-iibb">
+        <Button className="w-full h-14 text-base mb-6">
+          Cierre IIBB
+        </Button>
+      </Link>
 
       {/* Recent budgets */}
       <div className="space-y-3">
