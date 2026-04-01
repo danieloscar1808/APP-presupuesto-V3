@@ -19,6 +19,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
   if (!factura || !budget) return null;
 
   const datos = preliminar ? budget.facturaPreliminar : factura;
+  const totalFinal = preliminar ? budget.total : factura.total;
 
   return (
     <div className="bg-white text-black p-4 mt-2 rounded-xl shadow print:max-h-none overflow-y-auto">
@@ -100,28 +101,34 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
         </div>  
 
     {/* USD SOLO SI APLICA */}
-    {factura?.currency === "USD" && (
-      <>
-        <div className="flex justify-between">
-          <span className="text-gray-600">Tipo de cambio</span>
-          <span>{factura?.exchangeRate}</span>
-        </div>
+    {datos?.currency === "USD" && (
+  <>
+    <div className="flex justify-between">
+      <span className="text-gray-600">Tipo de cambio</span>
+      <span>{datos?.exchangeRate || "-"}</span>
+    </div>
 
-        <div className="flex justify-between">
-          <span className="text-gray-600">Total USD</span>
-          <span>
-            {factura?.totalUSD
-            ? Number(factura.totalUSD).toLocaleString("es-AR")
-            : "-"}
-        </span>
-        </div>
+    {/* TOTAL USD */}
+    <div className="flex justify-between">
+      <span className="text-gray-600">Total USD</span>
+      <span>
+        {preliminar
+          ? Math.floor(Number(budget.total) / Number(datos?.exchangeRate || 1)).toLocaleString("es-AR")
+          : factura?.totalUSD
+          ? Number(factura.totalUSD).toLocaleString("es-AR")
+          : "-"}
+      </span>
+    </div>
 
-        <div className="flex justify-between">
-          <span className="text-gray-600">Total ARS</span>
-          <span>
-            ${Number(factura?.total || 0).toLocaleString("es-AR")}
-          </span>
-        </div>
+    {/* TOTAL ARS */}
+    <div className="flex justify-between">
+      <span className="text-gray-600">Total ARS</span>
+      <span>
+        ${Number(
+          preliminar ? budget.total : factura?.total || 0
+        ).toLocaleString("es-AR")}
+      </span>
+    </div>
         </>
     )}
 
@@ -194,7 +201,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
     {/* TOTAL FINAL */}
     <p className="text-lg font-bold">
-      Total: ${Number(factura.total || 0).toLocaleString("es-AR")}
+      Total: ${Number(totalFinal || 0).toLocaleString("es-AR")}
     </p>
 
     {/* LEYENDA */}

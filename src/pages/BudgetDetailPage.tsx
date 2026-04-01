@@ -20,7 +20,7 @@ import { getClients } from "@/lib/storage";
 import { saveBudget } from "@/lib/storage";
 
 
-const BudgetDetailPage = () => {
+  const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [budget, setBudget] = useState<Budget | null>(null);
@@ -156,8 +156,24 @@ const BudgetDetailPage = () => {
 // ----------------------------------------------------
 
 const generarFactura = async () => {
-  if (!budget) return;
+  
+  if (budget.factura) {
+    alert("Esta factura ya fue emitida");
+    return;
+  }
 
+  if (budget.status !== "listo_para_facturar") {
+    alert("Primero debes generar la factura preliminar");
+    return;
+  }
+
+  if (!budget.total || budget.total <= 0) {
+    alert("El total no puede ser cero");
+    return;
+  }
+
+  
+  if (!budget) return;
   // 🔥 BLOQUEO COMPLETO (FACTURADO + CANCELADO)
   if (budget.factura) {
     alert("Este presupuesto ya tiene una factura generada");
@@ -242,15 +258,12 @@ if (currency === "USD") {
     const updatedBudgetFactura = {
       ...budget,
       status: "facturado",
-      factura: dataConNumero
-    };
+      factura: dataConNumero,
+      facturaPreliminar: undefined,
+      };
 
-    await saveBudget(updatedBudgetFactura);
-    
-    setBudget({
-  ...updatedBudgetFactura,
-    factura: { ...dataConNumero } // 🔥 CLAVE
-    });
+      await saveBudget(updatedBudgetFactura);
+      setBudget(updatedBudgetFactura);
 
     // 🔥 estado local
     setFactura(dataConNumero);
@@ -433,7 +446,7 @@ const generarPreliminar = async () => {
       exchangeRate,
       formaPago,
     },
-    status: "preliminar",
+    status: "listo_para_facturar",
   };
 
   await saveBudget(updatedBudget);
@@ -636,7 +649,7 @@ const generarPreliminar = async () => {
       </Button>
       </div>
 
-      {/* FACTURA */}
+      {/* FACTURA preliminar */}
       {(factura || budget.facturaPreliminar) && profile && budget && (
       <>
       <div ref={facturaRef} className="mt-4 print-area pb-4">
@@ -644,7 +657,7 @@ const generarPreliminar = async () => {
         factura={factura || budget.facturaPreliminar}
         profile={profile}
         budget={budget}
-        preliminar={budget.status === "preliminar"}
+        preliminar={budget.status === "listo_para_facturar"}
         />
       </div>
 
@@ -656,8 +669,20 @@ const generarPreliminar = async () => {
       </div>
       )}
 
+      {budget.status === "listo_para_facturar" && (
+  <div className="mt-2">
+    <Button
+      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+      onClick={generarFactura}
+    >
+      Emitir Factura
+    </Button>
+  </div>
+)}
+
+
       {/* BOTÓN PDF */}
-      <div className="mt-2">
+            <div className="mt-2">
       <Button
         className="w-full"
         onClick={descargarPDF}
