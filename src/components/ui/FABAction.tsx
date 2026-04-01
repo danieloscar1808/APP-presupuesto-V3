@@ -7,7 +7,7 @@ export default function FABAction() {
   return (
     <button
       onClick={() => navigate("/budgets/new")}
-      className="fixed bottom-20 left-4 z-50 w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg"
+      className="fixed bottom-4 left-4 z-50 w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg"
     >
       <Plus className="w-6 h-6" />
     </button>

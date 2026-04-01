@@ -31,9 +31,9 @@ export default function ResumenImpositivoPage() {
   const anio = hoy.getFullYear();
 
   const facturasMes = useMemo(
-    () => filtrarFacturasPorMes(facturas, mes, anio),
-    [facturas, mes, anio]
-  );
+  () => filtrarFacturasPorMes(facturas, mes, anio),
+  [facturas, mes, anio]
+);
 
   const resumen = useMemo(
     () => calcularResumen(facturasMes, retenciones, alicuota),
@@ -44,7 +44,23 @@ export default function ResumenImpositivoPage() {
     generarPDFImpositivo(resumen);
   };
 
-  return (
+  const { cerrarMes, obtenerEstadoMes } = useTaxStore();
+
+  const estadoMes = obtenerEstadoMes(mes, anio);
+
+  const cerrar = () => {
+  if (estadoMes?.cerrado) {
+    alert("Este mes ya está cerrado");
+    return;
+  }
+
+  const ok = confirm("¿Cerrar mes? Esto no se puede modificar después.");
+  if (ok) {
+    cerrarMes(mes, anio, resumen);
+  }
+};
+  
+    return (
     <div className="p-4 space-y-4">
       <h1 className="text-xl font-bold">Resumen Impositivo</h1>
 
@@ -55,6 +71,32 @@ export default function ResumenImpositivoPage() {
         <p className="font-bold">
           Saldo a pagar: ${resumen.saldo}
         </p>
+      </div>
+
+      <button
+      onClick={cerrar}
+      className="w-full bg-black text-white py-2 rounded"
+      >
+      {estadoMes?.cerrado ? "Mes cerrado" : "Cerrar mes"}
+      </button>
+
+      <div className="mt-6 space-y-3">
+        <h2 className="font-semibold text-lg">Historial de cierres</h2>
+
+        {cierres.length === 0 ? (
+          <p className="text-muted-foreground">No hay cierres aún</p>
+        ) : (
+          cierres.map((cierre, index) => (
+            <div key={index} className="border p-3 rounded">
+              <p className="font-medium">
+              {cierre.mes + 1}/{cierre.anio}
+              </p>
+              <p>Total: ${cierre.snapshot?.totalFacturado}</p>
+              <p>IIBB: ${cierre.snapshot?.iibb}</p>
+              <p>Saldo: ${cierre.snapshot?.saldo}</p>
+            </div>
+          ))
+      )}
       </div>
 
       <button

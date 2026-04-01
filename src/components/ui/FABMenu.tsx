@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, X, Home, Users, FileText, Package, Settings, Calculator } from "lucide-react";
+import { Menu, X, Home, Users, FileText, Package, Settings, Calculator } from "lucide-react";
 
 export const FABMenu = () => {
   const [open, setOpen] = useState(false);
@@ -16,7 +16,7 @@ export const FABMenu = () => {
   ];
 
   return (
-    <div className="fixed bottom-20 right-4 z-50 flex flex-col items-end gap-2">
+    <div className="fixed bottom-6 right-4 z-50 flex flex-col items-end gap-2">
       
       {/* Items desplegables */}
       {open &&
@@ -30,7 +30,7 @@ export const FABMenu = () => {
                 navigate(item.path);
                 setOpen(false);
               }}
-              className="flex items-center gap-2 bg-white shadow-lg rounded-full px-4 py-2 text-sm"
+              className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-full shadow-xl border border-gray-300"
             >
               <Icon className="w-4 h-4" />
               {item.label}
@@ -43,7 +43,7 @@ export const FABMenu = () => {
         onClick={() => setOpen(!open)}
         className="w-14 h-14 rounded-full bg-black text-white flex items-center justify-center shadow-lg"
       >
-        {open ? <X /> : <Plus />}
+        {open ? <X /> : <Menu />}
       </button>
     </div>
   );

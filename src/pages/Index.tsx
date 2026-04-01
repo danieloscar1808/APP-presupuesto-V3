@@ -77,12 +77,7 @@ const Index = () => {
         Nuevo Presupuesto
       </Button>
 
-      <Link to="/cierre-iibb">
-        <Button className="w-full h-14 text-base mb-6">
-          Cierre IIBB
-        </Button>
-      </Link>
-
+      
       {/* Recent budgets */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
