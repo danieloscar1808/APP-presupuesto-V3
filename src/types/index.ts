@@ -58,7 +58,7 @@ export interface Budget {
   validityDays: number;
   warranty: string;
   paymentTerms: string;
-  status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'listo_para_facturar' | 'facturado' | 'cancelado';
+  status: 'draft' | 'sent' | 'accepted' | 'rejected' | 'listo_para_facturar' | 'preliminar' | 'facturado' | 'cancelado';
   createdAt: string;
   sentAt?: string;
    // AC Equipment Data
@@ -81,6 +81,10 @@ export interface Budget {
    // FACTURACIÓN
   factura?: any;
   notaCredito?: any;
+  facturaPreliminar?: {
+  condicionIVA: string;
+  moneda: string;
+  formaPago: string;};
   }
 
 // AC Specific

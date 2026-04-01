@@ -2,9 +2,10 @@ type Props = {
   factura: any;
   profile: any;
   budget: any;
+  preliminar?: boolean;
 };
 
-const FacturaView = ({ factura, profile, budget }: Props) => {
+const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
  console.log("FACTURA EN VIEW:", factura); 
 
@@ -17,19 +18,27 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
 
   if (!factura || !budget) return null;
 
+  const datos = preliminar ? budget.facturaPreliminar : factura;
+
   return (
     <div className="bg-white text-black p-4 mt-2 rounded-xl shadow print:max-h-none overflow-y-auto">
+
+      {preliminar && (
+      <div className="bg-yellow-100 text-yellow-800 text-center py-2 font-bold rounded mb-2">
+        ⚠️ FACTURA PRELIMINAR - SIN VALIDEZ FISCAL
+      </div>
+      )}
 
       {/* HEADER */}
       <div className="flex justify-between items-start border-b pb-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">Factura C</h1>
           <p className="text-sm text-gray-600">
-            Punto de Venta: {factura.numero?.split("-")[0]}
+           Punto de Venta: {preliminar ? "—" : factura.numero?.split("-")[0]}
           </p>
 
           <p className="text-sm text-gray-600">
-            Comp. N°: {factura.numero?.split("-")[1]}
+          Comp. N°: {preliminar ? "—" : factura.numero?.split("-")[1]}
           </p>
 
           <p className="text-sm text-gray-500">
@@ -39,7 +48,7 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
 
         <div className="text-right text-sm">
           <p><strong>Fecha:</strong> {new Date().toLocaleDateString()}</p>
-          <p><strong>Condición:</strong> {factura?.ivaCondition || "Monotributista"}</p>       
+          <p><strong>Condición:</strong> {datos?.ivaCondition || "Monotributista"}</p>       
           </div>
         </div>
 
@@ -78,7 +87,7 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
     <div className="flex justify-between">
       <span className="text-gray-600">Moneda</span>
       <span>
-        {factura?.currency === "USD"
+        {datos?.currency === "USD"
           ? "Dólares Estadounidenses (USD)"
           : "Pesos Argentinos (ARS)"}
       </span>
@@ -87,7 +96,7 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
         {/* FORMA DE PAGO */}
         <div className="flex justify-between">
         <span className="text-gray-600">Forma de pago</span>
-        <span>{factura?.formaPago || "Transferencia"}</span>
+        <span>{datos?.formaPago || "Transferencia"}</span>
         </div>  
 
     {/* USD SOLO SI APLICA */}
@@ -197,10 +206,12 @@ const FacturaView = ({ factura, profile, budget }: Props) => {
   </div>
 
       {/* CAE */}
-      <div className="border-t pt-4 text-sm">
-        <p><strong>CAE:</strong> {factura.CAE}</p>
-        <p><strong>Vencimiento CAE:</strong> {factura.vencimiento}</p>
-      </div>
+      {!preliminar && (
+  <div className="border-t pt-4 text-sm">
+    <p><strong>CAE:</strong> {factura.CAE}</p>
+    <p><strong>Vencimiento CAE:</strong> {factura.vencimiento}</p>
+  </div>
+    )}
 
     </div>
   );

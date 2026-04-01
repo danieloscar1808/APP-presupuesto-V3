@@ -422,6 +422,32 @@ const cancelarFactura = async () => {
   }
 };
 
+const generarPreliminar = async () => {
+  if (!budget) return;
+
+  const updatedBudget = {
+    ...budget,
+    facturaPreliminar: {
+      ivaCondition,
+      currency,
+      exchangeRate,
+      formaPago,
+    },
+    status: "preliminar",
+  };
+
+  await saveBudget(updatedBudget);
+  setBudget(updatedBudget);
+
+  setTimeout(() => {
+    facturaRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, 100);
+};
+
+
 
   return (
     <PageLayout>
@@ -611,10 +637,15 @@ const cancelarFactura = async () => {
       </div>
 
       {/* FACTURA */}
-      {factura && profile && budget &&(
+      {(factura || budget.facturaPreliminar) && profile && budget && (
       <>
       <div ref={facturaRef} className="mt-4 print-area pb-4">
-      <FacturaView factura={factura} profile={profile} budget={budget}/>
+      <FacturaView
+        factura={factura || budget.facturaPreliminar}
+        profile={profile}
+        budget={budget}
+        preliminar={budget.status === "preliminar"}
+        />
       </div>
 
       
@@ -752,11 +783,11 @@ const cancelarFactura = async () => {
         <Button
           className="w-full"
           onClick={() => {
-            generarFactura(); // usamos tu función actual por ahora
+            generarPreliminar(); // usamos tu función actual por ahora
             setShowFiscalModal(false);
           }}
         >
-          Generar Factura
+          Generar Factura Preliminar
         </Button>
       </div>
 
