@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 type ResumenImpositivo = {
   totalFacturado: number;
@@ -11,7 +12,8 @@ type EstadoMes = {
   mes: number;
   anio: number;
   cerrado: boolean;
-  snapshot?: ResumenImpositivo;
+  fecha: string; // 👉 agregado
+  snapshot: ResumenImpositivo;
 };
 
 type TaxState = {
@@ -26,31 +28,39 @@ type TaxState = {
   obtenerEstadoMes: (mes: number, anio: number) => EstadoMes | undefined;
 };
 
-export const useTaxStore = create<TaxState>((set, get) => ({
-  cierres: [],
+export const useTaxStore = create<TaxState>()(
+  persist(
+    (set, get) => ({
+      cierres: [],
 
-  cerrarMes: (mes, anio, resumen) => {
-    const existe = get().cierres.find(
-      (c) => c.mes === mes && c.anio === anio
-    );
+      cerrarMes: (mes, anio, resumen) => {
+        const existe = get().cierres.find(
+          (c) => c.mes === mes && c.anio === anio
+        );
 
-    if (existe) return;
+        if (existe) return;
 
-    const nuevo: EstadoMes = {
-      mes,
-      anio,
-      cerrado: true,
-      snapshot: resumen,
-    };
+        const nuevo: EstadoMes = {
+          mes,
+          anio,
+          cerrado: true,
+          fecha: new Date().toISOString(), // 👉 importante
+          snapshot: resumen,
+        };
 
-    set((state) => ({
-      cierres: [...state.cierres, nuevo],
-    }));
-  },
+        set((state) => ({
+          cierres: [...state.cierres, nuevo],
+        }));
+      },
 
-  obtenerEstadoMes: (mes, anio) => {
-    return get().cierres.find(
-      (c) => c.mes === mes && c.anio === anio
-    );
-  },
-}));
+      obtenerEstadoMes: (mes, anio) => {
+        return get().cierres.find(
+          (c) => c.mes === mes && c.anio === anio
+        );
+      },
+    }),
+    {
+      name: "tax-storage", // 👉 guarda en localStorage
+    }
+  )
+);

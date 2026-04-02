@@ -18,6 +18,7 @@ import { useRef } from "react";
 import html2pdf from "html2pdf.js";
 import { getClients } from "@/lib/storage";
 import { saveBudget } from "@/lib/storage";
+import { useFacturasStore } from "../store/facturasStore";
 
 
   const BudgetDetailPage = () => {
@@ -35,6 +36,7 @@ import { saveBudget } from "@/lib/storage";
   const [currency, setCurrency] = useState("ARS");
   const [exchangeRate, setExchangeRate] = useState("");
   const [formaPago, setFormaPago] = useState("Transferencia");
+  const registrarFactura = useFacturasStore((s) => s.registrarFactura);
 
 
   // ----------------------------------------------------
@@ -248,6 +250,18 @@ if (currency === "USD") {
     CAE: data.CAE,
     vencimiento: data.vencimiento
     };
+
+    registrarFactura({
+    id: crypto.randomUUID(),
+    fecha: new Date().toISOString(),
+    total: Math.round(Number(data.total || 0)),
+    numero: Number(data.numero?.split("-")[1]),
+    puntoVenta: Number(data.numero?.split("-")[0]),
+    cae: data.CAE,
+    vencimientoCae: data.vencimiento,
+    estado: "facturado",
+    synced: true,
+    });
 
     console.log("RESPUESTA BACKEND FACTURA:", data);
     console.log("NUMERO:", data.numero);
