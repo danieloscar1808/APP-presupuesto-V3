@@ -7,8 +7,8 @@ type Props = {
 
 const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
- console.log("FACTURA EN VIEW:", factura); 
-
+console.log("FACTURA EN VIEW:", factura); 
+console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
  const formatDoc = (type: string, value: string) => {
     if (type === "CUIT" && value.length === 11) {
       return `${value.slice(0,2)}-${value.slice(2,10)}-${value.slice(10)}`;
@@ -35,18 +35,23 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       
       <div>
         <h1 className="text-2xl font-bold">Factura C</h1>
+
         <p className="text-sm text-gray-600">
-          Punto de Venta: {preliminar ? "—" : factura.numero?.split("-")[0]}
+            Punto de Venta: {preliminar ? "—" : String(factura?.puntoVenta || 1).padStart(5, "0")}
         </p>
+
         <p className="text-sm text-gray-600">
-          Comp. N°: {preliminar ? "—" : factura.numero?.split("-")[1]}
+            Comp. N°: {preliminar ? "—" : String(factura?.numero || 0).padStart(8, "0")}
         </p>
+
         <p className="text-sm text-gray-500">
           Ref: Presupuesto N° {budget.number}
         </p>
+
         <p className="text-sm text-gray-600">
           Fecha: {new Date().toLocaleDateString()}
         </p>
+
         <p className="text-sm text-gray-600">
           Condición Frente al IVA: {datos?.ivaCondition || "Monotributista"}
         </p>
@@ -215,11 +220,32 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
 
     {/* NOTA DE CRÉDITO */}
-{(factura?.estado === "cancelado" || factura?.facturaAsociada) && (
-  <div className="mt-4 p-3 border rounded bg-red-50 text-red-700">
-    <p className="font-bold">NOTA DE CRÉDITO ASOCIADA</p>
-    <p>Factura original: {factura.facturaAsociada || "-"}</p>
-    <p>Estado: CANCELADA</p>
+  {factura?.facturaAsociada && (
+  <div className="mt-4 p-4 border rounded bg-red-50 text-red-700">
+    
+    <p className="font-bold text-lg mb-2">
+      NOTA DE CRÉDITO C
+    </p>
+
+    <p>
+      Número NC: {factura?.facturaAsociada || "-"}
+    </p>
+
+    <p>
+      Factura Asociada: {
+        `${String(factura?.puntoVenta || 1).padStart(5, "0")} - ${String(factura?.numero || 0).padStart(8, "0")}`
+      }
+    </p>
+
+    <p>
+      Total: ${
+        Number(budget?.notaCredito?.total || factura?.total || 0)
+          .toLocaleString("es-AR")
+      }
+    </p>
+
+    <p>Estado: FACTURA CANCELADA</p>
+
   </div>
 )}
 

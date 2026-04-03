@@ -37,6 +37,9 @@ import { useFacturasStore } from "../store/facturasStore";
   const [exchangeRate, setExchangeRate] = useState("");
   const [formaPago, setFormaPago] = useState("Transferencia");
   const registrarFactura = useFacturasStore((s) => s.registrarFactura);
+  const facturas = useFacturasStore((s) => s.facturas);
+  const cancelarFacturaStore = useFacturasStore((s) => s.cancelarFactura);
+  
 
 
   // ----------------------------------------------------
@@ -125,8 +128,12 @@ import { useFacturasStore } from "../store/facturasStore";
   }
 
       console.log("BUDGET COMPLETO:", budget);
-
       console.log("PROFILE:", profile);
+
+      const facturaReal = facturas.find(
+  (f) =>
+    f.numero === Number(budget?.factura?.numero?.split("-")[1])
+);
 
   // ----------------------------------------------------
   // STATUS LABELS
@@ -432,6 +439,11 @@ const cancelarFactura = async () => {
       total: Math.round(Number(data.total || 0))
     };
 
+    cancelarFacturaStore(
+    Number(budget.factura.numero.split("-")[1]),
+    dataConNumero
+    );
+
     const updatedBudgetCancelado = {
       ...budget,
       notaCredito: dataConNumero,
@@ -668,7 +680,7 @@ const generarPreliminar = async () => {
       <>
       <div ref={facturaRef} className="mt-4 print-area pb-4">
       <FacturaView
-        factura={factura || budget.facturaPreliminar}
+        factura={facturaReal || factura || budget.facturaPreliminar}
         profile={profile}
         budget={budget}
         preliminar={budget.status === "listo_para_facturar"}
@@ -717,31 +729,7 @@ const generarPreliminar = async () => {
           Cancelar Factura
       </Button>
       </div>
-
-     {/* NOTA DE CRÉDITO */}
-    {budget.notaCredito && (
-    <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
-    <h2 className="font-bold text-red-600 text-lg mb-2">
-      Nota de Crédito C
-    </h2>
-
-    <p>
-      <strong>Número:</strong> {budget.notaCredito.numero}
-    </p>
-
-    <p>
-      <strong>Factura asociada:</strong>{" "}
-      {budget.notaCredito.facturaAsociada || "No disponible"}
-    </p>
-
-    <p>
-      <strong>Total:</strong>{" "}
-      {"$" + Number(budget.notaCredito.total || 0).toLocaleString("es-AR", {
-  })}
-    </p>
-  </div>
-)}
- </> 
+     </> 
 )}          
     
  {showFiscalModal && (
