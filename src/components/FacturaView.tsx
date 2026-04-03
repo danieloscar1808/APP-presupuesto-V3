@@ -31,7 +31,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     )}
 
     {/* HEADER */}
-    <div className="flex justify-between items-start border-b pb-4 mb-6">
+    <div className="flex justify-between items-start border-b pb-4 mb-3">
       
       <div>
         <h1 className="text-2xl font-bold">Factura C</h1>
@@ -66,7 +66,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     </div>
 
     {/* EMPRESA */}
-    <div className="mb-6">
+    <div className="mb-3">
       <h2 className="font-semibold text-lg">Emisor</h2>
       <p>{profile?.name || "Tu Empresa"}</p>
       <p>CUIT: {profile?.taxId || "CUIT no cargado"}</p>
@@ -74,7 +74,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     </div>
 
     {/* CLIENTE */}
-    <div className="mb-6">
+    <div className="mb-3">
       <h2 className="font-semibold text-lg">Cliente</h2>
       <p>{factura.cliente}</p>
 
@@ -97,7 +97,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     </div>
 
     {/* DATOS DEL PAGO */}
-    <div className="mb-6">
+    <div className="mb-3">
       <h2 className="font-semibold text-lg">Datos del Pago</h2>
 
       <div className="text-sm space-y-1">
@@ -149,7 +149,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     </div>
 
 {/* TABLA DETALLE */}
-<div className="mb-6">
+<div className="mb-3">
   <table className="w-full text-sm border">
     <thead className="bg-gray-100">
       <tr>
@@ -187,7 +187,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
 
 
     {/* TOTAL */}
-    <div className="flex justify-end mb-6">
+    <div className="flex justify-end mb-3">
       <div className="text-right space-y-1">
 
         <p>
@@ -218,36 +218,16 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
       </div>
     )}
 
-
     {/* NOTA DE CRÉDITO */}
   {factura?.facturaAsociada && (
-  <div className="mt-4 p-4 border rounded bg-red-50 text-red-700">
-    
-    <p className="font-bold text-lg mb-2">
-      NOTA DE CRÉDITO C
-    </p>
-
-    <p>
-      Número NC: {factura?.facturaAsociada || "-"}
-    </p>
-
-    <p>
-      Factura Asociada: {
-        `${String(factura?.puntoVenta || 1).padStart(5, "0")} - ${String(factura?.numero || 0).padStart(8, "0")}`
-      }
-    </p>
-
-    <p>
-      Total: ${
-        Number(budget?.notaCredito?.total || factura?.total || 0)
-          .toLocaleString("es-AR")
-      }
-    </p>
-
-    <p>Estado: FACTURA CANCELADA</p>
-
+  <div className="mt-2 p-2 border rounded bg-red-50 text-red-700">
+        <p className="font-bold text-lg mb-1">NOTA DE CRÉDITO C</p>
+        <p>Número NC: {factura?.facturaAsociada || "-"}</p>
+        <p>Factura Asociada: {`${String(factura?.puntoVenta || 1).padStart(5, "0")} - ${String(factura?.numero || 0).padStart(8, "0")}`}</p>
+        <p>Total: ${Number(budget?.notaCredito?.total || factura?.total || 0).toLocaleString("es-AR")}</p>
+        <p>Estado: FACTURA CANCELADA</p>
   </div>
-)}
+  )}
 
 </div>
 );
