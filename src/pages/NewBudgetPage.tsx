@@ -90,7 +90,7 @@ const NewBudgetPage = () => {
 
   const [validityDays,setValidityDays] = useState(7);
   const [warranty,setWarranty] = useState("6 meses");
-  const [paymentTerms,setPaymentTerms] = useState("Efectivo / Transferencia / Mercado Pago / Tarjeta de crédito o débito (una cuota) / Cuenta Corriente");
+  const [paymentTerms,setPaymentTerms] = useState("Efectivo / Transferencia / Mercado Pago / Debito");
 
     
   /* AC */
@@ -314,32 +314,22 @@ const NewBudgetPage = () => {
 
 
         {/* ELECTRIC */}
-
         {category === "electric" && (
-
           <div className="card-elevated p-4 space-y-3">
-
             <Label>Descripción del trabajo</Label>
-
             <Textarea
               value={electricWorkDescription}
               onChange={(e)=>setElectricWorkDescription(e.target.value)}
               className="min-h-[120px]"
             />
-
           </div>
-
         )}
 
 
         {/* SOLAR */}
-
         {category === "solar" && (
-
           <div className="card-elevated p-4 space-y-3">
-
             <Label>Datos del sistema</Label>
-
             <Select value={solarType} onValueChange={setSolarType}>
               <SelectTrigger>
                 <SelectValue placeholder="Tipo de sistema"/>
@@ -374,20 +364,17 @@ const NewBudgetPage = () => {
               value={solarQty}
               onChange={(e)=>setSolarQty(Number(e.target.value))}
             />
-
           </div>
 
         )}
 
 
         {/* ITEMS */}
-
         <ItemsEditor
           items={items}
           category={category}
           onChange={setItems}
         />
-
 
         {/* COSTOS */}
 

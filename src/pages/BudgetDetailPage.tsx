@@ -600,7 +600,7 @@ const generarPreliminar = async () => {
           )}
 
           <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
-            <span>Total (impuestos incluidos)</span>
+            <span>Total</span>
             <span className="text-primary">
               ${budget.total.toLocaleString("es-AR", {
                 minimumFractionDigits: 0,
@@ -676,7 +676,6 @@ const generarPreliminar = async () => {
       </div>
 
       
-
       {budget.status === "cancelado" && (
       <div className="text-center text-red-600 font-bold mt-2">
         ⚠️ Factura anulada mediante Nota de Crédito
@@ -688,7 +687,7 @@ const generarPreliminar = async () => {
     <Button
       className="w-full bg-blue-600 hover:bg-blue-700 text-white"
       onClick={generarFactura}
-    >
+      >
       Emitir Factura
     </Button>
   </div>
@@ -785,7 +784,7 @@ const generarPreliminar = async () => {
     className="w-full border p-2 rounded"
     value={formaPago}
     onChange={(e) => setFormaPago(e.target.value)}
-  >
+    >
     <option>Efectivo / Contado</option>
     <option>Transferencia</option>
     <option>Mercado Pago</option>
@@ -825,11 +824,10 @@ const generarPreliminar = async () => {
             generarPreliminar(); // usamos tu función actual por ahora
             setShowFiscalModal(false);
           }}
-        >
+          >
           Generar Factura Preliminar
         </Button>
       </div>
-
     </div>
   </div>
 )}   
