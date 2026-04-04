@@ -64,7 +64,7 @@ export const getBudgets = async (): Promise<Budget[]> => {
 
 export const saveBudget = async (budget: Budget): Promise<void> => {
   await db.budgets.put(budget, budget.id);
-};
+};  
 
 export const deleteBudget = async (id: string): Promise<void> => {
   await db.budgets.delete(id);
@@ -78,7 +78,18 @@ export const updateBudgetStatus = async (id: string, status: Budget['status']): 
   const budget = await db.budgets.get(id);
   if (!budget) return;
 
+  // 🔒 BLOQUEO GLOBAL
+if (
+  budget.status === "facturado" ||
+  budget.status === "cancelado" ||
+  budget.status === "listo_para_facturar"
+) {
+  console.warn("No se puede modificar este presupuesto en este estado");
+  return;
+}
+
   budget.status = status;
+
   if (status === 'sent') {
     budget.sentAt = new Date().toISOString();
   }

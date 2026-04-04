@@ -211,12 +211,26 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     </div>
 
     {/* CAE */}
-    {!preliminar && (
-      <div className="border-t pt-4 text-sm">
-        <p><strong>CAE:</strong> {factura.CAE}</p>
-        <p><strong>Vencimiento CAE:</strong> {factura.vencimiento}</p>
-      </div>
+  {!preliminar && (
+  <div className="border-t pt-4 text-sm">
+    
+    {/* 🔹 CAE SIEMPRE DESDE LA FACTURA ORIGINAL */}
+    {budget?.factura?.CAE && (
+      <>
+        <p><strong>CAE:</strong> {budget.factura.CAE}</p>
+        <p><strong>Vencimiento CAE:</strong> {budget.factura.vencimiento}</p>
+      </>
     )}
+
+    {/* 🔹 MENSAJE SI ESTÁ CANCELADA */}
+    {budget?.notaCredito && (
+      <p className="text-red-600 font-bold text-xl text-center">
+        ⚠️ Factura anulada mediante Nota de Crédito
+      </p>
+    )}
+
+  </div>
+)}
 
     {/* NOTA DE CRÉDITO */}
   {factura?.facturaAsociada && (

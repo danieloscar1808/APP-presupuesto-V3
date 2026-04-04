@@ -12,9 +12,10 @@ interface Props {
   budget: Budget;
   profile: Profile;
   onStatusChange?: () => void;
+  disabled?: boolean;
 }
 
-export const ShareOptions = ({ budget, profile, onStatusChange }: Props) => {
+export const ShareOptions = ({ budget, profile, onStatusChange, disabled }: Props) => {
   const [loading, setLoading] = useState(false);
 
   // ---------------------------------------------------------
@@ -33,21 +34,27 @@ export const ShareOptions = ({ budget, profile, onStatusChange }: Props) => {
   };
 
   // ---------------------------------------------------------
-  // ESTADOS DEL PRESUPUESTO
-  // ---------------------------------------------------------
-  const setStatus = async (status: Budget["status"]) => {
-    try {
-      setLoading(true);
-      await updateBudgetStatus(budget.id, status);
-      toast.success("Estado actualizado");
+// ESTADOS DEL PRESUPUESTO
+// ---------------------------------------------------------
+const setStatus = async (status: Budget["status"]) => {
+  // 🔒 BLOQUEO DURO
+  if (disabled) {
+    console.warn("Presupuesto bloqueado - no se puede cambiar estado");
+    return;
+  }
 
-      if (onStatusChange) onStatusChange();
-    } catch (err) {
-      toast.error("No se pudo actualizar el estado");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    await updateBudgetStatus(budget.id, status);
+    toast.success("Estado actualizado");
+
+    if (onStatusChange) onStatusChange();
+  } catch (err) {
+    toast.error("No se pudo actualizar el estado");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // ---------------------------------------------------------
   // WHATSAPP
@@ -112,16 +119,16 @@ export const ShareOptions = ({ budget, profile, onStatusChange }: Props) => {
       <div className="grid grid-cols-2 gap-2 pt-2">
         <Button
           onClick={() => setStatus("accepted")}
-          disabled={loading}
+          disabled={disabled}
           className="btn-gradient w-full"
         >
           <CheckCircle className="w-4 h-4 mr-2" />
           Aceptado
         </Button>
 
-        <Button
+      <Button
           onClick={() => setStatus("rejected")}
-          disabled={loading}
+          disabled={disabled}
           variant="destructive"
           className="w-full"
         >

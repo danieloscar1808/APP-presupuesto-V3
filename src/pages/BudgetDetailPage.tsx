@@ -39,8 +39,7 @@ import { useFacturasStore } from "../store/facturasStore";
   const registrarFactura = useFacturasStore((s) => s.registrarFactura);
   const facturas = useFacturasStore((s) => s.facturas);
   const cancelarFacturaStore = useFacturasStore((s) => s.cancelarFactura);
-  
-
+  const [loadingAFIP, setLoadingAFIP] = useState(false);
 
   // ----------------------------------------------------
   // LOAD DATA
@@ -130,6 +129,11 @@ import { useFacturasStore } from "../store/facturasStore";
       console.log("BUDGET COMPLETO:", budget);
       console.log("PROFILE:", profile);
 
+      const isLocked = 
+      budget.status === "facturado" || 
+      budget.status === "cancelado"||
+      budget.status === "listo_para_facturar";
+
       const facturaReal = facturas.find(
   (f) =>
     f.numero === Number(budget?.factura?.numero?.split("-")[1])
@@ -165,6 +169,11 @@ import { useFacturasStore } from "../store/facturasStore";
 // ----------------------------------------------------
 
 const generarFactura = async () => {
+  
+  // 🔒 EVITA DOBLE CLICK
+  if (loadingAFIP) return;
+
+  setLoadingAFIP(true); // 🔥 ACTIVAR ANIMACIÓN
   
   if (budget.factura) {
     alert("Esta factura ya fue emitida");
@@ -304,6 +313,9 @@ if (currency === "USD") {
     }, 100);
     } catch (error) {
   console.error("Error al generar factura", error);
+
+   } finally {
+    setLoadingAFIP(false); // 🔥 APAGA ANIMACIÓN SIEMPRE
 }
 };
 
@@ -403,6 +415,10 @@ Gracias por tu confianza.`;
 };
 
 const cancelarFactura = async () => {
+  
+   // 🔒 EVITA DOBLE CLICK
+  if (loadingAFIP) return;
+    
   if (budget.notaCredito) {
     alert("Esta factura ya fue cancelada");
     return;
@@ -415,6 +431,8 @@ const cancelarFactura = async () => {
 
   const confirmar = confirm("¿Deseás cancelar esta factura?");
   if (!confirmar) return;
+
+setLoadingAFIP(true); // 🔥 ACTIVA ANIMACIÓN
 
   try {
     const response = await fetch(
@@ -458,6 +476,9 @@ const cancelarFactura = async () => {
 
   } catch (error) {
     console.error("Error al cancelar factura", error);
+
+     } finally {
+    setLoadingAFIP(false); // 🔥 APAGA ANIMACIÓN SIEMPRE
   }
 };
 
@@ -657,6 +678,7 @@ const generarPreliminar = async () => {
           budget={budget}
           profile={profile}
           onStatusChange={loadData}
+          disabled={isLocked}
         />
       </div>
 
@@ -688,11 +710,7 @@ const generarPreliminar = async () => {
       </div>
 
       
-      {budget.status === "cancelado" && (
-      <div className="text-center text-red-600 font-bold mt-2">
-        ⚠️ Factura anulada mediante Nota de Crédito
-      </div>
-      )}
+     
 
       {budget.status === "listo_para_facturar" && (
   <div className="mt-2">
@@ -722,12 +740,22 @@ const generarPreliminar = async () => {
           Enviar por WhatsApp
       </Button>
 
-      <Button
-        className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
-        onClick={cancelarFactura}
-        >
-          Cancelar Factura
-      </Button>
+      {budget.notaCredito ? (
+  
+  <div className="w-full mt-2">
+  <div className="w-full h-10 bg-red-600 text-white rounded-md flex items-center justify-center font-medium">
+    Factura cancelada correctamente
+  </div>
+</div>
+
+) : (
+  <Button
+    className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
+    onClick={cancelarFactura}
+  >
+    Cancelar Factura
+  </Button>
+)}
       </div>
      </> 
 )}          
@@ -818,7 +846,62 @@ const generarPreliminar = async () => {
       </div>
     </div>
   </div>
-)}   
+)}  
+
+{/* 🔥 ANIMACIÓN AFIP */}
+{loadingAFIP && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
+    
+    <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6">
+
+      <p className="font-semibold text-sm">
+        Comunicando con AFIP...
+      </p>
+
+      <div className="flex items-center gap-6">
+
+        {/* SISTEMA */}
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center text-xl">
+            🧾
+          </div>
+          <span className="text-xs mt-2">Sistema</span>
+        </div>
+
+        {/* FLECHAS ANIMADAS */}
+        <div className="flex flex-col items-center gap-2">
+
+          <div className="flex gap-1 text-blue-500 animate-pulse">
+            <span>→</span>
+            <span>→</span>
+            <span>→</span>
+          </div>
+
+          <div className="flex gap-1 text-green-500 animate-pulse">
+            <span>←</span>
+            <span>←</span>
+            <span>←</span>
+          </div>
+
+        </div>
+
+        {/* AFIP */}
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center text-xl">
+            🏛️
+          </div>
+          <span className="text-xs mt-2">AFIP</span>
+        </div>
+
+      </div>
+
+      <p className="text-xs text-muted-foreground text-center">
+        Enviando datos fiscales y esperando respuesta...
+      </p>
+
+    </div>
+  </div>
+)}
     
     </PageLayout>
   );
