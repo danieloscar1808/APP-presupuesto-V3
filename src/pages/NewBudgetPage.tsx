@@ -66,15 +66,42 @@ const generarNumeroPresupuesto = () => {
 };
 
 
+const formatNumber = (value: string) => {
+  const numeric = value.replace(/\D/g, "");
+  return new Intl.NumberFormat("es-AR").format(Number(numeric));
+};
+
+const parseNumber = (value: string) => {
+  return Number(value.replace(/\./g, "")) || 0;
+};
+
+
 /* -------------------------------- */
 /* COMPONENTE                       */
 /* -------------------------------- */
-
 const NewBudgetPage = () => {
+
+  const [laborCost,setLaborCost] = useState(0);
+  const [discount,setDiscount] = useState(0);
+  
+  const [laborInput, setLaborInput] = useState("");
+  const [discountInput, setDiscountInput] = useState("");
+  
+  useEffect(() => {
+  if (laborCost) {
+    setLaborInput(new Intl.NumberFormat("es-AR").format(laborCost));
+  }
+  if (discount) {
+    setDiscountInput(new Intl.NumberFormat("es-AR").format(discount));
+  }
+  }, [laborCost, discount]);
 
   const navigate = useNavigate();
 
   const [clients,setClients] = useState<Client[]>([]);
+
+  
+
   const [clientId,setClientId] = useState("");
   const [clientName,setClientName] = useState("");
   const [clientDocType, setClientDocType] = useState("");
@@ -84,8 +111,7 @@ const NewBudgetPage = () => {
   const [category,setCategory] = useState<BudgetCategory>("ac");
 
   const [items,setItems] = useState<any[]>([]);
-  const [laborCost,setLaborCost] = useState(0);
-  const [discount,setDiscount] = useState(0);
+  
   const [notes,setNotes] = useState("");
 
   const [validityDays,setValidityDays] = useState(7);
@@ -384,10 +410,32 @@ const NewBudgetPage = () => {
 {/* RESTO ORIGINAL (NO MODIFICADO) */}
 
 <Label>Mano de obra</Label>
-<Input type="number" value={laborCost} onChange={(e)=>setLaborCost(Number(e.target.value))}/>
+<Input
+  value={laborInput}
+  onChange={(e) => {
+    const raw = e.target.value.replace(/\D/g, "");
+
+    setLaborInput(
+      new Intl.NumberFormat("es-AR").format(Number(raw || 0))
+    );
+
+    setLaborCost(Number(raw || 0));
+  }}
+/>
 
 <Label>Descuento</Label>
-<Input type="number" value={discount} onChange={(e)=>setDiscount(Number(e.target.value))}/>
+<Input
+  value={discountInput}
+  onChange={(e) => {
+    const raw = e.target.value.replace(/\D/g, "");
+
+    setDiscountInput(
+      new Intl.NumberFormat("es-AR").format(Number(raw || 0))
+    );
+
+    setDiscount(Number(raw || 0));
+  }}
+/>
 
 <Label>Notas</Label>
 <Textarea value={notes} onChange={(e)=>setNotes(e.target.value)}/>
