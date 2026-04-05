@@ -25,13 +25,33 @@ const Index = () => {
       setProfile(p);
 
       // Cargar presupuestos y clientes
-      const budgets = await getBudgets();
+     const budgets = await getBudgets();
+
+// 🟢 SOLO ACTIVOS (INICIO)
+const activos = budgets.filter(
+  (b) =>
+    b.status !== "facturado" &&
+    b.status !== "cancelado"
+);
+
+      // 🔥 SOLO ACTIVOS (INICIO)
+const budgetsActivos = budgets.filter(
+  (b) =>
+    b.status === "draft" ||
+    b.status === "sent" ||
+    b.status === "accepted" ||
+    b.status === "rejected" ||
+    b.status === "listo_para_facturar"
+);
+
       const clients = await getClients();
 
       // Ordenar presupuestos recientes
-      const sorted = [...budgets].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      const sorted = [...activos].sort(
+  (a, b) =>
+    new Date(b.createdAt).getTime() -
+    new Date(a.createdAt).getTime()
+);
 
       setRecentBudgets(sorted.slice(0, 3));
 

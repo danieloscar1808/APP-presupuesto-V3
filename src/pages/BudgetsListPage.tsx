@@ -28,33 +28,44 @@ const BudgetsListPage = () => {
   }, []);
 
   const loadBudgets = async () => {
-    setLoading(true);
+  setLoading(true);
 
-    const data = await getBudgets(); // AHORA ES ASYNC
+  const data = await getBudgets();
 
-    // Ordenar por fecha descendente
-    const sorted = [...data].sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() -
-        new Date(a.createdAt).getTime()
-    );
+  const sorted = [...data].sort(
+    (a, b) =>
+      new Date(b.createdAt).getTime() -
+      new Date(a.createdAt).getTime()
+  );
 
-    setBudgets(sorted);
-    setLoading(false);
-  };
+  setBudgets(sorted);
+  setLoading(false);
+};
+
+
+
+ 
 
   // -------------------------------------------------------
   // APLICAR FILTROS
   // -------------------------------------------------------
+  
+
+  // 🔴 FILTRO HISTORIAL (CLAVE)
   const filteredBudgets = budgets.filter((b) => {
-    const matchSearch = b.clientName
-      .toLowerCase()
-      .includes(search.toLowerCase());
+  const isHistorial =
+    b.status === "facturado" ||
+    b.status === "cancelado";
 
-    const matchFilter = filter === "all" || b.category === filter;
+  const matchSearch = b.clientName
+    .toLowerCase()
+    .includes(search.toLowerCase());
 
-    return matchSearch && matchFilter;
-  });
+  const matchFilter =
+    filter === "all" || b.category === filter;
+
+  return isHistorial && matchSearch && matchFilter;
+});
 
   const filterButtons: { id: FilterCategory; label: string }[] = [
     { id: "all", label: "Todos" },
