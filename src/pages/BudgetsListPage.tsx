@@ -19,6 +19,9 @@ const BudgetsListPage = () => {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterCategory>("all");
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<"all" | "facturado" | "cancelado">("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   // -------------------------------------------------------
   // CARGAR PRESUPUESTOS DESDE INDEXEDDB
@@ -42,29 +45,54 @@ const BudgetsListPage = () => {
   setLoading(false);
 };
 
-
-
- 
-
-  // -------------------------------------------------------
-  // APLICAR FILTROS
-  // -------------------------------------------------------
-  
-
-  // 🔴 FILTRO HISTORIAL (CLAVE)
+    //  FILTRO HISTORIAL
   const filteredBudgets = budgets.filter((b) => {
+
+  // 🔴 HISTORIAL
   const isHistorial =
     b.status === "facturado" ||
     b.status === "cancelado";
 
+  // 🔹 ESTADO
+  const matchStatus =
+    statusFilter === "all" || b.status === statusFilter;
+
+  // 🔹 CLIENTE
   const matchSearch = b.clientName
     .toLowerCase()
     .includes(search.toLowerCase());
 
+  // 🔹 CATEGORÍA
   const matchFilter =
     filter === "all" || b.category === filter;
 
-  return isHistorial && matchSearch && matchFilter;
+  // 🔹 FECHA
+  const d = new Date(b.createdAt);
+
+const budgetDateStr =
+  d.getFullYear() +
+  "-" +
+  String(d.getMonth() + 1).padStart(2, "0") +
+  "-" +
+  String(d.getDate()).padStart(2, "0");
+
+// 🔹 FROM
+const matchFrom =
+  !dateFrom || budgetDateStr >= dateFrom;
+
+// 🔹 TO
+const matchTo =
+  !dateTo || budgetDateStr <= dateTo;
+
+
+  return (
+    isHistorial &&
+    matchStatus &&
+    matchSearch &&
+    matchFilter &&
+    matchFrom &&
+    matchTo
+  );
 });
 
   const filterButtons: { id: FilterCategory; label: string }[] = [
@@ -108,6 +136,64 @@ const BudgetsListPage = () => {
         ))}
       </div>
 
+      {/* FILTRO ESTADO */}
+<div className="flex gap-2 mb-4">
+  <Button
+    size="sm"
+    variant={statusFilter === "all" ? "default" : "outline"}
+    onClick={() => setStatusFilter("all")}
+  >
+    Todos
+  </Button>
+
+  <Button
+    size="sm"
+    variant={statusFilter === "facturado" ? "default" : "outline"}
+    onClick={() => setStatusFilter("facturado")}
+  >
+    Facturados
+  </Button>
+
+  <Button
+    size="sm"
+    variant={statusFilter === "cancelado" ? "default" : "outline"}
+    onClick={() => setStatusFilter("cancelado")}
+  >
+    Cancelados
+  </Button>
+</div>
+
+{/* FILTRO FECHA */}
+<div className="flex gap-2 mb-4 items-center">
+
+  {/* BOTÓN TODOS */}
+  <Button
+    size="sm"
+    variant={!dateFrom && !dateTo ? "default" : "outline"}
+    onClick={() => {
+      setDateFrom("");
+      setDateTo("");
+    }}
+  >
+    Todos
+  </Button>
+
+  {/* DESDE */}
+  <Input
+    type="date"
+    value={dateFrom}
+    onChange={(e) => setDateFrom(e.target.value)}
+  />
+
+  {/* HASTA */}
+  <Input
+    type="date"
+    value={dateTo}
+    onChange={(e) => setDateTo(e.target.value)}
+  />
+
+</div>
+
       {/* LOADING */}
       {loading ? (
         <div className="card-elevated p-8 text-center">
@@ -116,15 +202,21 @@ const BudgetsListPage = () => {
       ) : filteredBudgets.length === 0 ? (
         <div className="card-elevated p-8 text-center">
           <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
-          <p className="text-muted-foreground">No hay presupuestos</p>
+          <p className="text-muted-foreground">
+  {budgets.length === 0
+    ? "No hay presupuestos"
+    : "No hay resultados con los filtros aplicados"}
+</p>
 
-          <Button
-            variant="link"
-            onClick={() => navigate("/budgets/new")}
-            className="mt-2 text-primary"
-          >
-            Crear primer presupuesto
-          </Button>
+{budgets.length === 0 && (
+  <Button
+    variant="link"
+    onClick={() => navigate("/budgets/new")}
+    className="mt-2 text-primary"
+  >
+    Crear primer presupuesto
+  </Button>
+)}
         </div>
       ) : (
         <div className="space-y-3">

@@ -108,7 +108,7 @@ const budgetsActivos = budgets.filter(
               onClick={() => navigate('/budgets')}
               className="text-primary p-0 h-auto"
             >
-              Ver todos
+              VER HISTORIAL
             </Button>
           )}
         </div>
