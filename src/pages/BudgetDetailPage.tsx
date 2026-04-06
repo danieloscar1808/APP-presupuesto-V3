@@ -19,6 +19,7 @@ import html2pdf from "html2pdf.js";
 import { getClients } from "@/lib/storage";
 import { saveBudget } from "@/lib/storage";
 import { useFacturasStore } from "../store/facturasStore";
+import { CheckCircle, XCircle } from "lucide-react";
 
 
   const BudgetDetailPage = () => {
@@ -684,18 +685,36 @@ const generarPreliminar = async () => {
 
       {/* FACTURAR */}
       <div className="mt-4">
-      <Button
+
+  {budget.status === "facturado" ? (
+
+    // 🟢 FACTURA GENERADA
+    <div className="flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-md font-semibold">
+  <CheckCircle className="w-5 h-5" />
+  Factura generada
+</div>
+
+  ) : budget.status === "cancelado" ? (
+
+    // 🔴 FACTURA CANCELADA
+    <div className="flex items-center justify-center gap-2 bg-red-600 text-white py-3 rounded-md font-semibold">
+  <XCircle className="w-5 h-5" />
+  Factura cancelada
+</div>
+
+  ) : (
+
+    // 🔵 BOTÓN NORMAL
+    <Button
       className="w-full btn-gradient"
-            onClick={() => setShowFiscalModal(true)}
-      disabled={budget.status === "facturado" || budget.status === "cancelado"}
-      >
-      {budget.status === "facturado"
-        ? "Factura generada"
-         : budget.status === "cancelado"
-         ? "Factura cancelada"
-         : "Introducir datos fiscales"}
-      </Button>
-      </div>
+      onClick={() => setShowFiscalModal(true)}
+    >
+      Introducir datos fiscales
+    </Button>
+
+  )}
+
+</div>
 
       {/* FACTURA preliminar */}
       {(factura || budget.facturaPreliminar) && profile && budget && (
