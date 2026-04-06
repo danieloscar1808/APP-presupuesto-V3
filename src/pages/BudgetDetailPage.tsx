@@ -20,6 +20,7 @@ import { getClients } from "@/lib/storage";
 import { saveBudget } from "@/lib/storage";
 import { useFacturasStore } from "../store/facturasStore";
 import { CheckCircle, XCircle } from "lucide-react";
+import { Server, Building2 } from "lucide-react";
 
 
   const BudgetDetailPage = () => {
@@ -41,6 +42,24 @@ import { CheckCircle, XCircle } from "lucide-react";
   const facturas = useFacturasStore((s) => s.facturas);
   const cancelarFacturaStore = useFacturasStore((s) => s.cancelarFactura);
   const [loadingAFIP, setLoadingAFIP] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+
+
+  useEffect(() => {
+  if (!loadingAFIP) return;
+
+  setProgress(0);
+
+  const interval = setInterval(() => {
+    setProgress((prev) => {
+      if (prev >= 90) return prev;
+      return prev + Math.random() * 10;
+    });
+  }, 400);
+
+  return () => clearInterval(interval);
+}, [loadingAFIP]);
 
   // ----------------------------------------------------
   // LOAD DATA
@@ -171,11 +190,9 @@ import { CheckCircle, XCircle } from "lucide-react";
 
 const generarFactura = async () => {
   
-  // 🔒 EVITA DOBLE CLICK
+  // 🔒 VALIDACIONES PRIMERO (SIN LOADING)
   if (loadingAFIP) return;
-
-  setLoadingAFIP(true); // 🔥 ACTIVAR ANIMACIÓN
-  
+   
   if (budget.factura) {
     alert("Esta factura ya fue emitida");
     return;
@@ -199,10 +216,13 @@ const generarFactura = async () => {
     return;
   }
 
-  if (budget.status === "facturado" || budget.status === "cancelado") {
+     if (budget.status === "facturado" || budget.status === "cancelado") {
     alert("Este presupuesto ya tiene una factura asociada");
     return;
   }
+
+  setLoadingAFIP(true); // 🔥 ACTIVAR ANIMACIÓN
+
 
   try {
       const totalFinal = Number(budget.total || 0);
@@ -244,10 +264,12 @@ if (currency === "USD") {
     });
 
     if (!response.ok) {
-    const errorText = await response.text();
-    console.error("ERROR BACKEND:", errorText);
-    return;
-    }
+  const errorText = await response.text();
+  console.error("ERROR BACKEND:", errorText);
+
+  setLoadingAFIP(false); // 🔥 APAGAR
+  return;
+}
 
     const data = await response.json();
 
@@ -296,8 +318,16 @@ if (currency === "USD") {
       await saveBudget(updatedBudgetFactura);
       setBudget(updatedBudgetFactura);
 
-    // 🔥 estado local
-    setFactura(dataConNumero);
+      // 🔥 estado local
+      setFactura(dataConNumero);
+      
+      // 🔥 FINAL PROCESO AFIP
+      setProgress(100);
+
+      setTimeout(() => {
+      setLoadingAFIP(false);
+      }, 500);
+  
 
     // 🔥 persistencia extra (opcional)
     localStorage.setItem(
@@ -306,17 +336,16 @@ if (currency === "USD") {
     );
 
     // scroll automático
-    setTimeout(() => {
-    facturaRef.current?.scrollIntoView({
+setTimeout(() => {
+  facturaRef.current?.scrollIntoView({
     behavior: "smooth",
-    block: "start" 
-    });
-    }, 100);
-    } catch (error) {
-  console.error("Error al generar factura", error);
+    block: "start",
+  });
+}, 100);
 
-   } finally {
-    setLoadingAFIP(false); // 🔥 APAGA ANIMACIÓN SIEMPRE
+} catch (error) {
+  console.error("Error al generar factura", error);
+  setLoadingAFIP(false);
 }
 };
 
@@ -473,14 +502,19 @@ setLoadingAFIP(true); // 🔥 ACTIVA ANIMACIÓN
     await saveBudget(updatedBudgetCancelado);
     setBudget(updatedBudgetCancelado);
 
-    alert("Factura cancelada correctamente");
+    // 🔥 FINAL PROCESO
+    setProgress(100);
+
+    setTimeout(() => {
+      setLoadingAFIP(false);
+    }, 500);
 
   } catch (error) {
     console.error("Error al cancelar factura", error);
 
-     } finally {
-    setLoadingAFIP(false); // 🔥 APAGA ANIMACIÓN SIEMPRE
-  }
+    // 🔴 IMPORTANTE
+    setLoadingAFIP(false);
+     } 
 };
 
 const generarPreliminar = async () => {
@@ -507,6 +541,8 @@ const generarPreliminar = async () => {
     });
   }, 100);
 };
+
+
 
 
 
@@ -727,10 +763,7 @@ const generarPreliminar = async () => {
         preliminar={budget.status === "listo_para_facturar"}
         />
       </div>
-
-      
-     
-
+         
       {budget.status === "listo_para_facturar" && (
   <div className="mt-2">
     <Button
@@ -741,7 +774,6 @@ const generarPreliminar = async () => {
     </Button>
   </div>
 )}
-
 
       {/* BOTÓN PDF */}
             <div className="mt-2">
@@ -867,56 +899,77 @@ const generarPreliminar = async () => {
   </div>
 )}  
 
-{/* 🔥 ANIMACIÓN AFIP */}
+{/* ANIMACIÓN AFIP PRO */}
 {loadingAFIP && (
   <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
-    
-    <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6">
 
+    <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
+
+      {/* TÍTULO */}
       <p className="font-semibold text-sm">
         Comunicando con AFIP...
       </p>
 
+      {/* CONTENIDO */}
       <div className="flex items-center gap-6">
 
         {/* SISTEMA */}
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center text-xl">
-            🧾
+          <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
+            <Server className="w-8 h-8 text-blue-600" />
           </div>
-          <span className="text-xs mt-2">Sistema</span>
+          <span className="text-xs mt-2">System SICE</span>
         </div>
 
-        {/* FLECHAS ANIMADAS */}
+        {/* FLECHAS ANIMADAS (IDA Y VUELTA REAL) */}
         <div className="flex flex-col items-center gap-2">
 
-          <div className="flex gap-1 text-blue-500 animate-pulse">
-            <span>→</span>
-            <span>→</span>
-            <span>→</span>
+          {/* IDA */}
+          <div className="flex gap-1 text-blue-500">
+            <span className="animate-[pulse_1s_infinite]">→</span>
+            <span className="animate-[pulse_1s_infinite_0.2s]">→</span>
+            <span className="animate-[pulse_1s_infinite_0.4s]">→</span>
           </div>
 
-          <div className="flex gap-1 text-green-500 animate-pulse">
-            <span>←</span>
-            <span>←</span>
-            <span>←</span>
+          {/* VUELTA */}
+          <div className="flex gap-1 text-green-500">
+            <span className="animate-[pulse_1s_infinite]">←</span>
+            <span className="animate-[pulse_1s_infinite_0.2s]">←</span>
+            <span className="animate-[pulse_1s_infinite_0.4s]">←</span>
           </div>
 
         </div>
 
         {/* AFIP */}
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center text-xl">
-            🏛️
+          <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
+            <Building2 className="w-8 h-8 text-green-600" />
           </div>
-          <span className="text-xs mt-2">AFIP</span>
+          <span className="text-xs mt-2">ARCA</span>
         </div>
 
       </div>
 
-      <p className="text-xs text-muted-foreground text-center">
-        Enviando datos fiscales y esperando respuesta...
+      {/* TEXTO */}
+      <p className="text-xs text-muted-foreground text-center animate-pulse">
+        Enviando datos fiscales y esperando validación...
       </p>
+
+      {/* SPINNER EXTRA */}
+      <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+
+{/* BARRA DE PROGRESO */}
+<div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+  <div
+    className="bg-blue-500 h-2 transition-all duration-300"
+    style={{ width: `${progress}%` }}
+  />
+</div>
+
+{/* % opcional */}
+<span className="text-xs text-muted-foreground">
+  {Math.floor(progress)}%
+</span>
 
     </div>
   </div>
@@ -927,3 +980,5 @@ const generarPreliminar = async () => {
 };
 
 export default BudgetDetailPage;
+
+ 

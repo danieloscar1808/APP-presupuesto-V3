@@ -231,7 +231,7 @@ const NewBudgetPage = () => {
 
     toast.success("Presupuesto creado correctamente");
 
-    navigate("/budgets");
+    navigate("/");
 
   };
 
