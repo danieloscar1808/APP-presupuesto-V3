@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Search, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BudgetCard } from "@/components/BudgetCard";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 type FilterCategory = "all" | "ac" | "electric" | "solar";
 
@@ -32,7 +34,7 @@ const BudgetsListPage = () => {
 
   const loadBudgets = async () => {
   setLoading(true);
-
+    
   const data = await getBudgets();
 
   const sorted = [...data].sort(
@@ -45,10 +47,57 @@ const BudgetsListPage = () => {
   setLoading(false);
 };
 
+const descargarReportePDF = () => {
+  const doc = new jsPDF({
+  orientation: "landscape"
+  });
+
+  doc.setFontSize(14);
+  doc.text("Reporte de Historial", 14, 15);
+
+  const rows = filteredBudgets.map((b) => [
+    b.clientName,
+    b.category.toUpperCase(),
+    b.number || "-",
+    new Date(b.createdAt).toLocaleDateString(),
+
+    b.factura?.numero || "-",
+    b.factura?.fecha
+      ? new Date(b.factura.fecha).toLocaleDateString()
+      : "-",
+
+    b.notaCredito?.numero || "-",
+    b.notaCredito?.fecha
+      ? new Date(b.notaCredito.fecha).toLocaleDateString()
+      : "-",
+
+    `$${(b.total || 0).toLocaleString("es-AR")}`
+  ]);
+
+  autoTable(doc, {
+    startY: 25,
+    head: [[
+      "Cliente",
+      "Tipo",
+      "Presupuesto",
+      "Fecha Pres.",
+      "Factura",
+      "Fecha Fact.",
+      "Nota de Crédito",
+      "Fecha NC",
+      "Total"
+    ]],
+    body: rows,
+  });
+
+  doc.save("reporte_presupuestos.pdf");
+};
+
+
     //  FILTRO HISTORIAL
   const filteredBudgets = budgets.filter((b) => {
 
-  // 🔴 HISTORIAL
+    // 🔴 HISTORIAL
   const isHistorial =
     b.status === "facturado" ||
     b.status === "cancelado";
@@ -84,7 +133,7 @@ const matchFrom =
 const matchTo =
   !dateTo || budgetDateStr <= dateTo;
 
-
+ 
   return (
     isHistorial &&
     matchStatus &&
@@ -94,6 +143,13 @@ const matchTo =
     matchTo
   );
 });
+
+const hayFiltrosActivos =
+  search !== "" ||
+  filter !== "all" ||
+  statusFilter !== "all" ||
+  dateFrom ||
+  dateTo;
 
   const filterButtons: { id: FilterCategory; label: string }[] = [
     { id: "all", label: "Todos" },
@@ -194,6 +250,15 @@ const matchTo =
 
 </div>
 
+{hayFiltrosActivos && (// hay algún filtro activo (excepto búsqueda)
+  <Button
+    className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white"
+    onClick={descargarReportePDF}
+  >
+    Descargar datos
+  </Button>
+)}
+
       {/* LOADING */}
       {loading ? (
         <div className="card-elevated p-8 text-center">
@@ -207,6 +272,7 @@ const matchTo =
     ? "No hay presupuestos"
     : "No hay resultados con los filtros aplicados"}
 </p>
+
 
 {budgets.length === 0 && (
   <Button

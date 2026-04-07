@@ -273,6 +273,8 @@ if (currency === "USD") {
 
     const data = await response.json();
 
+    console.log("RESPUESTA BACKEND NC:", data);
+
     console.log("DATA BACKEND FACTURA:", data);
 
 
@@ -287,7 +289,8 @@ if (currency === "USD") {
     totalUSD,
     formaPago,
     CAE: data.CAE,
-    vencimiento: data.vencimiento
+    vencimiento: data.vencimiento,
+    fecha: new Date().toISOString(),
     };
 
     registrarFactura({
@@ -484,7 +487,10 @@ setLoadingAFIP(true); // 🔥 ACTIVA ANIMACIÓN
     const dataConNumero = {
       numero: data.numero,
       facturaAsociada: data.facturaAsociada,
-      total: Math.round(Number(data.total || 0))
+      total: Math.round(Number(data.total || 0)),
+      CAE: data.CAE,                
+      vencimiento: data.vencimiento,
+      fecha: new Date().toISOString()
     };
 
     cancelarFacturaStore(
@@ -496,7 +502,7 @@ setLoadingAFIP(true); // 🔥 ACTIVA ANIMACIÓN
       ...budget,
       notaCredito: dataConNumero,
       status: "cancelado"
-    };
+      };
 
     // ✅ TODO ADENTRO DEL TRY
     await saveBudget(updatedBudgetCancelado);

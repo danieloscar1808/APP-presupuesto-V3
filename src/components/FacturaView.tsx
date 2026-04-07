@@ -237,9 +237,11 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
   <div className="mt-2 p-2 border rounded bg-red-50 text-red-700">
         <p className="font-bold text-lg mb-1">NOTA DE CRÉDITO C</p>
         <p>Número NC: {factura?.facturaAsociada || "-"}</p>
+        <p><strong>CAE:</strong> {budget.notaCredito?.CAE || "-"}</p>
+        <p><strong>Vencimiento CAE:</strong>{" "}{budget.notaCredito?.vencimiento? new Date(budget.notaCredito.vencimiento).toLocaleDateString(): "-"}</p>
         <p>Factura Asociada: {`${String(factura?.puntoVenta || 1).padStart(5, "0")} - ${String(factura?.numero || 0).padStart(8, "0")}`}</p>
         <p>Total: ${Number(budget?.notaCredito?.total || factura?.total || 0).toLocaleString("es-AR")}</p>
-        <p>Estado: FACTURA CANCELADA</p>
+        {/* <p>Estado: FACTURA CANCELADA</p> */}
   </div>
   )}
 
