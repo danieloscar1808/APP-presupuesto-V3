@@ -107,9 +107,9 @@ const descargarReportePDF = () => {
     statusFilter === "all" || b.status === statusFilter;
 
   // 🔹 CLIENTE
-  const matchSearch = b.clientName
-    .toLowerCase()
-    .includes(search.toLowerCase());
+  const matchSearch = (b.clientName || "")
+  .toLowerCase()
+  .includes(search.toLowerCase());
 
   // 🔹 CATEGORÍA
   const matchFilter =
@@ -144,12 +144,13 @@ const matchTo =
   );
 });
 
-const hayFiltrosActivos =
+
+  const hayFiltrosActivos =
   search !== "" ||
   filter !== "all" ||
   statusFilter !== "all" ||
-  dateFrom ||
-  dateTo;
+  dateFrom !== "" ||
+  dateTo !== "";
 
   const filterButtons: { id: FilterCategory; label: string }[] = [
     { id: "all", label: "Todos" },
