@@ -89,8 +89,12 @@ import { Server, Building2 } from "lucide-react";
 
     setBudget(b);
     if (b.factura) {
-    setFactura(b.factura);
-    }
+  setFactura({
+    ...b.factura,
+    cae: b.factura.cae || b.cae,
+    vencimiento: b.factura.vencimiento || b.vencimiento
+  });
+}
 
     setProfile(p);
     setLoading(false);
@@ -154,10 +158,13 @@ import { Server, Building2 } from "lucide-react";
       budget.status === "cancelado"||
       budget.status === "listo_para_facturar";
 
-      const facturaReal = facturas.find(
-  (f) =>
-    f.numero === Number(budget?.factura?.numero?.split("-")[1])
+      
+      const numeroBuscado = budget?.factura?.numero?.split?.("-")?.[1];
+
+const facturaReal = facturas.find(
+  (f) => f.numero === Number(numeroBuscado)
 );
+
 
   // ----------------------------------------------------
   // STATUS LABELS
@@ -288,26 +295,29 @@ if (currency === "USD") {
     exchangeRate,
     totalUSD,
     formaPago,
-    CAE: data.CAE,
+    cae: data.cae,
     vencimiento: data.vencimiento,
     fecha: new Date().toISOString(),
     };
 
-    registrarFactura({
-    id: crypto.randomUUID(),
-    fecha: new Date().toISOString(),
-    total: Math.round(Number(data.total || 0)),
-    numero: Number(data.numero?.split("-")[1]),
-    puntoVenta: Number(data.numero?.split("-")[0]),
-    cae: data.CAE,
-    vencimientoCae: data.vencimiento,
-    estado: "facturado",
-    synced: true,
-    });
+    const numeroParts = data.numero ? data.numero.split("-") : ["00001", "0"];
+
+registrarFactura({
+  id: crypto.randomUUID(),
+  fecha: new Date().toISOString(),
+  total: Math.round(Number(data.total || 0)),
+  numero: Number(numeroParts[1]),
+  puntoVenta: Number(numeroParts[0]),
+  cae: data.cae,
+  vencimientoCae: data.vencimiento,
+  estado: "facturado",
+  synced: true,
+});
 
     console.log("RESPUESTA BACKEND FACTURA:", data);
     console.log("NUMERO:", data.numero);
-    console.log("FACTURA BACKEND RAW:", data.numeroFactura);
+    console.log("FACTURA BACKEND RAW:", data);
+    console.log("DATA COMPLETA:", data);
     console.log("FACTURA GUARDADA EN BUDGET:", dataConNumero);
 
     // 🔥 UN SOLO OBJETO (sin duplicados)
@@ -537,8 +547,15 @@ const generarPreliminar = async () => {
     status: "listo_para_facturar",
   };
 
-  await saveBudget(updatedBudget);
-  setBudget(updatedBudget);
+  const budgetLimpio = {
+  ...updatedBudget,
+  notaCredito: null // 🔥 clave
+};
+
+console.log("ANTES DE GUARDAR:", updatedBudget);
+
+await saveBudget(budgetLimpio);
+setBudget(budgetLimpio);
 
   setTimeout(() => {
     facturaRef.current?.scrollIntoView({

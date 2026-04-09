@@ -19,7 +19,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
   if (!factura || !budget) return null;
 
   const datos = preliminar ? budget.facturaPreliminar : factura;
-  const totalFinal = preliminar ? budget.total : factura.total;
+  const totalFinal = budget.total;
 
   return (
   <div className="bg-white text-black p-4 mt-2 rounded-xl shadow print:max-h-none overflow-y-auto">
@@ -210,43 +210,68 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
       </div>
     </div>
 
-    {/* CAE */}
-  {!preliminar && (
+  
+    
+  {/* 🔹 CAE SIEMPRE DESDE LA FACTURA ORIGINAL */}
+  {!preliminar && (factura?.cae || budget?.factura?.cae) && (
   <div className="border-t pt-4 text-sm">
     
-    {/* 🔹 CAE SIEMPRE DESDE LA FACTURA ORIGINAL */}
-    {budget?.factura?.CAE && (
-      <>
-        <p><strong>CAE:</strong> {budget.factura.CAE}</p>
-        <p><strong>Vencimiento CAE:</strong> {budget.factura.vencimiento}</p>
-      </>
-    )}
+    <p>
+      <strong>CAE:</strong>{" "}
+      {factura?.cae || budget?.factura?.cae || "-"}
+    </p>
 
-    {/* 🔹 MENSAJE SI ESTÁ CANCELADA */}
+    <p>
+      <strong>Vencimiento CAE:</strong>{" "}
+      {(factura?.vencimiento || budget?.factura?.vencimiento)
+        ? new Date(
+            (factura?.vencimiento || budget?.factura?.vencimiento).length === 8
+              ? `${(factura?.vencimiento || budget?.factura?.vencimiento).slice(0,4)}-${(factura?.vencimiento || budget?.factura?.vencimiento).slice(4,6)}-${(factura?.vencimiento || budget?.factura?.vencimiento).slice(6,8)}`
+              : (factura?.vencimiento || budget?.factura?.vencimiento)
+          ).toLocaleDateString("es-AR")
+        : "-"}
+    </p>
+
     {budget?.notaCredito && (
       <p className="text-red-600 font-bold text-xl text-center">
         ⚠️ Factura anulada mediante Nota de Crédito
       </p>
     )}
 
-  </div>
-)}
-
     {/* NOTA DE CRÉDITO */}
-  {factura?.facturaAsociada && (
-  <div className="mt-2 p-2 border rounded bg-red-50 text-red-700">
-        <p className="font-bold text-lg mb-1">NOTA DE CRÉDITO C</p>
-        <p>Número NC: {factura?.facturaAsociada || "-"}</p>
-        <p><strong>CAE:</strong> {budget.notaCredito?.CAE || "-"}</p>
-        <p><strong>Vencimiento CAE:</strong>{" "}{budget.notaCredito?.vencimiento? new Date(budget.notaCredito.vencimiento).toLocaleDateString(): "-"}</p>
-        <p>Factura Asociada: {`${String(factura?.puntoVenta || 1).padStart(5, "0")} - ${String(factura?.numero || 0).padStart(8, "0")}`}</p>
-        <p>Total: ${Number(budget?.notaCredito?.total || factura?.total || 0).toLocaleString("es-AR")}</p>
-        {/* <p>Estado: FACTURA CANCELADA</p> */}
-  </div>
-  )}
+    {budget?.notaCredito?.numero && (
+    <div className="mt-2 p-2 border rounded bg-red-50 text-red-700">
+    <p className="font-bold text-lg mb-1">NOTA DE CRÉDITO C</p>
 
-</div>
-);
-};
+    <p>Número NC: {budget.notaCredito.numero}</p>
+
+    <p>
+      <strong>cae:</strong> {budget.notaCredito.CAE || "-"}
+    </p>
+
+    <p>
+      <strong>Vencimiento cae:</strong>{" "}
+      {budget.notaCredito.vencimiento
+        ? new Date(budget.notaCredito.vencimiento).toLocaleDateString()
+        : "-"}
+    </p>
+
+    <p>
+      Factura Asociada:{" "}
+      {`${String(factura?.puntoVenta || 1).padStart(5, "0")} - ${String(factura?.numero || 0).padStart(8, "0")}`}
+    </p>
+
+    <p>
+      Total: $
+      {Number(budget?.notaCredito?.total || 0).toLocaleString("es-AR")}
+    </p>
+    </div>
+    )}
+  </div>
+  
+    )}
+  </div>
+); 
+} 
 
 export default FacturaView;

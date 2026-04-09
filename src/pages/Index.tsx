@@ -53,7 +53,7 @@ const budgetsActivos = budgets.filter(
     new Date(a.createdAt).getTime()
 );
 
-      setRecentBudgets(sorted.slice(0, 3));
+      setRecentBudgets(sorted);
 
       // Stats
       const totalAmount = budgets.reduce((sum, b) => sum + (b.total || 0), 0);
