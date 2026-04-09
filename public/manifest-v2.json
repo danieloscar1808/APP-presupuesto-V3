@@ -1,6 +1,6 @@
 {
-  "name": "APP Presupuesto V3",
-  "short_name": "Presupuestos",
+  "name": "Sistemas Integrales de Climatización y Energía",
+  "short_name": "SICE Invoice",
   "description": "Aplicación PWA para crear presupuestos.",
   "start_url": "/APP-presupuesto-V3/",
   "scope": "/APP-presupuesto-V3/",
