@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import CreatePinScreen from '../screens/CreatePinScreen.jsx';
+import EnterPinScreen from '../screens/EnterPinScreen.jsx';
 import { PageLayout } from '@/components/PageLayout';
 import { Profile } from '@/types';
 import { getProfile, saveProfile, generateBackup } from '@/lib/storage';
@@ -8,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Save, Building2, User, Phone, Mail, MapPin, CreditCard } from 'lucide-react';
+
 
 const ProfilePage = () => {
   const [profile, setProfile] = useState<Profile>({
@@ -20,6 +23,10 @@ const ProfilePage = () => {
     address: '',
   });
 
+  const [autorizado, setAutorizado] = useState(false);
+  const [pinCreado, setPinCreado] = useState(false);
+  const user_id = "usuario_demo";
+
   // Cargar perfil almacenado
   useEffect(() => {
     async function load() {
@@ -27,6 +34,10 @@ const ProfilePage = () => {
       if (existing) {
         setProfile(existing);
       }
+      const pin = localStorage.getItem("pin_creado");
+      if (pin === "true") {
+      setPinCreado(true);
+    }
     }
     load();
   }, []);
@@ -47,6 +58,29 @@ const ProfilePage = () => {
     toast.success('Perfil guardado correctamente');
   };
 
+  // 1. No tiene PIN → crear
+if (!pinCreado) {
+  return (
+    <CreatePinScreen
+      user_id={user_id}
+      onSuccess={() => setPinCreado(true)}
+    />
+  );
+}
+
+// 2. Tiene PIN pero no validó → pedir PIN
+if (!autorizado) {
+  return (
+    <EnterPinScreen
+      user_id={user_id}
+      onSuccess={() => {
+        console.log("AUTORIZADO");
+        setAutorizado(true);
+      }}
+    />
+  );
+}
+  
   return (
     <PageLayout title="Perfil Profesional">
       <form onSubmit={handleSubmit} className="space-y-6">
