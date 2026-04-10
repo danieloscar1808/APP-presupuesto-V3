@@ -120,8 +120,11 @@ const styles = {
     gap: 20,
   },
   title: {
-    marginBottom: 10,
-  },
+  fontSize: 28,
+  fontWeight: "600",
+  textAlign: "center",
+  marginBottom: 10,
+},
   pinContainer: {
     display: "flex",
     gap: 15,
@@ -134,7 +137,7 @@ const styles = {
   },
   errorText: {
     color: "red",
-    fontSize: 14,
+    fontSize: 20,
   },
   keyboard: {
     display: "grid",
@@ -144,7 +147,7 @@ const styles = {
   },
   key: {
     height: 70,
-    fontSize: 20,
+    fontSize: 30,
     borderRadius: 12,
     border: "none",
     background: "#f1f5f9",

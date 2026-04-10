@@ -83,9 +83,11 @@ const styles = {
     gap: 20,
   },
   title: {
-    textAlign: "center",
-    marginBottom: 10,
-  },
+  fontSize: 28,
+  fontWeight: "600",
+  textAlign: "center",
+  marginBottom: 10,
+},
   input: {
     height: 55,
     fontSize: 20,
@@ -100,7 +102,7 @@ const styles = {
     border: "none",
     background: "#2563eb",
     color: "#fff",
-    fontSize: 16,
+    fontSize: 20,
     cursor: "pointer",
   },
 };
