@@ -403,13 +403,8 @@ const NewBudgetPage = () => {
         />
 
         {/* COSTOS */}
-
         <div className="card-elevated p-4 space-y-3">
-
-      
-{/* RESTO ORIGINAL (NO MODIFICADO) */}
-
-<Label>Mano de obra</Label>
+    <Label>Mano de obra</Label>
 <Input
   value={laborInput}
   onChange={(e) => {

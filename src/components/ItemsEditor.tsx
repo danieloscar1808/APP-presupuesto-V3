@@ -37,6 +37,11 @@ interface ItemsEditorProps {
 export const ItemsEditor = ({ items, onChange, category }: ItemsEditorProps) => {
   const [newItem, setNewItem] = useState({ description: '', quantity: 1, unitPrice: 0 });
   const [catalogItems, setCatalogItems] = useState<CatalogItem[]>([]);
+
+  const removeItem = (id: string) => {
+  const nuevosItems = items.filter(item => item.id !== id);
+  onChange(nuevosItems);
+};
  
 
 
