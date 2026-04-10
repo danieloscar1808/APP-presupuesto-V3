@@ -1,1 +1,0 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/APP-presupuesto-V3/sw.js', { scope: '/APP-presupuesto-V3/' })})}

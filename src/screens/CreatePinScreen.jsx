@@ -76,7 +76,7 @@ const styles = {
     maxWidth: 400,
     padding: 30,
     borderRadius: 16,
-    background: "#fff",
+    background: "#f9ebdc",
     boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
     display: "flex",
     flexDirection: "column",
