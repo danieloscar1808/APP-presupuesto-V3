@@ -77,13 +77,13 @@ const budgetsActivos = budgets.filter(
             <Settings className="w-10 h-10 text-primary" />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">Bienvenido</h1>
-          <p className="text-muted-foreground mb-6 max-w-sm">
-            Configurar perfil para generar 
-            Presupuestos 
-            Facturas
-            Notas de Credito
-          </p>
-          <Button onClick={() => navigate('/profile')} className="btn-gradient">
+          <p className="text-center flex flex-col">
+  <span>Configurar perfil para generar</span>
+  <span>Presupuestos</span>
+  <span>Facturas</span>
+  <span>Notas de Credito</span>
+</p>
+          <Button onClick={() => navigate('/profile')} className="btn-gradient mt-4">
             Configurar Perfil
           </Button>
         </div>
