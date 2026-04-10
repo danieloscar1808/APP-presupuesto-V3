@@ -105,7 +105,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "#f4f6f8",
+    background: "#657e97",
   },
   card: {
     width: "100%",
@@ -120,7 +120,7 @@ const styles = {
     gap: 20,
   },
   title: {
-  fontSize: 28,
+  fontSize: 25,
   fontWeight: "600",
   textAlign: "center",
   marginBottom: 10,
@@ -147,7 +147,7 @@ const styles = {
   },
   key: {
     height: 70,
-    fontSize: 30,
+    fontSize: 25,
     borderRadius: 12,
     border: "none",
     background: "#f1f5f9",
