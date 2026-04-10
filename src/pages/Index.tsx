@@ -78,7 +78,10 @@ const budgetsActivos = budgets.filter(
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">Bienvenido</h1>
           <p className="text-muted-foreground mb-6 max-w-sm">
-            Configura tu perfil profesional para comenzar a generar presupuestos
+            Configurar perfil para generar 
+            Presupuestos 
+            Facturas
+            Notas de Credito
           </p>
           <Button onClick={() => navigate('/profile')} className="btn-gradient">
             Configurar Perfil
