@@ -95,7 +95,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     <div className="separador"></div>
     <div className="mb-3">
       <h2 className="font-semibold text-lg">Cliente</h2>
-      <p>{factura.cliente}</p>
+      <p>{factura?.cliente || budget?.clientName || "Cliente no definido"}</p>
 
       {budget?.clientDocNumber && (
         <p>
