@@ -17,6 +17,8 @@ export interface Profile {
   email: string;
   address: string;
   logo?: string;
+  iibb?: string;
+  startDate?: string;
 }
 
 export interface Client {

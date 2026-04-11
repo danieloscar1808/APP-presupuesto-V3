@@ -205,6 +205,11 @@
   .status-accepted {
     @apply bg-success/10 text-success;
   }
+
+  .separador {
+  border-top: 1px dashed #999;
+  margin: 12px 0;
+}
 }
 
 @layer utilities {

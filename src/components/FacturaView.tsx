@@ -31,42 +31,60 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     )}
 
     {/* HEADER */}
-    <div className="flex justify-between items-start border-b pb-4 mb-3">
-      
-      <div>
-        <h1 className="text-2xl font-bold">Factura C</h1>
 
-        <p className="text-sm text-gray-600">
-            Punto de Venta: {preliminar ? "—" : String(factura?.puntoVenta || 1).padStart(5, "0")}
-        </p>
+<div className="text-center mb-2">
+  <p className="font-bold text-lg">
+    {profile?.businessName && profile.businessName.trim() !== ""
+      ? profile.businessName
+      : "SERVICIOS INTEGRALES DE CLIMATIZACION Y ENERGIA"}
+  </p>
+</div>
 
-        <p className="text-sm text-gray-600">
-            Comp. N°: {preliminar ? "—" : String(factura?.numero || 0).padStart(8, "0")}
-        </p>
+    <div>
+  <h1 className="text-2xl font-bold">Factura C</h1>
 
-        <p className="text-sm text-gray-500">
-          Ref: Presupuesto N° {budget.number}
-        </p>
+  <div className="text-sm text-gray-600 mt-2 space-y-1">
 
-        <p className="text-sm text-gray-600">
-          Fecha: {new Date().toLocaleDateString()}
-        </p>
-
-        <p className="text-sm text-gray-600">
-          Condición Frente al IVA: {datos?.ivaCondition || "Monotributista"}
-        </p>
-      </div>
-
-      <div className="text-right text-sm max-w-[240px]">
-        <p className="font-bold text-base leading-tight">
-          SERVICIOS INTEGRALES DE CLIMATIZACION Y ENERGIA
-        </p>
-      </div>
-
+    <div>
+      Punto de Venta: {preliminar ? "—" : String(factura?.puntoVenta || 1).padStart(5, "0")}
     </div>
 
+    <div>
+      Comp. N°: {preliminar ? "—" : String(factura?.numero || 0).padStart(8, "0")}
+    </div>
+
+    <div>
+      Ref: Presupuesto N° {budget.number}
+    </div>
+
+    <div>
+      Fecha: {new Date().toLocaleDateString()}
+    </div>
+
+    <div>
+      Condición frente al IVA: {datos?.ivaCondition || "Monotributista"}
+    </div>
+
+    {/* 🔹 NUEVO: IIBB */}
+    {profile?.iibb && (
+      <div>
+        IIBB: {profile.iibb}
+      </div>
+    )}
+
+    {/* 🔹 NUEVO: Inicio de actividades */}
+    {profile?.startDate && (
+  <div>
+    Inicio de actividades: {profile.startDate}
+  </div>
+)}
+
+  </div>
+</div>
+
     {/* EMPRESA */}
-    <div className="mb-3">
+     <div className="separador"></div>
+    <div className="mb-3 mt-3">
       <h2 className="font-semibold text-lg">Emisor</h2>
       <p>{profile?.name || "Tu Empresa"}</p>
       <p>CUIT: {profile?.taxId || "CUIT no cargado"}</p>
@@ -74,6 +92,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     </div>
 
     {/* CLIENTE */}
+    <div className="separador"></div>
     <div className="mb-3">
       <h2 className="font-semibold text-lg">Cliente</h2>
       <p>{factura.cliente}</p>
@@ -97,6 +116,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     </div>
 
     {/* DATOS DEL PAGO */}
+    <div className="separador"></div>
     <div className="mb-3">
       <h2 className="font-semibold text-lg">Datos del Pago</h2>
 

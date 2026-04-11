@@ -21,6 +21,8 @@ const ProfilePage = () => {
     phone: '',
     email: '',
     address: '',
+    iibb: '',
+    startDate: '',
   });
 
   const [autorizado, setAutorizado] = useState(false);
@@ -182,6 +184,29 @@ if (!autorizado) {
                 />
               </div>
             </div>
+
+            <div>
+              <Label htmlFor="iibb">Ingresos Brutos (IIBB)</Label>
+              <Input
+              id="iibb"
+              value={profile.iibb || ''}
+                onChange={(e) => updateField('iibb', e.target.value)}
+                placeholder="901-123456-7"
+                className="mt-1"
+                />
+            </div>
+
+            <div>
+              <Label htmlFor="startDate">Inicio de Actividades</Label>
+              <Input
+              id="startDate"
+              type="date"
+              value={profile.startDate || ''}
+              onChange={(e) => updateField('startDate', e.target.value)}
+              className="mt-1"
+              />
+            </div>
+
           </div>
         </div>
 
