@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronLeft } from "lucide-react";
 
 const MODO = "simulation";
 
@@ -81,17 +82,19 @@ export default function EnterPinScreen({ user_id, onSuccess }) {
           <button
             style={{
               ...styles.key,
-              background: "#2563eb",
-              color: "white"
+             background: "#d9c2ab",
+             color: "#1f2937" 
             }}
             onClick={handleValidate}
-          >
+            >
             OK
           </button>
 
           <button style={styles.key} onClick={removeLast}>
-            ←
-          </button>
+  <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+    <ChevronLeft size={30} />
+  </div>
+</button>
         </div>
 
       </div>
@@ -105,14 +108,14 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "#657e97",
+    background: "#f9ebdc",
   },
   card: {
     width: "100%",
     maxWidth: 400,
     padding: 30,
     borderRadius: 16,
-    background: "#f9ebdc",
+    background: "#1d4ed8",
     boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
     display: "flex",
     flexDirection: "column",
@@ -124,6 +127,7 @@ const styles = {
   fontWeight: "600",
   textAlign: "center",
   marginBottom: 10,
+  color: "#d9c2ab", 
 },
   pinContainer: {
     display: "flex",
