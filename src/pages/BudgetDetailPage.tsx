@@ -43,7 +43,7 @@ import { Server, Building2 } from "lucide-react";
   const cancelarFacturaStore = useFacturasStore((s) => s.cancelarFactura);
   const [loadingAFIP, setLoadingAFIP] = useState(false);
   const [progress, setProgress] = useState(0);
-
+  const [showDownloadOptions, setShowDownloadOptions] = useState(false);  
 
 
   useEffect(() => {
@@ -414,6 +414,78 @@ const descargarPDF = () => {
     jsPDF:        { unit: "mm", format: "a4", orientation: "portrait" }
   };
   html2pdf().set(opt).from(elemento).save();
+};
+
+
+const imprimirTicket80mm = () => {
+  const contenido = facturaRef.current;
+  if (!contenido) return;
+
+  const ventana = window.open("", "_blank");
+
+  const estilos = Array.from(document.styleSheets)
+    .map((styleSheet) => {
+      try {
+        return Array.from(styleSheet.cssRules)
+          .map((rule) => rule.cssText)
+          .join("");
+      } catch (e) {
+        return "";
+      }
+    })
+    .join("\n");
+
+  ventana.document.write(`
+    <html>
+      <head>
+        <title>Ticket 80mm</title>
+        <style>
+          ${estilos}
+
+          body {
+            margin: 0;
+            padding: 0;
+            width: 80mm;
+            background: white;
+          }
+
+          .print-area {
+            width: 80mm !important;
+            padding: 6mm !important;
+            box-sizing: border-box;
+          }
+
+          /* 🔥 ACHICA TODO PARA TICKET */
+          h1 {
+            font-size: 16px !important;
+          }
+
+          h2 {
+            font-size: 14px !important;
+          }
+
+          p, span, div {
+            font-size: 11px !important;
+          }
+
+          table {
+            font-size: 11px !important;
+          }
+        </style>
+      </head>
+      <body>
+        ${contenido.outerHTML}
+        <script>
+          window.onload = function() {
+            window.print();
+            window.close();
+          }
+        </script>
+      </body>
+    </html>
+  `);
+
+  ventana.document.close();
 };
 
 
@@ -802,7 +874,7 @@ setBudget(budgetLimpio);
             <div className="mt-2">
       <Button
         className="w-full"
-        onClick={descargarPDF}
+        onClick={() => setShowDownloadOptions(true)}
         >
            Descargar Factura
       </Button>
@@ -921,6 +993,50 @@ setBudget(budgetLimpio);
     </div>
   </div>
 )}  
+
+{showDownloadOptions && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    
+    <div className="bg-white p-6 rounded-xl w-[280px] space-y-4">
+
+      <h2 className="text-center font-bold">Elegir formato</h2>
+
+      {/* PDF A4 */}
+      <Button
+        className="w-full"
+        onClick={() => {
+          descargarPDF(); // 🔥 tu función original
+          setShowDownloadOptions(false);
+        }}
+      >
+        📄 PDF A4
+      </Button>
+
+      {/* TICKET */}
+      <Button
+        className="w-full bg-gray-800 text-white"
+        onClick={() => {
+          imprimirTicket80mm();
+          setShowDownloadOptions(false);
+        }}
+      >
+        🧾 Ticket 80mm
+      </Button>
+
+      {/* CANCELAR */}
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={() => setShowDownloadOptions(false)}
+      >
+        Cancelar
+      </Button>
+
+    </div>
+
+  </div>
+)}
+
 
 {/* ANIMACIÓN AFIP PRO */}
 {loadingAFIP && (
