@@ -23,7 +23,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 import { Server, Building2 } from "lucide-react";
 
 
-  const BudgetDetailPage = () => {
+const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [budget, setBudget] = useState<Budget | null>(null);
@@ -43,23 +43,23 @@ import { Server, Building2 } from "lucide-react";
   const cancelarFacturaStore = useFacturasStore((s) => s.cancelarFactura);
   const [loadingAFIP, setLoadingAFIP] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [showDownloadOptions, setShowDownloadOptions] = useState(false);  
+  const [showDownloadOptions, setShowDownloadOptions] = useState(false);
 
 
   useEffect(() => {
-  if (!loadingAFIP) return;
+    if (!loadingAFIP) return;
 
-  setProgress(0);
+    setProgress(0);
 
-  const interval = setInterval(() => {
-    setProgress((prev) => {
-      if (prev >= 90) return prev;
-      return prev + Math.random() * 10;
-    });
-  }, 400);
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 90) return prev;
+        return prev + Math.random() * 10;
+      });
+    }, 400);
 
-  return () => clearInterval(interval);
-}, [loadingAFIP]);
+    return () => clearInterval(interval);
+  }, [loadingAFIP]);
 
   // ----------------------------------------------------
   // LOAD DATA
@@ -89,21 +89,21 @@ import { Server, Building2 } from "lucide-react";
 
     setBudget(b);
     if (b.factura) {
-  setFactura({
-    ...b.factura,
-    cae: b.factura.cae || b.cae,
-    vencimiento: b.factura.vencimiento || b.vencimiento
-  });
-}
+      setFactura({
+        ...b.factura,
+        cae: b.factura.cae || b.cae,
+        vencimiento: b.factura.vencimiento || b.vencimiento
+      });
+    }
 
     setProfile(p);
     setLoading(false);
 
     const facturaGuardada = localStorage.getItem(`factura-${id}`);
-      if (facturaGuardada) {
+    if (facturaGuardada) {
       setFactura(JSON.parse(facturaGuardada));
-      }
-        setLoading(false);
+    }
+    setLoading(false);
   };
 
   // ----------------------------------------------------
@@ -114,8 +114,8 @@ import { Server, Building2 } from "lucide-react";
 
     // 🔒 BLOQUEO de boton si el presupuesto ya esta facturado
     if (budget.factura || budget.status === "cancelado") {
-    alert("No se puede eliminar un presupuesto con factura o cancelado");
-    return;
+      alert("No se puede eliminar un presupuesto con factura o cancelado");
+      return;
     }
 
     if (confirm("¿Eliminar este presupuesto?")) {
@@ -150,20 +150,20 @@ import { Server, Building2 } from "lucide-react";
     );
   }
 
-      console.log("BUDGET COMPLETO:", budget);
-      console.log("PROFILE:", profile);
+  console.log("BUDGET COMPLETO:", budget);
+  console.log("PROFILE:", profile);
 
-      const isLocked = 
-      budget.status === "facturado" || 
-      budget.status === "cancelado"||
-      budget.status === "listo_para_facturar";
+  const isLocked =
+    budget.status === "facturado" ||
+    budget.status === "cancelado" ||
+    budget.status === "listo_para_facturar";
 
-      
-      const numeroBuscado = budget?.factura?.numero?.split?.("-")?.[1];
 
-const facturaReal = facturas.find(
-  (f) => f.numero === Number(numeroBuscado)
-);
+  const numeroBuscado = budget?.factura?.numero?.split?.("-")?.[1];
+
+  const facturaReal = facturas.find(
+    (f) => f.numero === Number(numeroBuscado)
+  );
 
 
   // ----------------------------------------------------
@@ -180,152 +180,152 @@ const facturaReal = facturas.find(
   };
 
   const statusStyles: Record<Budget["status"], string> = {
-  draft: "bg-muted text-muted-foreground",
-  sent: "status-sent",
-  accepted: "status-accepted",
-  rejected: "bg-destructive/10 text-destructive",
-  listo_para_facturar: "bg-blue-100 text-blue-600",
-  facturado: "bg-green-600 text-white",
-  cancelado: "bg-red-600 text-white",
-};
+    draft: "bg-muted text-muted-foreground",
+    sent: "status-sent",
+    accepted: "status-accepted",
+    rejected: "bg-destructive/10 text-destructive",
+    listo_para_facturar: "bg-blue-100 text-blue-600",
+    facturado: "bg-green-600 text-white",
+    cancelado: "bg-red-600 text-white",
+  };
 
 
 
-// ----------------------------------------------------
-// ABRIR APP DE FACTURACIÓN
-// ----------------------------------------------------
+  // ----------------------------------------------------
+  // ABRIR APP DE FACTURACIÓN
+  // ----------------------------------------------------
 
-const generarFactura = async () => {
-  
-  // 🔒 VALIDACIONES PRIMERO (SIN LOADING)
-  if (loadingAFIP) return;
-   
-  if (budget.factura) {
-    alert("Esta factura ya fue emitida");
-    return;
-  }
+  const generarFactura = async () => {
 
-  if (budget.status !== "listo_para_facturar") {
-    alert("Primero debes generar la factura preliminar");
-    return;
-  }
+    // 🔒 VALIDACIONES PRIMERO (SIN LOADING)
+    if (loadingAFIP) return;
 
-  if (!budget.total || budget.total <= 0) {
-    alert("El total no puede ser cero");
-    return;
-  }
+    if (budget.factura) {
+      alert("Esta factura ya fue emitida");
+      return;
+    }
 
-  
-  if (!budget) return;
-  // 🔥 BLOQUEO COMPLETO (FACTURADO + CANCELADO)
-  if (budget.factura) {
-    alert("Este presupuesto ya tiene una factura generada");
-    return;
-  }
+    if (budget.status !== "listo_para_facturar") {
+      alert("Primero debes generar la factura preliminar");
+      return;
+    }
 
-     if (budget.status === "facturado" || budget.status === "cancelado") {
-    alert("Este presupuesto ya tiene una factura asociada");
-    return;
-  }
-
-  setLoadingAFIP(true); // 🔥 ACTIVAR ANIMACIÓN
+    if (!budget.total || budget.total <= 0) {
+      alert("El total no puede ser cero");
+      return;
+    }
 
 
-  try {
+    if (!budget) return;
+    // 🔥 BLOQUEO COMPLETO (FACTURADO + CANCELADO)
+    if (budget.factura) {
+      alert("Este presupuesto ya tiene una factura generada");
+      return;
+    }
+
+    if (budget.status === "facturado" || budget.status === "cancelado") {
+      alert("Este presupuesto ya tiene una factura asociada");
+      return;
+    }
+
+    setLoadingAFIP(true); // 🔥 ACTIVAR ANIMACIÓN
+
+
+    try {
       const totalFinal = Number(budget.total || 0);
       const subtotal = totalFinal;
       const ivaAmount = 0;
 
-// 👉 USD DESPUÉS DEL IVA
-let totalUSD = "";
+      // 👉 USD DESPUÉS DEL IVA
+      let totalUSD = "";
 
-if (currency === "USD") {
-  const rate = Number(exchangeRate || 0);
+      if (currency === "USD") {
+        const rate = Number(exchangeRate || 0);
 
-  if (rate > 0) {
-    totalUSD = String(Math.floor(totalFinal / rate));
-  }
-}
+        if (rate > 0) {
+          totalUSD = String(Math.floor(totalFinal / rate));
+        }
+      }
 
-    // -----------------------------------------
-    // 🔗 BACKEND
-    // -----------------------------------------
-    const response = await fetch("https://facturacion-server-backend.onrender.com/api/factura", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-      cliente: budget.clientName,
-      total: totalFinal,
-      subtotal: totalFinal,
-      iva: 0,
-      invoiceType: "C",
-      ivaCondition,
-      currency,
-      exchangeRate,
-      totalUSD,
-      formaPago,
-      descripcion: "Trabajo de instalación"
-      })
-    });
+      // -----------------------------------------
+      // 🔗 BACKEND
+      // -----------------------------------------
+      const response = await fetch("https://facturacion-server-backend.onrender.com/api/factura", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          cliente: budget.clientName,
+          total: totalFinal,
+          subtotal: totalFinal,
+          iva: 0,
+          invoiceType: "C",
+          ivaCondition,
+          currency,
+          exchangeRate,
+          totalUSD,
+          formaPago,
+          descripcion: "Trabajo de instalación"
+        })
+      });
 
-    if (!response.ok) {
-  const errorText = await response.text();
-  console.error("ERROR BACKEND:", errorText);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("ERROR BACKEND:", errorText);
 
-  setLoadingAFIP(false); // 🔥 APAGAR
-  return;
-}
+        setLoadingAFIP(false); // 🔥 APAGAR
+        return;
+      }
 
-    const data = await response.json();
+      const data = await response.json();
 
-    console.log("RESPUESTA BACKEND NC:", data);
+      console.log("RESPUESTA BACKEND NC:", data);
 
-    console.log("DATA BACKEND FACTURA:", data);
+      console.log("DATA BACKEND FACTURA:", data);
 
 
 
-    const dataConNumero = {
-    numero: data.numero, 
-    cliente: data.cliente,
-    total: Math.round(Number(data.total || 0)),
-    subtotal,
-    currency,
-    exchangeRate,
-    totalUSD,
-    formaPago,
-    cae: data.cae,
-    vencimiento: data.vencimiento,
-    fecha: new Date().toISOString(),
-    };
+      const dataConNumero = {
+        numero: data.numero,
+        cliente: data.cliente,
+        total: Math.round(Number(data.total || 0)),
+        subtotal,
+        currency,
+        exchangeRate,
+        totalUSD,
+        formaPago,
+        cae: data.cae,
+        vencimiento: data.vencimiento,
+        fecha: new Date().toISOString(),
+      };
 
-    const numeroParts = data.numero ? data.numero.split("-") : ["00001", "0"];
+      const numeroParts = data.numero ? data.numero.split("-") : ["00001", "0"];
 
-registrarFactura({
-  id: crypto.randomUUID(),
-  fecha: new Date().toISOString(),
-  total: Math.round(Number(data.total || 0)),
-  numero: Number(numeroParts[1]),
-  puntoVenta: Number(numeroParts[0]),
-  cae: data.cae,
-  vencimientoCae: data.vencimiento,
-  estado: "facturado",
-  synced: true,
-});
+      registrarFactura({
+        id: crypto.randomUUID(),
+        fecha: new Date().toISOString(),
+        total: Math.round(Number(data.total || 0)),
+        numero: Number(numeroParts[1]),
+        puntoVenta: Number(numeroParts[0]),
+        cae: data.cae,
+        vencimientoCae: data.vencimiento,
+        estado: "facturado",
+        synced: true,
+      });
 
-    console.log("RESPUESTA BACKEND FACTURA:", data);
-    console.log("NUMERO:", data.numero);
-    console.log("FACTURA BACKEND RAW:", data);
-    console.log("DATA COMPLETA:", data);
-    console.log("FACTURA GUARDADA EN BUDGET:", dataConNumero);
+      console.log("RESPUESTA BACKEND FACTURA:", data);
+      console.log("NUMERO:", data.numero);
+      console.log("FACTURA BACKEND RAW:", data);
+      console.log("DATA COMPLETA:", data);
+      console.log("FACTURA GUARDADA EN BUDGET:", dataConNumero);
 
-    // 🔥 UN SOLO OBJETO (sin duplicados)
-    const updatedBudgetFactura = {
-      ...budget,
-      status: "facturado",
-      factura: dataConNumero,
-      facturaPreliminar: undefined,
+      // 🔥 UN SOLO OBJETO (sin duplicados)
+      const updatedBudgetFactura = {
+        ...budget,
+        status: "facturado",
+        factura: dataConNumero,
+        facturaPreliminar: undefined,
       };
 
       await saveBudget(updatedBudgetFactura);
@@ -333,56 +333,56 @@ registrarFactura({
 
       // 🔥 estado local
       setFactura(dataConNumero);
-      
+
       // 🔥 FINAL PROCESO AFIP
       setProgress(100);
 
       setTimeout(() => {
-      setLoadingAFIP(false);
+        setLoadingAFIP(false);
       }, 500);
-  
 
-    // 🔥 persistencia extra (opcional)
-    localStorage.setItem(
-      `factura-${budget.id}`,
-      JSON.stringify(dataConNumero)
-    );
 
-    // scroll automático
-setTimeout(() => {
-  facturaRef.current?.scrollIntoView({
-    behavior: "smooth",
-    block: "start",
-  });
-}, 100);
+      // 🔥 persistencia extra (opcional)
+      localStorage.setItem(
+        `factura-${budget.id}`,
+        JSON.stringify(dataConNumero)
+      );
 
-} catch (error) {
-  console.error("Error al generar factura", error);
-  setLoadingAFIP(false);
-}
-};
+      // scroll automático
+      setTimeout(() => {
+        facturaRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 100);
 
-const imprimirFactura = () => {
-  const contenido = facturaRef.current;
+    } catch (error) {
+      console.error("Error al generar factura", error);
+      setLoadingAFIP(false);
+    }
+  };
 
-  if (!contenido) return;
+  const imprimirFactura = () => {
+    const contenido = facturaRef.current;
 
-  const ventana = window.open("", "_blank");
+    if (!contenido) return;
 
-  // 🔥 CLONAMOS LOS ESTILOS DEL DOCUMENTO ORIGINAL
-  const estilos = Array.from(document.styleSheets)
-    .map((styleSheet) => {
-      try {
-        return Array.from(styleSheet.cssRules)
-          .map((rule) => rule.cssText)
-          .join("");
-      } catch (e) {
-        return "";
-      }
-    })
-    .join("\n");
+    const ventana = window.open("", "_blank");
 
-  ventana.document.write(`
+    // 🔥 CLONAMOS LOS ESTILOS DEL DOCUMENTO ORIGINAL
+    const estilos = Array.from(document.styleSheets)
+      .map((styleSheet) => {
+        try {
+          return Array.from(styleSheet.cssRules)
+            .map((rule) => rule.cssText)
+            .join("");
+        } catch (e) {
+          return "";
+        }
+      })
+      .join("\n");
+
+    ventana.document.write(`
     <html>
       <head>
         <title>Factura</title>
@@ -394,248 +394,272 @@ const imprimirFactura = () => {
     </html>
   `);
 
-  ventana.document.close();
+    ventana.document.close();
 
-  ventana.onload = () => {
-    ventana.focus();
-    ventana.print();
-    ventana.close();
+    ventana.onload = () => {
+      ventana.focus();
+      ventana.print();
+      ventana.close();
+    };
   };
-};
 
-const descargarPDF = () => {
-  const elemento = facturaRef.current;
-  if (!elemento) return;
-  const opt = {
-    margin:       10,
-    filename:     `Factura_${factura?.numero || "sin-numero"}_${budget?.clientName || "cliente"}.pdf`,
-    image:        { type: "jpeg", quality: 0.98 },
-    html2canvas:  { scale: 2 },
-    jsPDF:        { unit: "mm", format: "a4", orientation: "portrait" }
+  const descargarPDF = () => {
+    const elemento = facturaRef.current;
+    if (!elemento) return;
+    const opt = {
+      margin: 10,
+      filename: `Factura_${factura?.numero || "sin-numero"}_${budget?.clientName || "cliente"}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    };
+    html2pdf().set(opt).from(elemento).save();
   };
-  html2pdf().set(opt).from(elemento).save();
-};
 
 
-const imprimirTicket80mm = () => {
-  const contenido = facturaRef.current;
-  if (!contenido) return;
+  const imprimirTicket80mm = () => {
+    const contenido = facturaRef.current;
+    if (!contenido) return;
 
-  const ventana = window.open("", "_blank");
+    const ventana = window.open("", "_blank");
 
-  const estilos = Array.from(document.styleSheets)
-    .map((styleSheet) => {
-      try {
-        return Array.from(styleSheet.cssRules)
-          .map((rule) => rule.cssText)
-          .join("");
-      } catch (e) {
-        return "";
-      }
-    })
-    .join("\n");
+    const estilos = Array.from(document.styleSheets)
+      .map((styleSheet) => {
+        try {
+          return Array.from(styleSheet.cssRules)
+            .map((rule) => rule.cssText)
+            .join("");
+        } catch (e) {
+          return "";
+        }
+      })
+      .join("\n");
 
-  ventana.document.write(`
+    ventana.document.write(`
     <html>
       <head>
         <title>Ticket 80mm</title>
-        <style>
-          ${estilos}
+    <style>
+  ${estilos}
 
-          body {
-            margin: 0;
-            padding: 0;
-            width: 80mm;
-            background: white;
-          }
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
 
-          .print-area {
-            width: 80mm !important;
-            padding: 6mm !important;
-            box-sizing: border-box;
-          }
+  body {
+    margin: 0;
+    padding: 0;
+    width: 80mm;
+    background: white;
+  }
 
-          /* 🔥 ACHICA TODO PARA TICKET */
-          h1 {
-            font-size: 16px !important;
-          }
+  .print-area {
+    width: 80mm !important;
+    padding: 4mm !important;
+    box-sizing: border-box;
+  }
 
-          h2 {
-            font-size: 14px !important;
-          }
+  /* 🔥 COMPACTO REAL */
+  h1 { font-size: 16px !important; }
+  h2 { font-size: 14px !important; }
 
-          p, span, div {
-            font-size: 11px !important;
-          }
+  p, span, div {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
 
-          table {
-            font-size: 11px !important;
-          }
-        </style>
+  table {
+    font-size: 11px !important;
+  }
+
+  /* 🔥 OCULTAR BOTÓN AL IMPRIMIR */
+  @media print {
+    button {
+      display: none !important;
+    }
+  }
+
+</style>
       </head>
-      <body>
-        ${contenido.outerHTML}
-        <script>
-          window.onload = function() {
-            window.print();
-            window.close();
-          }
-        </script>
-      </body>
+      
+  <body>
+
+  <!-- 🔹 CONTENIDO DEL TICKET -->
+  <div class="print-area">
+    ${contenido.outerHTML}
+  </div>
+
+  <!-- 🔹 BOTÓN IMPRIMIR -->
+  <div style="text-align:center; margin-top:10px;">
+    <button onclick="window.print()" style="
+      padding:10px;
+      font-size:14px;
+      background:black;
+      color:white;
+      border:none;
+      border-radius:5px;
+      width:90%;
+    ">
+      Imprimir Ticket
+    </button>
+  </div>
+
+</body>
     </html>
   `);
 
-  ventana.document.close();
-};
+    ventana.document.close();
+  };
 
 
-const formatearTelefono = (telefono: string) => {
-  if (!telefono) return "";
+  const formatearTelefono = (telefono: string) => {
+    if (!telefono) return "";
 
-  // sacar todo lo que no sea número
-  let limpio = telefono.replace(/\D/g, "");
+    // sacar todo lo que no sea número
+    let limpio = telefono.replace(/\D/g, "");
 
-  // si empieza con 0 → lo sacamos
-  if (limpio.startsWith("0")) {
-    limpio = limpio.substring(1);
-  }
+    // si empieza con 0 → lo sacamos
+    if (limpio.startsWith("0")) {
+      limpio = limpio.substring(1);
+    }
 
-  // si no tiene código país → lo agregamos
-  if (!limpio.startsWith("54")) {
-    limpio = "54" + limpio;
-  }
+    // si no tiene código país → lo agregamos
+    if (!limpio.startsWith("54")) {
+      limpio = "54" + limpio;
+    }
 
-  // agregar 9 para celulares (Argentina)
-  if (!limpio.startsWith("549")) {
-    limpio = limpio.replace(/^54/, "549");
-  }
+    // agregar 9 para celulares (Argentina)
+    if (!limpio.startsWith("549")) {
+      limpio = limpio.replace(/^54/, "549");
+    }
 
-  return limpio;
-};
+    return limpio;
+  };
 
-const enviarWhatsApp = () => {
-  if (!budget || !client) return;
-  const telefono = formatearTelefono(client.phone || "");
-  if (!telefono) {
-    alert("El cliente no tiene teléfono cargado");
-    return;
-  }
-  const mensaje = `Hola ${budget.clientName},
+  const enviarWhatsApp = () => {
+    if (!budget || !client) return;
+    const telefono = formatearTelefono(client.phone || "");
+    if (!telefono) {
+      alert("El cliente no tiene teléfono cargado");
+      return;
+    }
+    const mensaje = `Hola ${budget.clientName},
 Te envío la factura correspondiente:
 🧾 Factura N° ${budget.number}
 💲 Total ( impuestos incluidos): $${budget.total.toLocaleString("es-AR")}
 Gracias por tu confianza.`;
-  const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
-  window.open(url, "_blank");
-};
-
-const cancelarFactura = async () => {
-  
-   // 🔒 EVITA DOBLE CLICK
-  if (loadingAFIP) return;
-    
-  if (budget.notaCredito) {
-    alert("Esta factura ya fue cancelada");
-    return;
-  }
-
-  if (!budget.factura) {
-    alert("No hay factura para cancelar");
-    return;
-  }
-
-  const confirmar = confirm("¿Deseás cancelar esta factura?");
-  if (!confirmar) return;
-
-setLoadingAFIP(true); // 🔥 ACTIVA ANIMACIÓN
-
-  try {
-    const response = await fetch(
-      "https://facturacion-server-backend.onrender.com/api/nota-credito",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          facturaNumero: budget.factura.numero,
-          total: budget.factura.total
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    const dataConNumero = {
-      numero: data.numero,
-      facturaAsociada: data.facturaAsociada,
-      total: Math.round(Number(data.total || 0)),
-      CAE: data.CAE,                
-      vencimiento: data.vencimiento,
-      fecha: new Date().toISOString()
-    };
-
-    cancelarFacturaStore(
-    Number(budget.factura.numero.split("-")[1]),
-    dataConNumero
-    );
-
-    const updatedBudgetCancelado = {
-      ...budget,
-      notaCredito: dataConNumero,
-      status: "cancelado"
-      };
-
-    // ✅ TODO ADENTRO DEL TRY
-    await saveBudget(updatedBudgetCancelado);
-    setBudget(updatedBudgetCancelado);
-
-    // 🔥 FINAL PROCESO
-    setProgress(100);
-
-    setTimeout(() => {
-      setLoadingAFIP(false);
-    }, 500);
-
-  } catch (error) {
-    console.error("Error al cancelar factura", error);
-
-    // 🔴 IMPORTANTE
-    setLoadingAFIP(false);
-     } 
-};
-
-const generarPreliminar = async () => {
-  if (!budget) return;
-
-  const updatedBudget = {
-    ...budget,
-    facturaPreliminar: {
-      ivaCondition,
-      currency,
-      exchangeRate,
-      formaPago,
-    },
-    status: "listo_para_facturar",
+    const url = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
+    window.open(url, "_blank");
   };
 
-  const budgetLimpio = {
-  ...updatedBudget,
-  notaCredito: null // 🔥 clave
-};
+  const cancelarFactura = async () => {
 
-console.log("ANTES DE GUARDAR:", updatedBudget);
+    // 🔒 EVITA DOBLE CLICK
+    if (loadingAFIP) return;
 
-await saveBudget(budgetLimpio);
-setBudget(budgetLimpio);
+    if (budget.notaCredito) {
+      alert("Esta factura ya fue cancelada");
+      return;
+    }
 
-  setTimeout(() => {
-    facturaRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  }, 100);
-};
+    if (!budget.factura) {
+      alert("No hay factura para cancelar");
+      return;
+    }
+
+    const confirmar = confirm("¿Deseás cancelar esta factura?");
+    if (!confirmar) return;
+
+    setLoadingAFIP(true); // 🔥 ACTIVA ANIMACIÓN
+
+    try {
+      const response = await fetch(
+        "https://facturacion-server-backend.onrender.com/api/nota-credito",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            facturaNumero: budget.factura.numero,
+            total: budget.factura.total
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      const dataConNumero = {
+        numero: data.numero,
+        facturaAsociada: data.facturaAsociada,
+        total: Math.round(Number(data.total || 0)),
+        CAE: data.CAE,
+        vencimiento: data.vencimiento,
+        fecha: new Date().toISOString()
+      };
+
+      cancelarFacturaStore(
+        Number(budget.factura.numero.split("-")[1]),
+        dataConNumero
+      );
+
+      const updatedBudgetCancelado = {
+        ...budget,
+        notaCredito: dataConNumero,
+        status: "cancelado"
+      };
+
+      // ✅ TODO ADENTRO DEL TRY
+      await saveBudget(updatedBudgetCancelado);
+      setBudget(updatedBudgetCancelado);
+
+      // 🔥 FINAL PROCESO
+      setProgress(100);
+
+      setTimeout(() => {
+        setLoadingAFIP(false);
+      }, 500);
+
+    } catch (error) {
+      console.error("Error al cancelar factura", error);
+
+      // 🔴 IMPORTANTE
+      setLoadingAFIP(false);
+    }
+  };
+
+  const generarPreliminar = async () => {
+    if (!budget) return;
+
+    const updatedBudget = {
+      ...budget,
+      facturaPreliminar: {
+        ivaCondition,
+        currency,
+        exchangeRate,
+        formaPago,
+      },
+      status: "listo_para_facturar",
+    };
+
+    const budgetLimpio = {
+      ...updatedBudget,
+      notaCredito: null // 🔥 clave
+    };
+
+    console.log("ANTES DE GUARDAR:", updatedBudget);
+
+    await saveBudget(budgetLimpio);
+    setBudget(budgetLimpio);
+
+    setTimeout(() => {
+      facturaRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
+  };
 
 
 
@@ -650,7 +674,7 @@ setBudget(budgetLimpio);
         </Button>
 
         <div className="flex-1">
-        <h1 className="font-bold text-lg text-foreground whitespace-nowrap">Presupuesto #{budget.number}</h1>
+          <h1 className="font-bold text-lg text-foreground whitespace-nowrap">Presupuesto #{budget.number}</h1>
         </div>
 
         <Button
@@ -683,49 +707,49 @@ setBudget(budgetLimpio);
           {statusLabels[budget.status]}
         </span>
       </div>
-      
-{/* CLIENTE */}
-<div className="card-elevated p-4 space-y-2">
-  <h3 className="font-semibold text-primary">Cliente</h3>
-  <p className="text-foreground">{budget.clientName}</p>
-</div>
 
-{/* TIPO DE INSTALACIÓN */}
-<div className="card-elevated p-4 space-y-2">
-  <h3 className="font-semibold text-primary">Tipo de Instalación</h3>
-  <p className="text-foreground">
-    {CATEGORY_LABELS[budget.category]}
-  </p>
-</div>
+      {/* CLIENTE */}
+      <div className="card-elevated p-4 space-y-2">
+        <h3 className="font-semibold text-primary">Cliente</h3>
+        <p className="text-foreground">{budget.clientName}</p>
+      </div>
 
-{/* DETALLES POR CATEGORÍA */}
-{budget.category === "ac" && budget.acEquipment && (
-  <div className="card-elevated p-4 space-y-2">
-    <h3 className="font-semibold text-primary">Datos del Equipo</h3>
-    <p>Capacidad: {budget.acEquipment.capacity} frigorías</p>
-    <p>Tecnología: {budget.acEquipment.technology}</p>
-    <p>Estado: {budget.acEquipment.status}</p>
-  </div>
-)}
+      {/* TIPO DE INSTALACIÓN */}
+      <div className="card-elevated p-4 space-y-2">
+        <h3 className="font-semibold text-primary">Tipo de Instalación</h3>
+        <p className="text-foreground">
+          {CATEGORY_LABELS[budget.category]}
+        </p>
+      </div>
 
-{budget.category === "solar" && budget.solarSystem && (
-  <div className="card-elevated p-4 space-y-2">
-    <h3 className="font-semibold text-primary">Datos del Sistema FV</h3>
-    <p>Tipo de sistema: {budget.solarSystem.systemType}</p>
-    <p>Panel: {budget.solarSystem.panelType} - {budget.solarSystem.panelPower} W</p>
-    <p>Cantidad de paneles: {budget.solarSystem.quantity}</p>
-    <p>Potencia total: {budget.solarSystem.totalPower} W</p>
-  </div>
-)}
+      {/* DETALLES POR CATEGORÍA */}
+      {budget.category === "ac" && budget.acEquipment && (
+        <div className="card-elevated p-4 space-y-2">
+          <h3 className="font-semibold text-primary">Datos del Equipo</h3>
+          <p>Capacidad: {budget.acEquipment.capacity} frigorías</p>
+          <p>Tecnología: {budget.acEquipment.technology}</p>
+          <p>Estado: {budget.acEquipment.status}</p>
+        </div>
+      )}
 
-{budget.category === "electric" && budget.electricWorkDescription && (
-  <div className="card-elevated p-4 space-y-2">
-    <h3 className="font-semibold text-primary">Descripción del Trabajo</h3>
-    <p className="whitespace-pre-line text-foreground">
-      {budget.electricWorkDescription}
-    </p>
-  </div>
-)}
+      {budget.category === "solar" && budget.solarSystem && (
+        <div className="card-elevated p-4 space-y-2">
+          <h3 className="font-semibold text-primary">Datos del Sistema FV</h3>
+          <p>Tipo de sistema: {budget.solarSystem.systemType}</p>
+          <p>Panel: {budget.solarSystem.panelType} - {budget.solarSystem.panelPower} W</p>
+          <p>Cantidad de paneles: {budget.solarSystem.quantity}</p>
+          <p>Potencia total: {budget.solarSystem.totalPower} W</p>
+        </div>
+      )}
+
+      {budget.category === "electric" && budget.electricWorkDescription && (
+        <div className="card-elevated p-4 space-y-2">
+          <h3 className="font-semibold text-primary">Descripción del Trabajo</h3>
+          <p className="whitespace-pre-line text-foreground">
+            {budget.electricWorkDescription}
+          </p>
+        </div>
+      )}
 
       {/* ITEMS */}
       <div className="card-elevated p-4 mb-4">
@@ -756,7 +780,7 @@ setBudget(budgetLimpio);
             <span className="text-muted-foreground">Mano de Obra</span>
             <span>${budget.laborCost.toLocaleString("es-AR")}</span>
           </div>
-         
+
           {budget.discount > 0 && (
             <div className="flex justify-between text-sm text-accent">
               <span>Descuento</span>
@@ -817,307 +841,306 @@ setBudget(budgetLimpio);
       {/* FACTURAR */}
       <div className="mt-4">
 
-  {budget.status === "facturado" ? (
+        {budget.status === "facturado" ? (
 
-    // 🟢 FACTURA GENERADA
-    <div className="flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-md font-semibold">
-  <CheckCircle className="w-5 h-5" />
-  Factura generada
-</div>
+          // 🟢 FACTURA GENERADA
+          <div className="flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-md font-semibold">
+            <CheckCircle className="w-5 h-5" />
+            Factura generada
+          </div>
 
-  ) : budget.status === "cancelado" ? (
+        ) : budget.status === "cancelado" ? (
 
-    // 🔴 FACTURA CANCELADA
-    <div className="flex items-center justify-center gap-2 bg-red-600 text-white py-3 rounded-md font-semibold">
-  <XCircle className="w-5 h-5" />
-  Factura cancelada
-</div>
+          // 🔴 FACTURA CANCELADA
+          <div className="flex items-center justify-center gap-2 bg-red-600 text-white py-3 rounded-md font-semibold">
+            <XCircle className="w-5 h-5" />
+            Factura cancelada
+          </div>
 
-  ) : (
+        ) : (
 
-    // 🔵 BOTÓN NORMAL
-    <Button
-      className="w-full btn-gradient"
-      onClick={() => setShowFiscalModal(true)}
-    >
-      Introducir datos fiscales
-    </Button>
+          // 🔵 BOTÓN NORMAL
+          <Button
+            className="w-full btn-gradient"
+            onClick={() => setShowFiscalModal(true)}
+          >
+            Introducir datos fiscales
+          </Button>
 
-  )}
+        )}
 
-</div>
+      </div>
 
       {/* FACTURA preliminar */}
       {(factura || budget.facturaPreliminar) && profile && budget && (
-      <>
-      <div ref={facturaRef} className="mt-4 print-area pb-4">
-      <FacturaView
-        factura={facturaReal || factura || budget.facturaPreliminar}
-        profile={profile}
-        budget={budget}
-        preliminar={budget.status === "listo_para_facturar"}
-        />
-      </div>
-         
-      {budget.status === "listo_para_facturar" && (
-  <div className="mt-2">
-    <Button
-      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-      onClick={generarFactura}
-      >
-      Emitir Factura
-    </Button>
-  </div>
-)}
+        <>
+          <div ref={facturaRef} className="mt-4 print-area pb-4">
+            <FacturaView
+              factura={facturaReal || factura || budget.facturaPreliminar}
+              profile={profile}
+              budget={budget}
+              preliminar={budget.status === "listo_para_facturar"}
+            />
+          </div>
 
-      {/* BOTÓN PDF */}
+          {budget.status === "listo_para_facturar" && (
             <div className="mt-2">
-      <Button
-        className="w-full"
-        onClick={() => setShowDownloadOptions(true)}
-        >
-           Descargar Factura
-      </Button>
+              <Button
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={generarFactura}
+              >
+                Emitir Factura
+              </Button>
+            </div>
+          )}
 
-      <Button
-        className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
-        onClick={enviarWhatsApp}
-        >
-          Enviar por WhatsApp
-      </Button>
+          {/* BOTÓN PDF */}
+          <div className="mt-2">
+            <Button
+              className="w-full"
+              onClick={() => setShowDownloadOptions(true)}
+            >
+              Descargar Factura
+            </Button>
 
-      {budget.notaCredito ? (
-  
-  <div className="w-full mt-2">
-  <div className="w-full h-10 bg-red-600 text-white rounded-md flex items-center justify-center font-medium">
-    Factura cancelada correctamente
-  </div>
-</div>
+            <Button
+              className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
+              onClick={enviarWhatsApp}
+            >
+              Enviar por WhatsApp
+            </Button>
 
-) : (
-  <Button
-    className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
-    onClick={cancelarFactura}
-  >
-    Cancelar Factura
-  </Button>
-)}
-      </div>
-     </> 
-)}          
-    
- {showFiscalModal && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-xl w-full max-w-md space-y-4">
+            {budget.notaCredito ? (
 
-      <h2 className="text-lg font-bold">Datos Fiscales</h2>
+              <div className="w-full mt-2">
+                <div className="w-full h-10 bg-red-600 text-white rounded-md flex items-center justify-center font-medium">
+                  Factura cancelada correctamente
+                </div>
+              </div>
 
-      <div>
-  <label className="text-sm">Condición frente al IVA</label>
-  <select
-    className="w-full border p-2 rounded"
-    value={ivaCondition}
-    onChange={(e) => setIvaCondition(e.target.value)}
-  >
-    <option>Consumidor Final</option>
-    <option>Responsable Inscripto</option>
-    <option>Monotributista</option>
-    <option>Exento</option>
-  </select>
-  </div>
-      
-      {/* MONEDA */}
-<div>
-      <label className="text-sm">Moneda</label>
-      <select
-      className="w-full border p-2 rounded"
-      value={currency}
-      onChange={(e) => setCurrency(e.target.value)}
-      >
-      <option value="ARS">Pesos</option>
-      <option value="USD">USD</option>
-      </select>
-</div>
-
-      {/* FORMA DE PAGO */}
-<div>
-  <label className="text-sm">Forma de pago</label>
-  <select
-    className="w-full border p-2 rounded"
-    value={formaPago}
-    onChange={(e) => setFormaPago(e.target.value)}
-    >
-    <option>Efectivo / Contado</option>
-    <option>Transferencia</option>
-    <option>Mercado Pago</option>
-    <option>Tarjeta de Débito</option>
-    <option>Tarjeta de Crédito</option>
-    <option>Cuenta Corriente</option>
-    <option>Otro</option>
-  </select>
-</div>
-
-{/* TIPO DE CAMBIO */}
-{currency === "USD" && (
-  <div>
-    <label className="text-sm">Tipo de cambio</label>
-    <input
-      className="w-full border p-2 rounded"
-      value={exchangeRate}
-      onChange={(e) => setExchangeRate(e.target.value)}
-      placeholder="Ej: 1000"
-    />
-  </div>
-)}
-
-      {/* BOTONES */}
-      <div className="flex gap-2">
-        <Button
-          className="w-full"
-          variant="outline"
-          onClick={() => setShowFiscalModal(false)}
-        >
-          Cancelar
-        </Button>
-
-        <Button
-          className="w-full"
-          onClick={() => {
-            generarPreliminar(); // usamos tu función actual por ahora
-            setShowFiscalModal(false);
-          }}
-          >
-          Generar Factura Preliminar
-        </Button>
-      </div>
-    </div>
-  </div>
-)}  
-
-{showDownloadOptions && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    
-    <div className="bg-white p-6 rounded-xl w-[280px] space-y-4">
-
-      <h2 className="text-center font-bold">Elegir formato</h2>
-
-      {/* PDF A4 */}
-      <Button
-        className="w-full"
-        onClick={() => {
-          descargarPDF(); // 🔥 tu función original
-          setShowDownloadOptions(false);
-        }}
-      >
-        📄 PDF A4
-      </Button>
-
-      {/* TICKET */}
-      <Button
-        className="w-full bg-gray-800 text-white"
-        onClick={() => {
-          imprimirTicket80mm();
-          setShowDownloadOptions(false);
-        }}
-      >
-        🧾 Ticket 80mm
-      </Button>
-
-      {/* CANCELAR */}
-      <Button
-        variant="outline"
-        className="w-full"
-        onClick={() => setShowDownloadOptions(false)}
-      >
-        Cancelar
-      </Button>
-
-    </div>
-
-  </div>
-)}
-
-
-{/* ANIMACIÓN AFIP PRO */}
-{loadingAFIP && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
-
-    <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
-
-      {/* TÍTULO */}
-      <p className="font-semibold text-sm">
-        Comunicando con AFIP...
-      </p>
-
-      {/* CONTENIDO */}
-      <div className="flex items-center gap-6">
-
-        {/* SISTEMA */}
-        <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
-            <Server className="w-8 h-8 text-blue-600" />
+            ) : (
+              <Button
+                className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
+                onClick={cancelarFactura}
+              >
+                Cancelar Factura
+              </Button>
+            )}
           </div>
-          <span className="text-xs mt-2">System SICE</span>
+        </>
+      )}
+
+      {showFiscalModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl w-full max-w-md space-y-4">
+
+            <h2 className="text-lg font-bold">Datos Fiscales</h2>
+
+            <div>
+              <label className="text-sm">Condición frente al IVA</label>
+              <select
+                className="w-full border p-2 rounded"
+                value={ivaCondition}
+                onChange={(e) => setIvaCondition(e.target.value)}
+              >
+                <option>Consumidor Final</option>
+                <option>Responsable Inscripto</option>
+                <option>Monotributista</option>
+                <option>Exento</option>
+              </select>
+            </div>
+
+            {/* MONEDA */}
+            <div>
+              <label className="text-sm">Moneda</label>
+              <select
+                className="w-full border p-2 rounded"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+              >
+                <option value="ARS">Pesos</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+
+            {/* FORMA DE PAGO */}
+            <div>
+              <label className="text-sm">Forma de pago</label>
+              <select
+                className="w-full border p-2 rounded"
+                value={formaPago}
+                onChange={(e) => setFormaPago(e.target.value)}
+              >
+                <option>Efectivo / Contado</option>
+                <option>Transferencia</option>
+                <option>Mercado Pago</option>
+                <option>Tarjeta de Débito</option>
+                <option>Tarjeta de Crédito</option>
+                <option>Cuenta Corriente</option>
+                <option>Otro</option>
+              </select>
+            </div>
+
+            {/* TIPO DE CAMBIO */}
+            {currency === "USD" && (
+              <div>
+                <label className="text-sm">Tipo de cambio</label>
+                <input
+                  className="w-full border p-2 rounded"
+                  value={exchangeRate}
+                  onChange={(e) => setExchangeRate(e.target.value)}
+                  placeholder="Ej: 1000"
+                />
+              </div>
+            )}
+
+            {/* BOTONES */}
+            <div className="flex gap-2">
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={() => setShowFiscalModal(false)}
+              >
+                Cancelar
+              </Button>
+
+              <Button
+                className="w-full"
+                onClick={() => {
+                  generarPreliminar(); // usamos tu función actual por ahora
+                  setShowFiscalModal(false);
+                }}
+              >
+                Generar Factura Preliminar
+              </Button>
+            </div>
+          </div>
         </div>
+      )}
 
-        {/* FLECHAS ANIMADAS (IDA Y VUELTA REAL) */}
-        <div className="flex flex-col items-center gap-2">
+      {showDownloadOptions && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
-          {/* IDA */}
-          <div className="flex gap-1 text-blue-500">
-            <span className="animate-[pulse_1s_infinite]">→</span>
-            <span className="animate-[pulse_1s_infinite_0.2s]">→</span>
-            <span className="animate-[pulse_1s_infinite_0.4s]">→</span>
-          </div>
+          <div className="bg-white p-6 rounded-xl w-[280px] space-y-4">
 
-          {/* VUELTA */}
-          <div className="flex gap-1 text-green-500">
-            <span className="animate-[pulse_1s_infinite]">←</span>
-            <span className="animate-[pulse_1s_infinite_0.2s]">←</span>
-            <span className="animate-[pulse_1s_infinite_0.4s]">←</span>
+            <h2 className="text-center font-bold">Elegir formato</h2>
+
+            {/* PDF A4 */}
+            <Button
+              className="w-full"
+              onClick={() => {
+                descargarPDF(); // 🔥 tu función original
+                setShowDownloadOptions(false);
+              }}
+            >
+              📄 PDF A4
+            </Button>
+
+            {/* TICKET */}
+            <Button
+              className="w-full bg-gray-800 text-white"
+              onClick={() => {
+                imprimirTicket80mm();
+                setShowDownloadOptions(false);
+              }}
+            >
+              🧾 Ticket 80mm
+            </Button>
+
+            {/* CANCELAR */}
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setShowDownloadOptions(false)}
+            >
+              Cancelar
+            </Button>
+
           </div>
 
         </div>
+      )}
 
-        {/* AFIP */}
-        <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
-            <Building2 className="w-8 h-8 text-green-600" />
+
+      {/* ANIMACIÓN AFIP PRO */}
+      {loadingAFIP && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
+
+          <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
+
+            {/* TÍTULO */}
+            <p className="font-semibold text-sm">
+              Comunicando con AFIP...
+            </p>
+
+            {/* CONTENIDO */}
+            <div className="flex items-center gap-6">
+
+              {/* SISTEMA */}
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
+                  <Server className="w-8 h-8 text-blue-600" />
+                </div>
+                <span className="text-xs mt-2">System SICE</span>
+              </div>
+
+              {/* FLECHAS ANIMADAS (IDA Y VUELTA REAL) */}
+              <div className="flex flex-col items-center gap-2">
+
+                {/* IDA */}
+                <div className="flex gap-1 text-blue-500">
+                  <span className="animate-[pulse_1s_infinite]">→</span>
+                  <span className="animate-[pulse_1s_infinite_0.2s]">→</span>
+                  <span className="animate-[pulse_1s_infinite_0.4s]">→</span>
+                </div>
+
+                {/* VUELTA */}
+                <div className="flex gap-1 text-green-500">
+                  <span className="animate-[pulse_1s_infinite]">←</span>
+                  <span className="animate-[pulse_1s_infinite_0.2s]">←</span>
+                  <span className="animate-[pulse_1s_infinite_0.4s]">←</span>
+                </div>
+
+              </div>
+
+              {/* AFIP */}
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
+                  <Building2 className="w-8 h-8 text-green-600" />
+                </div>
+                <span className="text-xs mt-2">ARCA</span>
+              </div>
+
+            </div>
+
+            {/* TEXTO */}
+            <p className="text-xs text-muted-foreground text-center animate-pulse">
+              Enviando datos fiscales y esperando validación...
+            </p>
+
+            {/* SPINNER EXTRA */}
+            <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+
+            {/* BARRA DE PROGRESO */}
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-blue-500 h-2 transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+
+            {/* % opcional */}
+            <span className="text-xs text-muted-foreground">
+              {Math.floor(progress)}%
+            </span>
+
           </div>
-          <span className="text-xs mt-2">ARCA</span>
         </div>
+      )}
 
-      </div>
-
-      {/* TEXTO */}
-      <p className="text-xs text-muted-foreground text-center animate-pulse">
-        Enviando datos fiscales y esperando validación...
-      </p>
-
-      {/* SPINNER EXTRA */}
-      <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
-
-{/* BARRA DE PROGRESO */}
-<div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-  <div
-    className="bg-blue-500 h-2 transition-all duration-300"
-    style={{ width: `${progress}%` }}
-  />
-</div>
-
-{/* % opcional */}
-<span className="text-xs text-muted-foreground">
-  {Math.floor(progress)}%
-</span>
-
-    </div>
-  </div>
-)}
-    
     </PageLayout>
   );
 };
 
 export default BudgetDetailPage;
 
- 
