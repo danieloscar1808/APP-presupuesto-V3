@@ -32,8 +32,8 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
 
     {/* HEADER */}
 
-<div className="text-center mb-2">
-  <p className="font-bold text-lg">
+<div className="text-center mb-1">
+  <p className="font-bold text-[25px] empresa-nombre">
     {profile?.businessName && profile.businessName.trim() !== ""
       ? profile.businessName
       : "SERVICIOS INTEGRALES DE CLIMATIZACION Y ENERGIA"}
@@ -41,9 +41,9 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
 </div>
 
     <div>
-  <h1 className="text-2xl font-bold">Factura C</h1>
+  <h1 className="text-[45px] font-bold">Factura C</h1>
 
-  <div className="text-sm text-gray-600 mt-2 space-y-1">
+  <div className="text-sm text-gray-600 mt-2 space-y-0">
 
     <div>
       Punto de Venta: {preliminar ? "—" : String(factura?.puntoVenta || 1).padStart(5, "0")}
@@ -253,7 +253,7 @@ console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
     </p>
 
     {budget?.notaCredito && (
-      <p className="text-red-600 font-bold text-xl text-center">
+      <p className="text-red-600 font-bold text-xl text-center mt-2 mb-3">
         ⚠️ Factura anulada mediante Nota de Crédito
       </p>
     )}

@@ -45,11 +45,12 @@
 
   @page {
     size: A4;
-    margin: 10mm;
+    margin: 5mm; /* 🔥 menos margen = más espacio */
   }
 
   body {
     margin: 0;
+    background: white !important;
   }
 
   body * {
@@ -65,19 +66,44 @@
     top: 0;
     left: 0;
     width: 100%;
+    height: auto;            /* 🔥 clave */
+    overflow: visible;       /* 🔥 clave */
   }
 
-  /* 🔴 CLAVE TOTAL */
-  .print-area {
-    height: 100vh;
-    overflow: hidden;
+  /* 🔥 COMPACTAR TODO */
+  h1 { font-size: 20px !important; }
+  h2 { font-size: 14px !important; }
+
+  p, span, div {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
   }
+
+  table {
+    font-size: 10px !important;
+  }
+
+}
+
+@media print {
+  body {
+    transform: scale(0.5);
+    transform-origin: top left;
+  }
+}
+ 
+@media print {
+  body {
+    background: white !important;
+  }
+
 
 @media print {
   body {
     background: white !important;
   }
 
+  
   .card-elevated {
     box-shadow: none !important;
     border: none !important;

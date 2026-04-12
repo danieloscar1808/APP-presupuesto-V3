@@ -460,9 +460,13 @@ const BudgetDetailPage = () => {
     box-sizing: border-box;
   }
 
+  .empresa-nombre {
+  font-size: 13px !important;
+  }    
+
   /* 🔥 COMPACTO REAL */
-  h1 { font-size: 16px !important; }
-  h2 { font-size: 14px !important; }
+  h1 { font-size: 26px !important; }
+  h2 { font-size: 15px !important; }
 
   p, span, div {
     font-size: 11px !important;
