@@ -4,6 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
+
 export default defineConfig(({ mode }) => ({
 
   base: "/APP-presupuesto-V3/",
@@ -55,6 +56,14 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "docs",
     emptyOutDir: true
+  },
+
+  server: {
+    host: true,
+    allowedHosts: [
+    ".ngrok-free.dev"
+  ]
   }
 
 }));
+
