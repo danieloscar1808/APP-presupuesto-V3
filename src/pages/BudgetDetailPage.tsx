@@ -363,45 +363,124 @@ const BudgetDetailPage = () => {
   };
 
   const imprimirFactura = () => {
-    const contenido = facturaRef.current;
+  const contenido = facturaRef.current;
+  if (!contenido) return;
 
-    if (!contenido) return;
+  // 🔥 CLONAR CONTENIDO (NO TOCAR ORIGINAL)
+  const clon = contenido.cloneNode(true) as HTMLElement;
 
-    const ventana = window.open("", "_blank");
+  // 🔥 APLICAR ESTILOS A4 CENTRALIZADOS
+  const aplicarEstilosA4 = (root: HTMLElement) => {
 
-    // 🔥 CLONAMOS LOS ESTILOS DEL DOCUMENTO ORIGINAL
-    const estilos = Array.from(document.styleSheets)
-      .map((styleSheet) => {
-        try {
-          return Array.from(styleSheet.cssRules)
-            .map((rule) => rule.cssText)
-            .join("");
-        } catch (e) {
-          return "";
+    const reglas: { selector: string; estilos: Partial<CSSStyleDeclaration> }[] = [
+
+      // CONTENEDOR GENERAL
+      {
+        selector: "div",
+        estilos: {
+          fontSize: "10px",
+          lineHeight: "1.3",
         }
-      })
-      .join("\n");
+      },
 
-    ventana.document.write(`
+      // TITULO PRINCIPAL
+      {
+        selector: "h1",
+        estilos: {
+          fontSize: "40px",
+        }
+      },
+
+      // SUBTITULOS
+      {
+        selector: "h2",
+        estilos: {
+          fontSize: "12px",
+        }
+      },
+
+      // TEXTO GENERAL
+      {
+        selector: "p, span",
+        estilos: {
+          fontSize: "10px",
+        }
+      },
+
+      // TABLAS
+      {
+        selector: "table",
+        estilos: {
+          fontSize: "9px",
+          width: "100%",
+          borderCollapse: "collapse",
+        }
+      },
+
+      // CELDAS
+      {
+        selector: "th, td",
+        estilos: {
+          padding: "4px",
+        }
+      },
+
+      // EMPRESA (tu clase específica)
+      {
+        selector: ".empresa-nombre",
+        estilos: {
+          fontSize: "12px",
+          fontWeight: "bold",
+        }
+      },
+
+    ];
+
+    reglas.forEach(({ selector, estilos }) => {
+      root.querySelectorAll(selector).forEach(el => {
+        Object.assign((el as HTMLElement).style, estilos);
+      });
+    });
+  };
+
+  // 🔥 aplicar estilos
+  aplicarEstilosA4(clon);
+
+  // 🔥 abrir ventana
+  const ventana = window.open("", "_blank");
+  if (!ventana) return;
+
+  // 🔥 escribir HTML LIMPIO (sin copiar estilos rotos)
+  ventana.document.write(`
     <html>
       <head>
         <title>Factura</title>
-        <style>${estilos}</style>
+        <style>
+          @page {
+            size: A4;
+            margin: 8mm;
+          }
+
+          body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+          }
+        </style>
       </head>
       <body>
-        ${contenido.outerHTML}
+        ${clon.outerHTML}
       </body>
     </html>
   `);
 
-    ventana.document.close();
+  ventana.document.close();
 
-    ventana.onload = () => {
-      ventana.focus();
-      ventana.print();
-      ventana.close();
-    };
+  ventana.onload = () => {
+    ventana.focus();
+    ventana.print();
+    ventana.close();
   };
+};
 
   const descargarPDF = () => {
     const elemento = facturaRef.current;
@@ -1030,15 +1109,15 @@ Gracias por tu confianza.`;
             <h2 className="text-center font-bold">Elegir formato</h2>
 
             {/* PDF A4 */}
-            <Button
-              className="w-full"
-              onClick={() => {
-                descargarPDF(); // 🔥 tu función original
-                setShowDownloadOptions(false);
-              }}
-            >
-              📄 PDF A4
-            </Button>
+  <Button
+  className="w-full"
+  onClick={() => {
+    descargarPDF();
+    setShowDownloadOptions(false);
+  }}
+>
+  📄 PDF A4
+</Button>
 
             {/* TICKET */}
             <Button
