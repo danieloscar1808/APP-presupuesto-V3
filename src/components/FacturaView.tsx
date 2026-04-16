@@ -22,8 +22,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
   const totalFinal = budget.total;
 
   return (
-    <div className="bg-white text-black p-4 mt-2 rounded-xl shadow print:max-h-none overflow-y-auto">
-
+    <div className="bg-white text-black pt-0 px-0 pb-4 mt-2 rounded-xl shadow border border-black overflow-hidden">
       {preliminar && (
         <div className="bg-yellow-100 text-yellow-800 text-center py-2 font-bold rounded mb-2">
           ⚠️ FACTURA PRELIMINAR - SIN VALIDEZ FISCAL
@@ -32,17 +31,17 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
       {/* HEADER */}
       <div className="text-center mb-1">
-        <p className="font-bold text-[13px] empresa-nombre">
+        <p className="empresa-nombre w-full bg-black text-white py-3 text-[13px] font-bold text-center">
           {profile?.businessName && profile.businessName.trim() !== ""
             ? profile.businessName
             : "SERVICIOS INTEGRALES DE CLIMATIZACION Y ENERGIA"}
         </p>
       </div>
 
-      <div>
+      <div className="px-3 pt-0">
         <h1 className="text-[25px] font-bold">Factura C</h1>
 
-        <div className="text-sm text-gray-600 text-[12px] leading-[1.3]">
+        <div className="text-gray-600 text-[12px] leading-[1.3]">
 
           <div>
             Punto de Venta: {preliminar ? "—" : String(factura?.puntoVenta || 1).padStart(5, "0")}
@@ -63,8 +62,8 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       </div>
 
       {/* EMPRESA */}
-      <div className="separador"></div>
-      <div className="mb-3 mt-3 text-[12px] leading-[1.3]">
+      <div className="border-t border-dashed border-gray-400 my-2"></div>
+      <div className="px-3 pt-0 mb-2 mt-2 text-[12px] leading-[1.3]">
         <h2 className="font-semibold text-[16px]">Emisor</h2>
         <p>{profile?.name || "Tu Empresa"}</p>
         <p>CUIT: {profile?.taxId || "CUIT no cargado"}</p>
@@ -75,8 +74,8 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       </div>
 
       {/* CLIENTE */}
-      <div className="separador"></div>
-      <div className="mb-3 text-[12px] leading-[1.3]">
+      <div className="border-t border-dashed border-gray-400 my-"></div>
+      <div className="px-3 pt-0 mb-2 mt-2 text-[12px] leading-[1.3]">
         <h2 className="font-semibold text-[16px]">Cliente</h2>
         <p>{factura?.cliente || budget?.clientName || "Cliente no definido"}</p>
 
@@ -99,8 +98,8 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       </div>
 
       {/* DATOS DEL PAGO */}
-      <div className="separador"></div>
-      <div className="mb-3">
+      <div className="border-t border-dashed border-gray-400 my-2"></div>
+      <div className="px-3 pt-0 mb-2 mt-2">
         <h2 className="font-semibold text-[16px]">Datos del Pago</h2>
 
         <div className=" text-[12px] leading-[1.3]">
@@ -152,8 +151,8 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       </div>
 
       {/* TABLA DETALLE */}
-      <div className="mb-3">
-        <table className="w-full text-sm border text-[12px]">
+      <div className="px-3 pt-0 mb-3">
+        <table className="w-full text-[12px] border leading-[1.2]">
           <thead className="bg-gray-100">
             <tr>
               <th className="text-left p-2 border">Descripción</th>
@@ -190,7 +189,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
 
       {/* TOTAL */}
-      <div className="flex justify-end mb-3">
+      <div className="px-3 pt-0 flex justify-end mb-3">
         <div className="text-right space-y-1">
 
           <p>
@@ -217,7 +216,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
       {/* 🔹 CAE SIEMPRE DESDE LA FACTURA ORIGINAL */}
       {!preliminar && (factura?.cae || budget?.factura?.cae) && (
-        <div className="border-t pt-4 text-sm">
+        <div className="px-3 pt-0 border-t pt-1 text-[12px] leading-[1.3]">
 
           <p>
             <strong>CAE:</strong>{" "}

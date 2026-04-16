@@ -87,7 +87,7 @@
 
 @media print {
   body {
-    transform: scale(0.5);
+    transform: scale(1.0);
     transform-origin: top left;
   }
 }
