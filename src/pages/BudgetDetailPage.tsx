@@ -287,18 +287,23 @@ const BudgetDetailPage = () => {
 
 
       const dataConNumero = {
-        numero: data.numero,
-        cliente: data.cliente,
-        total: Math.round(Number(data.total || 0)),
-        subtotal,
-        currency,
-        exchangeRate,
-        totalUSD,
-        formaPago,
-        cae: data.cae,
-        vencimiento: data.vencimiento,
-        fecha: new Date().toISOString(),
-      };
+  numero: data.numero,
+  cliente: data.cliente,
+  total: Math.round(Number(data.total || 0)),
+  subtotal,
+
+  // 🔴 CAMBIO CLAVE
+  currency: budget.facturaPreliminar?.currency || currency,
+  exchangeRate: budget.facturaPreliminar?.exchangeRate || exchangeRate,
+
+  totalUSD,
+  formaPago: budget.facturaPreliminar?.formaPago || formaPago,
+
+  cae: data.cae,
+  vencimiento: data.vencimiento,
+  fecha: new Date().toISOString(),
+};
+console.log("FACTURA FINAL:", dataConNumero);
 
       const numeroParts = data.numero ? data.numero.split("-") : ["00001", "0"];
 
@@ -322,11 +327,15 @@ const BudgetDetailPage = () => {
 
       // 🔥 UN SOLO OBJETO (sin duplicados)
       const updatedBudgetFactura = {
-        ...budget,
-        status: "facturado",
-        factura: dataConNumero,
-        facturaPreliminar: undefined,
-      };
+  ...budget,
+  status: "facturado",
+  factura: dataConNumero,
+
+  // 🔴 IMPORTANTE: conservar datos
+  facturaPreliminar: {
+    ...budget.facturaPreliminar
+  }
+};
 
       await saveBudget(updatedBudgetFactura);
       setBudget(updatedBudgetFactura);
@@ -959,7 +968,7 @@ Gracias por tu confianza.`;
         <>
           <div ref={facturaRef} className="mt-4 print-area pb-4">
             <FacturaView
-              factura={facturaReal || factura || budget.facturaPreliminar}
+              factura={factura || budget.facturaPreliminar}
               profile={profile}
               budget={budget}
               preliminar={budget.status === "listo_para_facturar"}
