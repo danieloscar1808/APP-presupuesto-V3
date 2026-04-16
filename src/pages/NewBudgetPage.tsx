@@ -26,9 +26,9 @@ import { v4 as uuid } from "uuid";
 /* LISTAS                           */
 /* -------------------------------- */
 
-const CAPACITIES = ["2300","2600","3000","3500","4000","4500","6000"];
+const CAPACITIES = ["2300", "2600", "3000", "3500", "4000", "4500", "6000"];
 
-const TECHNOLOGIES = ["Inverter","On/Off"];
+const TECHNOLOGIES = ["Inverter", "On/Off"];
 
 const STATUS_OPTIONS = [
   "Instalación Nueva",
@@ -37,9 +37,9 @@ const STATUS_OPTIONS = [
   "Desinstalación/Reinstalación"
 ];
 
-const SOLAR_TYPES = ["On Grid","Off Grid","Híbrido"];
+const SOLAR_TYPES = ["On Grid", "Off Grid", "Híbrido"];
 
-const PANEL_TYPES = ["Policristalino","Monocristalino"];
+const PANEL_TYPES = ["Policristalino", "Monocristalino"];
 
 
 /* -------------------------------- */
@@ -51,7 +51,7 @@ const generarNumeroPresupuesto = () => {
   const ahora = new Date();
 
   const year = ahora.getFullYear();
-  const month = String(ahora.getMonth() + 1).padStart(2,"0");
+  const month = String(ahora.getMonth() + 1).padStart(2, "0");
 
   const key = `${year}${month}`;
 
@@ -59,9 +59,9 @@ const generarNumeroPresupuesto = () => {
 
   const nuevo = ultimo + 1;
 
-  localStorage.setItem(`presupuesto_${key}`,String(nuevo));
+  localStorage.setItem(`presupuesto_${key}`, String(nuevo));
 
-  return `${key}-${String(nuevo).padStart(3,"0")}`;
+  return `${key}-${String(nuevo).padStart(3, "0")}`;
 
 };
 
@@ -81,97 +81,97 @@ const parseNumber = (value: string) => {
 /* -------------------------------- */
 const NewBudgetPage = () => {
 
-  const [laborCost,setLaborCost] = useState(0);
-  const [discount,setDiscount] = useState(0);
-  
+  const [laborCost, setLaborCost] = useState(0);
+  const [discount, setDiscount] = useState(0);
+
   const [laborInput, setLaborInput] = useState("");
   const [discountInput, setDiscountInput] = useState("");
-  
+
   useEffect(() => {
-  if (laborCost) {
-    setLaborInput(new Intl.NumberFormat("es-AR").format(laborCost));
-  }
-  if (discount) {
-    setDiscountInput(new Intl.NumberFormat("es-AR").format(discount));
-  }
+    if (laborCost) {
+      setLaborInput(new Intl.NumberFormat("es-AR").format(laborCost));
+    }
+    if (discount) {
+      setDiscountInput(new Intl.NumberFormat("es-AR").format(discount));
+    }
   }, [laborCost, discount]);
 
   const navigate = useNavigate();
 
-  const [clients,setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
 
-  
 
-  const [clientId,setClientId] = useState("");
-  const [clientName,setClientName] = useState("");
+
+  const [clientId, setClientId] = useState("");
+  const [clientName, setClientName] = useState("");
   const [clientDocType, setClientDocType] = useState("");
   const [clientDocNumber, setClientDocNumber] = useState("");
   const [clientAddress, setClientAddress] = useState("");
 
-  const [category,setCategory] = useState<BudgetCategory>("ac");
+  const [category, setCategory] = useState<BudgetCategory>("ac");
 
-  const [items,setItems] = useState<any[]>([]);
-  
-  const [notes,setNotes] = useState("");
+  const [items, setItems] = useState<any[]>([]);
 
-  const [validityDays,setValidityDays] = useState(7);
-  const [warranty,setWarranty] = useState("6 meses");
-  const [paymentTerms,setPaymentTerms] = useState("Efectivo / Transferencia / Mercado Pago / Debito");
+  const [notes, setNotes] = useState("");
 
-    
+  const [validityDays, setValidityDays] = useState(7);
+  const [warranty, setWarranty] = useState("6 meses");
+  const [paymentTerms, setPaymentTerms] = useState("Efectivo / Transferencia / Mercado Pago / Debito");
+
+
   /* AC */
 
-  const [acCapacity,setAcCapacity] = useState("");
-  const [acTechnology,setAcTechnology] = useState("");
-  const [acStatus,setAcStatus] = useState("");
+  const [acCapacity, setAcCapacity] = useState("");
+  const [acTechnology, setAcTechnology] = useState("");
+  const [acStatus, setAcStatus] = useState("");
 
   /* ELECTRIC */
 
-  const [electricWorkDescription,setElectricWorkDescription] = useState("");
+  const [electricWorkDescription, setElectricWorkDescription] = useState("");
 
   /* SOLAR */
 
-  const [solarType,setSolarType] = useState("");
-  const [solarPanelType,setSolarPanelType] = useState("");
-  const [solarPanelPower,setSolarPanelPower] = useState("");
-  const [solarQty,setSolarQty] = useState<number>(0);
+  const [solarType, setSolarType] = useState("");
+  const [solarPanelType, setSolarPanelType] = useState("");
+  const [solarPanelPower, setSolarPanelPower] = useState("");
+  const [solarQty, setSolarQty] = useState<number>(0);
 
 
   /* CARGAR CLIENTES */
 
-  useEffect(()=>{
+  useEffect(() => {
 
     getClients().then(setClients);
 
-  },[]);
+  }, []);
 
-   /* AUTO NOMBRE CLIENTE */
+  /* AUTO NOMBRE CLIENTE */
   useEffect(() => {
-  if (clientId) {
-    const cli = clients.find(c => c.id === clientId);
+    if (clientId) {
+      const cli = clients.find(c => c.id === clientId);
 
-    setClientName(cli ? cli.name : "");
-    setClientDocType(cli?.docType || "");
-    setClientDocNumber(cli?.docNumber || "");
-    setClientAddress(cli?.address || "");
-  }
-}, [clientId, clients]);
+      setClientName(cli ? cli.name : "");
+      setClientDocType(cli?.docType || "");
+      setClientDocNumber(cli?.docNumber || "");
+      setClientAddress(cli?.address || "");
+    }
+  }, [clientId, clients]);
 
- 
+
   /* GUARDAR */
   const handleSubmit = async () => {
-    if(!clientId){
+    if (!clientId) {
       toast.error("Debe seleccionar un cliente");
       return;
     }
 
-     const numeroPresupuesto = generarNumeroPresupuesto();
+    const numeroPresupuesto = generarNumeroPresupuesto();
 
-    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice,0);
+    const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
     const total =
-    Number(subtotal || 0) +
-    Number(laborCost || 0) -
-    Number(discount || 0);
+      Number(subtotal || 0) +
+      Number(laborCost || 0) -
+      Number(discount || 0);
     const budget: Budget = {
 
       id: uuid(),
@@ -183,7 +183,7 @@ const NewBudgetPage = () => {
       clientDocNumber,
       clientAddress,
       category,
-     
+
       items,
 
       laborCost,
@@ -196,17 +196,17 @@ const NewBudgetPage = () => {
       warranty,
       paymentTerms,
 
-      status:"draft",
+      status: "draft",
 
-      createdAt:new Date().toISOString(),
+      createdAt: new Date().toISOString(),
 
       acEquipment:
         category === "ac"
           ? {
-              capacity: acCapacity,
-              technology: acTechnology,
-              status: acStatus
-            }
+            capacity: acCapacity,
+            technology: acTechnology,
+            status: acStatus
+          }
           : undefined,
 
       electricWorkDescription:
@@ -217,12 +217,12 @@ const NewBudgetPage = () => {
       solarSystem:
         category === "solar"
           ? {
-              systemType: solarType,
-              panelType: solarPanelType,
-              panelPower: solarPanelPower,
-              quantity: solarQty,
-              totalPower: Number(solarPanelPower) * Number(solarQty)
-            }
+            systemType: solarType,
+            panelType: solarPanelType,
+            panelPower: solarPanelPower,
+            quantity: solarQty,
+            totalPower: Number(solarPanelPower) * Number(solarQty)
+          }
           : undefined
 
     };
@@ -251,12 +251,12 @@ const NewBudgetPage = () => {
           <Select value={clientId} onValueChange={setClientId}>
 
             <SelectTrigger>
-              <SelectValue placeholder="Seleccionar cliente"/>
+              <SelectValue placeholder="Seleccionar cliente" />
             </SelectTrigger>
 
             <SelectContent>
 
-              {clients.map(c=>(
+              {clients.map(c => (
                 <SelectItem key={c.id} value={c.id}>
                   {c.name}
                 </SelectItem>
@@ -278,7 +278,7 @@ const NewBudgetPage = () => {
           <Select value={category} onValueChange={setCategory}>
 
             <SelectTrigger>
-              <SelectValue/>
+              <SelectValue />
             </SelectTrigger>
 
             <SelectContent>
@@ -303,10 +303,10 @@ const NewBudgetPage = () => {
 
             <Select value={acCapacity} onValueChange={setAcCapacity}>
               <SelectTrigger>
-                <SelectValue placeholder="Capacidad"/>
+                <SelectValue placeholder="Capacidad" />
               </SelectTrigger>
               <SelectContent>
-                {CAPACITIES.map(c=>(
+                {CAPACITIES.map(c => (
                   <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
               </SelectContent>
@@ -314,10 +314,10 @@ const NewBudgetPage = () => {
 
             <Select value={acTechnology} onValueChange={setAcTechnology}>
               <SelectTrigger>
-                <SelectValue placeholder="Tecnología"/>
+                <SelectValue placeholder="Tecnología" />
               </SelectTrigger>
               <SelectContent>
-                {TECHNOLOGIES.map(t=>(
+                {TECHNOLOGIES.map(t => (
                   <SelectItem key={t} value={t}>{t}</SelectItem>
                 ))}
               </SelectContent>
@@ -325,10 +325,10 @@ const NewBudgetPage = () => {
 
             <Select value={acStatus} onValueChange={setAcStatus}>
               <SelectTrigger>
-                <SelectValue placeholder="Estado"/>
+                <SelectValue placeholder="Estado" />
               </SelectTrigger>
               <SelectContent>
-                {STATUS_OPTIONS.map(s=>(
+                {STATUS_OPTIONS.map(s => (
                   <SelectItem key={s} value={s}>{s}</SelectItem>
                 ))}
               </SelectContent>
@@ -345,7 +345,7 @@ const NewBudgetPage = () => {
             <Label>Descripción del trabajo</Label>
             <Textarea
               value={electricWorkDescription}
-              onChange={(e)=>setElectricWorkDescription(e.target.value)}
+              onChange={(e) => setElectricWorkDescription(e.target.value)}
               className="min-h-[120px]"
             />
           </div>
@@ -358,10 +358,10 @@ const NewBudgetPage = () => {
             <Label>Datos del sistema</Label>
             <Select value={solarType} onValueChange={setSolarType}>
               <SelectTrigger>
-                <SelectValue placeholder="Tipo de sistema"/>
+                <SelectValue placeholder="Tipo de sistema" />
               </SelectTrigger>
               <SelectContent>
-                {SOLAR_TYPES.map(t=>(
+                {SOLAR_TYPES.map(t => (
                   <SelectItem key={t} value={t}>{t}</SelectItem>
                 ))}
               </SelectContent>
@@ -369,10 +369,10 @@ const NewBudgetPage = () => {
 
             <Select value={solarPanelType} onValueChange={setSolarPanelType}>
               <SelectTrigger>
-                <SelectValue placeholder="Tipo de panel"/>
+                <SelectValue placeholder="Tipo de panel" />
               </SelectTrigger>
               <SelectContent>
-                {PANEL_TYPES.map(p=>(
+                {PANEL_TYPES.map(p => (
                   <SelectItem key={p} value={p}>{p}</SelectItem>
                 ))}
               </SelectContent>
@@ -381,14 +381,14 @@ const NewBudgetPage = () => {
             <Input
               placeholder="Potencia panel (W)"
               value={solarPanelPower}
-              onChange={(e)=>setSolarPanelPower(e.target.value)}
+              onChange={(e) => setSolarPanelPower(e.target.value)}
             />
 
             <Input
               type="number"
               placeholder="Cantidad paneles"
               value={solarQty}
-              onChange={(e)=>setSolarQty(Number(e.target.value))}
+              onChange={(e) => setSolarQty(Number(e.target.value))}
             />
           </div>
 
@@ -404,45 +404,45 @@ const NewBudgetPage = () => {
 
         {/* COSTOS */}
         <div className="card-elevated p-4 space-y-3">
-    <Label>Mano de obra</Label>
-<Input
-  value={laborInput}
-  onChange={(e) => {
-    const raw = e.target.value.replace(/\D/g, "");
+          <Label>Mano de obra</Label>
+          <Input
+            value={laborInput}
+            onChange={(e) => {
+              const raw = e.target.value.replace(/\D/g, "");
 
-    setLaborInput(
-      new Intl.NumberFormat("es-AR").format(Number(raw || 0))
-    );
+              setLaborInput(
+                new Intl.NumberFormat("es-AR").format(Number(raw || 0))
+              );
 
-    setLaborCost(Number(raw || 0));
-  }}
-/>
+              setLaborCost(Number(raw || 0));
+            }}
+          />
 
-<Label>Descuento</Label>
-<Input
-  value={discountInput}
-  onChange={(e) => {
-    const raw = e.target.value.replace(/\D/g, "");
+          <Label>Descuento</Label>
+          <Input
+            value={discountInput}
+            onChange={(e) => {
+              const raw = e.target.value.replace(/\D/g, "");
 
-    setDiscountInput(
-      new Intl.NumberFormat("es-AR").format(Number(raw || 0))
-    );
+              setDiscountInput(
+                new Intl.NumberFormat("es-AR").format(Number(raw || 0))
+              );
 
-    setDiscount(Number(raw || 0));
-  }}
-/>
+              setDiscount(Number(raw || 0));
+            }}
+          />
 
-<Label>Notas</Label>
-<Textarea value={notes} onChange={(e)=>setNotes(e.target.value)}/>
+          <Label>Notas</Label>
+          <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
 
-<Label>Validez</Label>
-<Input type="number" value={validityDays} onChange={(e)=>setValidityDays(Number(e.target.value))}/>
+          <Label>Validez</Label>
+          <Input type="number" value={validityDays} onChange={(e) => setValidityDays(Number(e.target.value))} />
 
-<Label>Garantía</Label>
-<Input value={warranty} onChange={(e)=>setWarranty(e.target.value)}/>
+          <Label>Garantía</Label>
+          <Input value={warranty} onChange={(e) => setWarranty(e.target.value)} />
 
-<Label>Forma de pago</Label>
-<Input value={paymentTerms} onChange={(e)=>setPaymentTerms(e.target.value)}/>
+          <Label>Forma de pago</Label>
+          <Input value={paymentTerms} onChange={(e) => setPaymentTerms(e.target.value)} />
 
         </div>
 

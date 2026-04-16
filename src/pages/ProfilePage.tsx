@@ -174,13 +174,13 @@ if (!autorizado) {
             <div>
               <Label htmlFor="address">Dirección</Label>
               <div className="relative mt-1">
-                <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                
                 <Textarea
                   id="address"
                   value={profile.address}
                   onChange={(e) => updateField('address', e.target.value)}
                   placeholder="Av. Corrientes 1234, CABA"
-                  className="pl-10 min-h-[60px]"
+                  className="pl-2 min-h-[60px] text-[16px]"
                 />
               </div>
             </div>
