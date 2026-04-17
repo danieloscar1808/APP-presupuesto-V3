@@ -83,6 +83,18 @@
     font-size: 10px !important;
   }
 
+.qr-print {
+  text-align: center;
+  margin-top: 10px;
+}
+
+@media print {
+  .qr-print canvas {
+    width: 80px !important;
+    height: 80px !important;
+  }
+}
+
 }
 
 @media print {

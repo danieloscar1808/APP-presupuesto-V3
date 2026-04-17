@@ -1,3 +1,5 @@
+import { QRCodeCanvas } from "qrcode.react";
+
 type Props = {
   factura: any;
   profile: any;
@@ -237,6 +239,17 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
               ).toLocaleDateString("es-AR")
               : "-"}
           </p>
+
+          <div className="qr-print">
+            {factura?.qr && (
+              <>
+                <QRCodeCanvas value={factura.qr} />
+                <p className="text-[10px] mt-1">
+                  Comprobante autorizado por AFIP
+                </p>
+              </>
+            )}
+          </div>
 
           {budget?.notaCredito && (
             <p className="text-red-600 font-bold text-[13px] text-center mt-2 mb-3">

@@ -706,7 +706,8 @@ Gracias por tu confianza.`;
         total: Math.round(Number(data.total || 0)),
         CAE: data.CAE,
         vencimiento: data.vencimiento,
-        fecha: new Date().toISOString()
+        fecha: new Date().toISOString(),
+        qr: data.qr
       };
 
       cancelarFacturaStore(
