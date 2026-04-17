@@ -515,7 +515,7 @@ const BudgetDetailPage = () => {
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
     };
     html2pdf().set(opt).from(elemento).save().then(() => {
-     
+
       // 🔄 Restaurar estilos
       if (header) header.style.marginBottom = "";
       if (titulo) titulo.style.marginTop = "";

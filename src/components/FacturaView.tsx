@@ -48,7 +48,11 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
           </div>
 
           <div>
-            Comp. N°: {preliminar ? "—" : String(factura?.numero || 0).padStart(8, "0")}
+            Comp. N°: {preliminar
+              ? "—"
+              : (factura?.numero
+                ? factura.numero.split("-")[1] || factura.numero
+                : "—")}
           </div>
 
           <div>

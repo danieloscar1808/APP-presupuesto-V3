@@ -33,129 +33,129 @@ const BudgetsListPage = () => {
   }, []);
 
   const loadBudgets = async () => {
-  setLoading(true);
-    
-  const data = await getBudgets();
+    setLoading(true);
 
-  const sorted = [...data].sort(
-    (a, b) =>
-      new Date(b.createdAt).getTime() -
-      new Date(a.createdAt).getTime()
-  );
+    const data = await getBudgets();
 
-  setBudgets(sorted);
-  setLoading(false);
-};
+    const sorted = [...data].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime()
+    );
 
-const descargarReportePDF = () => {
-  const doc = new jsPDF({
-  orientation: "landscape"
-  });
+    setBudgets(sorted);
+    setLoading(false);
+  };
 
-  doc.setFontSize(14);
-  doc.text("Reporte de Historial", 14, 15);
+  const descargarReportePDF = () => {
+    const doc = new jsPDF({
+      orientation: "landscape"
+    });
 
-  const rows = filteredBudgets.map((b) => [
-  b.clientName,
+    doc.setFontSize(14);
+    doc.text("Reporte de Historial", 14, 15);
 
-  // FACTURA
-  b.factura?.numero || "-",
-  b.factura?.fecha
-    ? new Date(b.factura.fecha).toLocaleDateString()
-    : "-",
-  b.factura?.cae || "-",
-  b.factura?.vencimiento || "-",
+    const rows = filteredBudgets.map((b) => [
+      b.clientName,
 
-  // NOTA DE CRÉDITO
-  b.notaCredito?.numero || "-",
-  b.notaCredito?.fecha
-    ? new Date(b.notaCredito.fecha).toLocaleDateString()
-    : "-",
-  b.notaCredito?.CAE || "-",
-  b.notaCredito?.vencimiento || "-",
+      // FACTURA
+      b.factura?.numero || "-",
+      b.factura?.fecha
+        ? new Date(b.factura.fecha).toLocaleDateString()
+        : "-",
+      b.factura?.cae || "-",
+      b.factura?.vencimiento || "-",
 
-  // TOTAL
-  `$${(b.total || 0).toLocaleString("es-AR")}`
-]);
+      // NOTA DE CRÉDITO
+      b.notaCredito?.numero || "-",
+      b.notaCredito?.fecha
+        ? new Date(b.notaCredito.fecha).toLocaleDateString()
+        : "-",
+      b.notaCredito?.CAE || "-",
+      b.notaCredito?.vencimiento || "-",
 
-  autoTable(doc, {
-    startY: 25,
-    head: [[
-      "Cliente",
-      "Factura",
-      "Fecha Fact.",
-      "CAE Fact.",
-      "Vto CAE Fact.",
-      "Nota de Crédito",
-      "Fecha NC",
-      "CAE NC",
-      "Vto CAE NC",
-      "Total"
-    ]],
-    body: rows,
-  });
+      // TOTAL
+      `$${(b.total || 0).toLocaleString("es-AR")}`
+    ]);
 
-  doc.save("reporte_presupuestos.pdf");
-};
+    autoTable(doc, {
+      startY: 25,
+      head: [[
+        "Cliente",
+        "Factura",
+        "Fecha Fact.",
+        "CAE Fact.",
+        "Vto CAE Fact.",
+        "Nota de Crédito",
+        "Fecha NC",
+        "CAE NC",
+        "Vto CAE NC",
+        "Total"
+      ]],
+      body: rows,
+    });
+
+    doc.save("reporte_presupuestos.pdf");
+  };
 
 
-    //  FILTRO HISTORIAL
+  //  FILTRO HISTORIAL
   const filteredBudgets = budgets.filter((b) => {
 
-    // 🔴 HISTORIAL
-  const isHistorial =
-    b.status === "facturado" ||
-    b.status === "cancelado";
+    // HISTORIAL
+    const isHistorial =
+      b.status === "facturado" ||
+      b.status === "cancelado";
 
-  // 🔹 ESTADO
-  const matchStatus =
-    statusFilter === "all" || b.status === statusFilter;
+    // ESTADO
+    const matchStatus =
+      statusFilter === "all" || b.status === statusFilter;
 
-  // 🔹 CLIENTE
-  const matchSearch = (b.clientName || "")
-  .toLowerCase()
-  .includes(search.toLowerCase());
+    // CLIENTE
+    const matchSearch = (b.clientName || "")
+      .toLowerCase()
+      .includes(search.toLowerCase());
 
-  // 🔹 CATEGORÍA
-  const matchFilter =
-    filter === "all" || b.category === filter;
+    // 🔹 CATEGORÍA
+    const matchFilter =
+      filter === "all" || b.category === filter;
 
-  // 🔹 FECHA
-  const d = new Date(b.createdAt);
+    // 🔹 FECHA
+    const d = new Date(b.createdAt);
 
-const budgetDateStr =
-  d.getFullYear() +
-  "-" +
-  String(d.getMonth() + 1).padStart(2, "0") +
-  "-" +
-  String(d.getDate()).padStart(2, "0");
+    const budgetDateStr =
+      d.getFullYear() +
+      "-" +
+      String(d.getMonth() + 1).padStart(2, "0") +
+      "-" +
+      String(d.getDate()).padStart(2, "0");
 
-// 🔹 FROM
-const matchFrom =
-  !dateFrom || budgetDateStr >= dateFrom;
+    // 🔹 FROM
+    const matchFrom =
+      !dateFrom || budgetDateStr >= dateFrom;
 
-// 🔹 TO
-const matchTo =
-  !dateTo || budgetDateStr <= dateTo;
+    // 🔹 TO
+    const matchTo =
+      !dateTo || budgetDateStr <= dateTo;
 
- 
-  return (
-    isHistorial &&
-    matchStatus &&
-    matchSearch &&
-    matchFilter &&
-    matchFrom &&
-    matchTo
-  );
-});
+
+    return (
+      isHistorial &&
+      matchStatus &&
+      matchSearch &&
+      matchFilter &&
+      matchFrom &&
+      matchTo
+    );
+  });
 
 
   const hayFiltrosActivos =
-  search !== "" ||
-  filter !== "all" ||
-  statusFilter !== "all" ||
-  dateFrom !== "" ||
-  dateTo !== "";
+    search !== "" ||
+    filter !== "all" ||
+    statusFilter !== "all" ||
+    dateFrom !== "" ||
+    dateTo !== "";
 
   const filterButtons: { id: FilterCategory; label: string }[] = [
     { id: "all", label: "Todos" },
@@ -199,71 +199,71 @@ const matchTo =
       </div>
 
       {/* FILTRO ESTADO */}
-<div className="flex gap-2 mb-4">
-  <Button
-    size="sm"
-    variant={statusFilter === "all" ? "default" : "outline"}
-    onClick={() => setStatusFilter("all")}
-  >
-    Todos
-  </Button>
+      <div className="flex gap-2 mb-4">
+        <Button
+          size="sm"
+          variant={statusFilter === "all" ? "default" : "outline"}
+          onClick={() => setStatusFilter("all")}
+        >
+          Todos
+        </Button>
 
-  <Button
-    size="sm"
-    variant={statusFilter === "facturado" ? "default" : "outline"}
-    onClick={() => setStatusFilter("facturado")}
-  >
-    Facturados
-  </Button>
+        <Button
+          size="sm"
+          variant={statusFilter === "facturado" ? "default" : "outline"}
+          onClick={() => setStatusFilter("facturado")}
+        >
+          Facturados
+        </Button>
 
-  <Button
-    size="sm"
-    variant={statusFilter === "cancelado" ? "default" : "outline"}
-    onClick={() => setStatusFilter("cancelado")}
-  >
-    Cancelados
-  </Button>
-</div>
+        <Button
+          size="sm"
+          variant={statusFilter === "cancelado" ? "default" : "outline"}
+          onClick={() => setStatusFilter("cancelado")}
+        >
+          Cancelados
+        </Button>
+      </div>
 
-{/* FILTRO FECHA */}
-<div className="flex gap-2 mb-4 items-center">
+      {/* FILTRO FECHA */}
+      <div className="flex gap-2 mb-4 items-center">
 
-  {/* BOTÓN TODOS */}
-  <Button
-    size="sm"
-    variant={!dateFrom && !dateTo ? "default" : "outline"}
-    onClick={() => {
-      setDateFrom("");
-      setDateTo("");
-    }}
-  >
-    Todos
-  </Button>
+        {/* BOTÓN TODOS */}
+        <Button
+          size="sm"
+          variant={!dateFrom && !dateTo ? "default" : "outline"}
+          onClick={() => {
+            setDateFrom("");
+            setDateTo("");
+          }}
+        >
+          Todos
+        </Button>
 
-  {/* DESDE */}
-  <Input
-    type="date"
-    value={dateFrom}
-    onChange={(e) => setDateFrom(e.target.value)}
-  />
+        {/* DESDE */}
+        <Input
+          type="date"
+          value={dateFrom}
+          onChange={(e) => setDateFrom(e.target.value)}
+        />
 
-  {/* HASTA */}
-  <Input
-    type="date"
-    value={dateTo}
-    onChange={(e) => setDateTo(e.target.value)}
-  />
+        {/* HASTA */}
+        <Input
+          type="date"
+          value={dateTo}
+          onChange={(e) => setDateTo(e.target.value)}
+        />
 
-</div>
+      </div>
 
-{hayFiltrosActivos && (// hay algún filtro activo (excepto búsqueda)
-  <Button
-    className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white"
-    onClick={descargarReportePDF}
-  >
-    Descargar datos
-  </Button>
-)}
+      {hayFiltrosActivos && (// hay algún filtro activo (excepto búsqueda)
+        <Button
+          className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white"
+          onClick={descargarReportePDF}
+        >
+          Descargar datos
+        </Button>
+      )}
 
       {/* LOADING */}
       {loading ? (
@@ -274,21 +274,21 @@ const matchTo =
         <div className="card-elevated p-8 text-center">
           <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
           <p className="text-muted-foreground">
-  {budgets.length === 0
-    ? "No hay presupuestos"
-    : "No hay resultados con los filtros aplicados"}
-</p>
+            {budgets.length === 0
+              ? "No hay presupuestos"
+              : "No hay resultados con los filtros aplicados"}
+          </p>
 
 
-{budgets.length === 0 && (
-  <Button
-    variant="link"
-    onClick={() => navigate("/budgets/new")}
-    className="mt-2 text-primary"
-  >
-    Crear primer presupuesto
-  </Button>
-)}
+          {budgets.length === 0 && (
+            <Button
+              variant="link"
+              onClick={() => navigate("/budgets/new")}
+              className="mt-2 text-primary"
+            >
+              Crear primer presupuesto
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
