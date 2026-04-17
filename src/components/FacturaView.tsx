@@ -31,7 +31,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
       {/* HEADER */}
       <div className="text-center mb-1">
-        <p className="empresa-nombre w-full bg-black text-white py-3 text-[13px] font-bold text-center">
+        <p className="empresa-nombre w-full bg-black text-white py-3 text-[20px] font-bold text-center">
           {profile?.businessName && profile.businessName.trim() !== ""
             ? profile.businessName
             : "SERVICIOS INTEGRALES DE CLIMATIZACION Y ENERGIA"}
@@ -39,7 +39,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       </div>
 
       <div className="px-3 pt-0">
-        <h1 className="text-[25px] font-bold">Factura C</h1>
+        <h1 className="text-center text-[30px] font-bold mt-0">Factura C</h1>
 
         <div className="text-gray-600 text-[14px] leading-[1.3]">
 

@@ -287,23 +287,23 @@ const BudgetDetailPage = () => {
 
 
       const dataConNumero = {
-  numero: data.numero,
-  cliente: data.cliente,
-  total: Math.round(Number(data.total || 0)),
-  subtotal,
+        numero: data.numero,
+        cliente: data.cliente,
+        total: Math.round(Number(data.total || 0)),
+        subtotal,
 
-  // 🔴 CAMBIO CLAVE
-  currency: budget.facturaPreliminar?.currency || currency,
-  exchangeRate: budget.facturaPreliminar?.exchangeRate || exchangeRate,
+        // 🔴 CAMBIO CLAVE
+        currency: budget.facturaPreliminar?.currency || currency,
+        exchangeRate: budget.facturaPreliminar?.exchangeRate || exchangeRate,
 
-  totalUSD,
-  formaPago: budget.facturaPreliminar?.formaPago || formaPago,
+        totalUSD,
+        formaPago: budget.facturaPreliminar?.formaPago || formaPago,
 
-  cae: data.cae,
-  vencimiento: data.vencimiento,
-  fecha: new Date().toISOString(),
-};
-console.log("FACTURA FINAL:", dataConNumero);
+        cae: data.cae,
+        vencimiento: data.vencimiento,
+        fecha: new Date().toISOString(),
+      };
+      console.log("FACTURA FINAL:", dataConNumero);
 
       const numeroParts = data.numero ? data.numero.split("-") : ["00001", "0"];
 
@@ -327,15 +327,15 @@ console.log("FACTURA FINAL:", dataConNumero);
 
       // 🔥 UN SOLO OBJETO (sin duplicados)
       const updatedBudgetFactura = {
-  ...budget,
-  status: "facturado",
-  factura: dataConNumero,
+        ...budget,
+        status: "facturado",
+        factura: dataConNumero,
 
-  // 🔴 IMPORTANTE: conservar datos
-  facturaPreliminar: {
-    ...budget.facturaPreliminar
-  }
-};
+        // 🔴 IMPORTANTE: conservar datos
+        facturaPreliminar: {
+          ...budget.facturaPreliminar
+        }
+      };
 
       await saveBudget(updatedBudgetFactura);
       setBudget(updatedBudgetFactura);
@@ -372,95 +372,95 @@ console.log("FACTURA FINAL:", dataConNumero);
   };
 
   const imprimirFactura = () => {
-  const contenido = facturaRef.current;
-  if (!contenido) return;
+    const contenido = facturaRef.current;
+    if (!contenido) return;
 
-  // 🔥 CLONAR CONTENIDO (NO TOCAR ORIGINAL)
-  const clon = contenido.cloneNode(true) as HTMLElement;
+    // 🔥 CLONAR CONTENIDO (NO TOCAR ORIGINAL)
+    const clon = contenido.cloneNode(true) as HTMLElement;
 
-  // 🔥 APLICAR ESTILOS A4 CENTRALIZADOS
-  const aplicarEstilosA4 = (root: HTMLElement) => {
+    // 🔥 APLICAR ESTILOS A4 CENTRALIZADOS
+    const aplicarEstilosA4 = (root: HTMLElement) => {
 
-    const reglas: { selector: string; estilos: Partial<CSSStyleDeclaration> }[] = [
+      const reglas: { selector: string; estilos: Partial<CSSStyleDeclaration> }[] = [
 
-      // CONTENEDOR GENERAL
-      {
-        selector: "div",
-        estilos: {
-          fontSize: "10px",
-          lineHeight: "1.3",
-        }
-      },
+        // CONTENEDOR GENERAL
+        {
+          selector: "div",
+          estilos: {
+            fontSize: "10px",
+            lineHeight: "1.3",
+          }
+        },
 
-      // TITULO PRINCIPAL
-      {
-        selector: "h1",
-        estilos: {
-          fontSize: "40px",
-        }
-      },
+        // TITULO PRINCIPAL
+        {
+          selector: "h1",
+          estilos: {
+            fontSize: "40px",
+          }
+        },
 
-      // SUBTITULOS
-      {
-        selector: "h2",
-        estilos: {
-          fontSize: "12px",
-        }
-      },
+        // SUBTITULOS
+        {
+          selector: "h2",
+          estilos: {
+            fontSize: "12px",
+          }
+        },
 
-      // TEXTO GENERAL
-      {
-        selector: "p, span",
-        estilos: {
-          fontSize: "10px",
-        }
-      },
+        // TEXTO GENERAL
+        {
+          selector: "p, span",
+          estilos: {
+            fontSize: "10px",
+          }
+        },
 
-      // TABLAS
-      {
-        selector: "table",
-        estilos: {
-          fontSize: "9px",
-          width: "100%",
-          borderCollapse: "collapse",
-        }
-      },
+        // TABLAS
+        {
+          selector: "table",
+          estilos: {
+            fontSize: "9px",
+            width: "100%",
+            borderCollapse: "collapse",
+          }
+        },
 
-      // CELDAS
-      {
-        selector: "th, td",
-        estilos: {
-          padding: "4px",
-        }
-      },
+        // CELDAS
+        {
+          selector: "th, td",
+          estilos: {
+            padding: "4px",
+          }
+        },
 
-      // EMPRESA (tu clase específica)
-      {
-        selector: ".empresa-nombre",
-        estilos: {
-          fontSize: "12px",
-          fontWeight: "bold",
-        }
-      },
+        // EMPRESA (tu clase específica)
+        {
+          selector: ".empresa-nombre",
+          estilos: {
+            fontSize: "12px",
+            fontWeight: "bold",
+          }
+        },
 
-    ];
+      ];
 
-    reglas.forEach(({ selector, estilos }) => {
-      root.querySelectorAll(selector).forEach(el => {
-        Object.assign((el as HTMLElement).style, estilos);
+      reglas.forEach(({ selector, estilos }) => {
+        root.querySelectorAll(selector).forEach(el => {
+          Object.assign((el as HTMLElement).style, estilos);
+        });
       });
-    });
-  };
+    };
 
-  // 🔥 aplicar estilos
-  aplicarEstilosA4(clon);
+    // 🔥 aplicar estilos
+    aplicarEstilosA4(clon);
 
-  // 🔥 abrir ventana
-  const ventana = window.open("", "_blank");
-  if (!ventana) return;
+    // 🔥 abrir ventana
+    const ventana = window.open("", "_blank");
+    if (!ventana) return;
 
-  // 🔥 escribir HTML LIMPIO (sin copiar estilos rotos)
-  ventana.document.write(`
+    // 🔥 escribir HTML LIMPIO (sin copiar estilos rotos)
+    ventana.document.write(`
     <html>
       <head>
         <title>Factura</title>
@@ -482,28 +482,46 @@ console.log("FACTURA FINAL:", dataConNumero);
     </html>
   `);
 
-  ventana.document.close();
+    ventana.document.close();
 
-  ventana.onload = () => {
-    ventana.focus();
-    ventana.print();
-    ventana.close();
+    ventana.onload = () => {
+      ventana.focus();
+      ventana.print();
+      ventana.close();
+    };
   };
-};
+
+
 
   const descargarPDF = () => {
     const elemento = facturaRef.current;
     if (!elemento) return;
+
+    // 🔧 ESCALA SOLO PARA PDF
+    elemento.style.transform = "scale(0.88)";
+    elemento.style.transformOrigin = "top left";
+
+    // 🔧 AJUSTE SOLO PARA PDF
+    const header = elemento.querySelector(".empresa-nombre");
+    const titulo = elemento.querySelector(".titulo-factura");
+    if (header) header.style.marginBottom = "-20px";
+    if (titulo) titulo.style.marginTop = "-20px";
+
     const opt = {
-      margin: 10,
+      margin: [5, 63, 5, 55],
       filename: `Factura_${factura?.numero || "sin-numero"}_${budget?.clientName || "cliente"}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
     };
-    html2pdf().set(opt).from(elemento).save();
+    html2pdf().set(opt).from(elemento).save().then(() => {
+     
+      // 🔄 Restaurar estilos
+      if (header) header.style.marginBottom = "";
+      if (titulo) titulo.style.marginTop = "";
+      elemento.style.transform = "";
+    });
   };
-
 
   const imprimirTicket80mm = () => {
     const contenido = facturaRef.current;
@@ -1118,15 +1136,15 @@ Gracias por tu confianza.`;
             <h2 className="text-center font-bold">Elegir formato</h2>
 
             {/* PDF A4 */}
-  <Button
-  className="w-full"
-  onClick={() => {
-    descargarPDF();
-    setShowDownloadOptions(false);
-  }}
->
-  📄 PDF A4
-</Button>
+            <Button
+              className="w-full"
+              onClick={() => {
+                descargarPDF();
+                setShowDownloadOptions(false);
+              }}
+            >
+              📄 PDF A4
+            </Button>
 
             {/* TICKET */}
             <Button
