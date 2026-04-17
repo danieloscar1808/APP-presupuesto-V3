@@ -41,7 +41,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       <div className="px-3 pt-0">
         <h1 className="text-[25px] font-bold">Factura C</h1>
 
-        <div className="text-gray-600 text-[12px] leading-[1.3]">
+        <div className="text-gray-600 text-[14px] leading-[1.3]">
 
           <div>
             Punto de Venta: {preliminar ? "—" : String(factura?.puntoVenta || 1).padStart(5, "0")}
@@ -63,7 +63,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
       {/* EMPRESA */}
       <div className="border-t border-dashed border-gray-400 my-2"></div>
-      <div className="px-3 pt-0 mb-2 mt-2 text-[12px] leading-[1.3]">
+      <div className="px-3 pt-0 mb-2 mt-2 text-[14px] leading-[1.3]">
         <h2 className="font-semibold text-[16px]">Emisor</h2>
         <p>{profile?.name || "Tu Empresa"}</p>
         <p>CUIT: {profile?.taxId || "CUIT no cargado"}</p>
@@ -75,7 +75,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
       {/* CLIENTE */}
       <div className="border-t border-dashed border-gray-400 my-"></div>
-      <div className="px-3 pt-0 mb-2 mt-2 text-[12px] leading-[1.3]">
+      <div className="px-3 pt-0 mb-2 mt-2 text-[15px] leading-[1.3]">
         <h2 className="font-semibold text-[16px]">Cliente</h2>
         <p>{factura?.cliente || budget?.clientName || "Cliente no definido"}</p>
 
@@ -102,7 +102,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       <div className="px-3 pt-0 mb-2 mt-2">
         <h2 className="font-semibold text-[16px]">Datos del Pago</h2>
 
-        <div className=" text-[12px] leading-[1.3]">
+        <div className=" text-[14px] leading-[1.3]">
 
           <div className="flex justify-between">
             <span className="text-gray-600">Moneda</span>
@@ -152,7 +152,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
       {/* TABLA DETALLE */}
       <div className="px-3 pt-0 mb-3">
-        <table className="w-full text-[12px] border leading-[1.2]">
+        <table className="w-full text-[14px] border leading-[1.2]">
           <thead className="bg-gray-100">
             <tr>
               <th className="text-left p-2 border">Descripción</th>
@@ -216,7 +216,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
       {/* 🔹 CAE SIEMPRE DESDE LA FACTURA ORIGINAL */}
       {!preliminar && (factura?.cae || budget?.factura?.cae) && (
-        <div className="px-3 pt-0 border-t pt-1 text-[12px] leading-[1.3]">
+        <div className="px-3 pt-0 border-t pt-1 text-[14px] leading-[1.3]">
 
           <p>
             <strong>CAE:</strong>{" "}

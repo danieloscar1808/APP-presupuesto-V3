@@ -801,14 +801,14 @@ Gracias por tu confianza.`;
       </div>
 
       {/* CLIENTE */}
-      <div className="card-elevated p-4 space-y-2">
-        <h3 className="font-semibold text-primary">Cliente</h3>
+      <div className="card-elevated p-3 space-y-1 text-[15px]">
+        <h3 className="font-semibold text-primary text-sm">Cliente</h3>
         <p className="text-foreground">{budget.clientName}</p>
       </div>
 
       {/* TIPO DE INSTALACIÓN */}
-      <div className="card-elevated p-4 space-y-2">
-        <h3 className="font-semibold text-primary">Tipo de Instalación</h3>
+      <div className="card-elevated p-3 space-y-1 text-[15px]">
+        <h3 className="font-semibold text-primary text-sm">Tipo de Instalación</h3>
         <p className="text-foreground">
           {CATEGORY_LABELS[budget.category]}
         </p>
@@ -816,8 +816,8 @@ Gracias por tu confianza.`;
 
       {/* DETALLES POR CATEGORÍA */}
       {budget.category === "ac" && budget.acEquipment && (
-        <div className="card-elevated p-4 space-y-2">
-          <h3 className="font-semibold text-primary">Datos del Equipo</h3>
+        <div className="card-elevated p-3 space-y-1 text-[15px]">
+          <h3 className="font-semibold text-primary text-sm">Datos del Equipo</h3>
           <p>Capacidad: {budget.acEquipment.capacity} frigorías</p>
           <p>Tecnología: {budget.acEquipment.technology}</p>
           <p>Estado: {budget.acEquipment.status}</p>
@@ -825,8 +825,8 @@ Gracias por tu confianza.`;
       )}
 
       {budget.category === "solar" && budget.solarSystem && (
-        <div className="card-elevated p-4 space-y-2">
-          <h3 className="font-semibold text-primary">Datos del Sistema FV</h3>
+        <div className="card-elevated p-3 space-y-1 text-[15px] ">
+          <h3 className="font-semibold text-primary text-sm">Datos del Sistema FV</h3>
           <p>Tipo de sistema: {budget.solarSystem.systemType}</p>
           <p>Panel: {budget.solarSystem.panelType} - {budget.solarSystem.panelPower} W</p>
           <p>Cantidad de paneles: {budget.solarSystem.quantity}</p>
@@ -835,8 +835,8 @@ Gracias por tu confianza.`;
       )}
 
       {budget.category === "electric" && budget.electricWorkDescription && (
-        <div className="card-elevated p-4 space-y-2">
-          <h3 className="font-semibold text-primary">Descripción del Trabajo</h3>
+        <div className="card-elevated p-3 space-y-1 text-[15px]">
+          <h3 className="font-semibold text-primary text-sm ">Descripción del Trabajo</h3>
           <p className="whitespace-pre-line text-foreground">
             {budget.electricWorkDescription}
           </p>
