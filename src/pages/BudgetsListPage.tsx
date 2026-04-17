@@ -56,35 +56,40 @@ const descargarReportePDF = () => {
   doc.text("Reporte de Historial", 14, 15);
 
   const rows = filteredBudgets.map((b) => [
-    b.clientName,
-    b.category.toUpperCase(),
-    b.number || "-",
-    new Date(b.createdAt).toLocaleDateString(),
+  b.clientName,
 
-    b.factura?.numero || "-",
-    b.factura?.fecha
-      ? new Date(b.factura.fecha).toLocaleDateString()
-      : "-",
+  // FACTURA
+  b.factura?.numero || "-",
+  b.factura?.fecha
+    ? new Date(b.factura.fecha).toLocaleDateString()
+    : "-",
+  b.factura?.cae || "-",
+  b.factura?.vencimiento || "-",
 
-    b.notaCredito?.numero || "-",
-    b.notaCredito?.fecha
-      ? new Date(b.notaCredito.fecha).toLocaleDateString()
-      : "-",
+  // NOTA DE CRÉDITO
+  b.notaCredito?.numero || "-",
+  b.notaCredito?.fecha
+    ? new Date(b.notaCredito.fecha).toLocaleDateString()
+    : "-",
+  b.notaCredito?.CAE || "-",
+  b.notaCredito?.vencimiento || "-",
 
-    `$${(b.total || 0).toLocaleString("es-AR")}`
-  ]);
+  // TOTAL
+  `$${(b.total || 0).toLocaleString("es-AR")}`
+]);
 
   autoTable(doc, {
     startY: 25,
     head: [[
       "Cliente",
-      "Tipo",
-      "Presupuesto",
-      "Fecha Pres.",
       "Factura",
       "Fecha Fact.",
+      "CAE Fact.",
+      "Vto CAE Fact.",
       "Nota de Crédito",
       "Fecha NC",
+      "CAE NC",
+      "Vto CAE NC",
       "Total"
     ]],
     body: rows,
