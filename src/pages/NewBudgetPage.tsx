@@ -244,7 +244,7 @@ const NewBudgetPage = () => {
 
         {/* CLIENTE */}
 
-        <div className="card-elevated p-4 space-y-3">
+        <div className="card-elevated p-2 space-y-2">
 
           <Label>Cliente</Label>
 
@@ -271,7 +271,7 @@ const NewBudgetPage = () => {
 
         {/* CATEGORIA */}
 
-        <div className="card-elevated p-4 space-y-3">
+        <div className="card-elevated p-2 space-y-2">
 
           <Label>Tipo de instalación</Label>
 
@@ -297,7 +297,7 @@ const NewBudgetPage = () => {
 
         {category === "ac" && (
 
-          <div className="card-elevated p-4 space-y-4">
+          <div className="card-elevated p-2 space-y-2">
 
             <Label>Datos del equipo</Label>
 
@@ -341,7 +341,7 @@ const NewBudgetPage = () => {
 
         {/* ELECTRIC */}
         {category === "electric" && (
-          <div className="card-elevated p-4 space-y-3">
+          <div className="card-elevated p-2 space-y-2">
             <Label>Descripción del trabajo</Label>
             <Textarea
               value={electricWorkDescription}
@@ -354,7 +354,7 @@ const NewBudgetPage = () => {
 
         {/* SOLAR */}
         {category === "solar" && (
-          <div className="card-elevated p-4 space-y-3">
+          <div className="card-elevated p-2 space-y-2">
             <Label>Datos del sistema</Label>
             <Select value={solarType} onValueChange={setSolarType}>
               <SelectTrigger>
@@ -394,7 +394,6 @@ const NewBudgetPage = () => {
 
         )}
 
-
         {/* ITEMS */}
         <ItemsEditor
           items={items}
@@ -403,7 +402,7 @@ const NewBudgetPage = () => {
         />
 
         {/* COSTOS */}
-        <div className="card-elevated p-4 space-y-3">
+        <div className="card-elevated p-2 space-y-1">
           <Label>Mano de obra</Label>
           <Input
             value={laborInput}

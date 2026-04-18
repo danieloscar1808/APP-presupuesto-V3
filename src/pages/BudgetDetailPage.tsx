@@ -302,6 +302,7 @@ const BudgetDetailPage = () => {
         cae: data.cae,
         vencimiento: data.vencimiento,
         fecha: new Date().toISOString(),
+         qr: data.qr,
       };
       console.log("FACTURA FINAL:", dataConNumero);
 
@@ -508,7 +509,7 @@ const BudgetDetailPage = () => {
     if (titulo) titulo.style.marginTop = "-20px";
 
     const opt = {
-      margin: [5, 63, 5, 55],
+      margin: [0, 63, 0, 55],
       filename: `Factura_${factura?.numero || "sin-numero"}_${budget?.clientName || "cliente"}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { scale: 2 },

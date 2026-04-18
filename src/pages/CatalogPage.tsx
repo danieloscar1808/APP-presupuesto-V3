@@ -242,7 +242,7 @@ const CatalogPage = () => {
 
         {/* Nuevo Ítem */}
         <Card className="border-dashed">
-          <CardContent className="p-4 space-y-3">
+          <CardContent className="p-2 space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Plus className="w-4 h-4" />
               Agregar nuevo ítem

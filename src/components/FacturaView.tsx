@@ -1,4 +1,4 @@
-import { QRCodeCanvas } from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";
 
 type Props = {
   factura: any;
@@ -8,6 +8,7 @@ type Props = {
 };
 
 const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
+
 
   console.log("FACTURA EN VIEW:", factura);
   console.log("FACTURA ASOCIADA:", factura?.facturaAsociada);
@@ -22,6 +23,8 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
   const datos = preliminar ? budget.facturaPreliminar : factura;
   const totalFinal = budget.total;
+  console.log("FACTURA:", factura);
+  console.log("QR:", factura?.qr);
 
   return (
     <div className="bg-white text-black pt-0 px-0 pb-4 mt-2 rounded-xl shadow border border-black overflow-hidden">
@@ -240,16 +243,25 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
               : "-"}
           </p>
 
-          <div className="qr-print">
-            {factura?.qr && (
-              <>
-                <QRCodeCanvas value={factura.qr} />
-                <p className="text-[10px] mt-1">
-                  Comprobante autorizado por AFIP
-                </p>
-              </>
-            )}
-          </div>
+          {!preliminar && factura?.qr && (
+            <div
+              className="qr-print"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginTop: 20
+              }}
+            >
+
+              <QRCodeSVG value={factura.qr} size={90} />
+
+              <p style={{ fontSize: "12px", marginTop: 6 }}>
+                Comprobante autorizado por AFIP
+              </p>
+
+            </div>
+          )}
 
           {budget?.notaCredito && (
             <p className="text-red-600 font-bold text-[13px] text-center mt-2 mb-3">
@@ -276,8 +288,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
               </p>
 
               <p>
-                Factura Asociada:{" "}
-                {`${String(factura?.puntoVenta || 1).padStart(5, "0")} - ${String(factura?.numero || 0).padStart(8, "0")}`}
+                Factura Asociada: {factura?.numero || "—"}
               </p>
 
               <p>

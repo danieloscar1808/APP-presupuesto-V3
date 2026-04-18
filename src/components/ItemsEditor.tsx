@@ -132,7 +132,7 @@ export const ItemsEditor = ({ items, onChange, category }: ItemsEditorProps) => 
   const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice,0);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
       <label className="text-sm font-medium text-foreground">Materiales e Items</label>
 
       {/* Item list */}
