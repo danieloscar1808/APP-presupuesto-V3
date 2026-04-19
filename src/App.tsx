@@ -14,6 +14,7 @@ import BudgetDetailPage from "./pages/BudgetDetailPage";
 import CatalogPage from "./pages/CatalogPage";
 import ResumenImpositivo from "./pages/CierreIIBBPage";
 import NotFound from "./pages/NotFound";
+import CatalogoManoDeObraPage from "@/pages/CatalogoManoDeObraPage";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
         <Route path="/catalog" element={<CatalogPage />} />
         <Route path="/resumen-impositivo" element={<ResumenImpositivo />} />
         <Route path="*" element={<NotFound />} />
+        <Route path="/catalogo-mano-obra" element={<CatalogoManoDeObraPage />} />
       </Routes>
 
     </TooltipProvider>

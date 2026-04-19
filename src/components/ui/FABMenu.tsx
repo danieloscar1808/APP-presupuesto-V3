@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Menu, X, Home, Users, FileText, Package, Settings, Calculator } from "lucide-react";
+import { Wrench } from "lucide-react";
 
 export const FABMenu = () => {
   const [open, setOpen] = useState(false);
@@ -12,6 +13,7 @@ export const FABMenu = () => {
     { label: "Clientes", path: "/clients", icon: Users },
     { label: "Cierre IIBB", path: "/cierre-iibb", icon: Calculator },
     { label: "Catalogo", path: "/catalog", icon: Package },
+    { label: "Mano de obra", path: "/catalogo-mano-obra", icon: Wrench },
     { label: "Perfil", path: "/profile", icon: Settings },
   ];
 

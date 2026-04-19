@@ -117,6 +117,44 @@ export const getCatalogItemByName = async (name: string): Promise<CatalogItem | 
   return items.find(i => i.name.toLowerCase() === name.toLowerCase());
 };
 
+const LABOR_KEY = "catalog_labor";
+
+// -------------------------------
+// OBTENER MANO DE OBRA
+// -------------------------------
+export const getLaborItems = async (): Promise<CatalogItem[]> => {
+  const data = localStorage.getItem(LABOR_KEY);
+  return data ? JSON.parse(data) : [];
+};
+
+// -------------------------------
+// GUARDAR MANO DE OBRA
+// -------------------------------
+export const saveLaborItem = async (item: CatalogItem) => {
+  const items = await getLaborItems();
+
+  const existingIndex = items.findIndex(i => i.id === item.id);
+
+  if (existingIndex >= 0) {
+    items[existingIndex] = item;
+  } else {
+    items.push(item);
+  }
+
+  localStorage.setItem(LABOR_KEY, JSON.stringify(items));
+};
+
+// -------------------------------
+// ELIMINAR MANO DE OBRA
+// -------------------------------
+export const deleteLaborItem = async (id: string) => {
+  const items = await getLaborItems();
+  const updated = items.filter(i => i.id !== id);
+
+  localStorage.setItem(LABOR_KEY, JSON.stringify(updated));
+};
+
+
 // -----------------------------------------------------
 // BACKUP
 // -----------------------------------------------------
