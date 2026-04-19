@@ -136,6 +136,8 @@ const NewBudgetPage = () => {
   const [solarPanelPower, setSolarPanelPower] = useState("");
   const [solarQty, setSolarQty] = useState<number>(0);
 
+  const SOLAR_NOTE = `La instalación del sistema fotovoltaico requiere condiciones climáticas favorables. En caso de lluvia, tormenta o humedad excesiva, los trabajos se suspenderán y se reprogramarán para garantizar la seguridad del personal y la calidad de la instalación.`;
+
 
   /* CARGAR CLIENTES */
 
@@ -156,6 +158,12 @@ const NewBudgetPage = () => {
       setClientAddress(cli?.address || "");
     }
   }, [clientId, clients]);
+
+  useEffect(() => {
+  if (category === "solar" && notes.trim() === "") {
+    setNotes(SOLAR_NOTE);
+  }
+}, [category]);
 
 
   /* GUARDAR */

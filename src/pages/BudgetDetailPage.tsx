@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
 import { PageLayout } from "@/components/PageLayout";
 import { ShareOptions } from "@/components/ShareOptions";
-
 import { Budget, Profile, CATEGORY_LABELS, CATEGORY_COLORS } from "@/types";
 import { getBudgetById, getProfile, deleteBudget } from "@/lib/storage";
-
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -21,7 +18,6 @@ import { saveBudget } from "@/lib/storage";
 import { useFacturasStore } from "../store/facturasStore";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Server, Building2 } from "lucide-react";
-
 
 const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -1175,81 +1171,84 @@ Gracias por tu confianza.`;
 
 
       {/* ANIMACIÓN AFIP PRO */}
-      {loadingAFIP && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
+{loadingAFIP && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
 
-          <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
+    <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
 
-            {/* TÍTULO */}
-            <p className="font-semibold text-sm">
-              Comunicando con AFIP...
-            </p>
+      {/* TÍTULO */}
+      <p className="font-semibold text-base">
+        Comunicando con ARCA...
+      </p>
 
-            {/* CONTENIDO */}
-            <div className="flex items-center gap-6">
+      {/* CONTENIDO */}
+      <div className="flex items-center gap-6">
 
-              {/* SISTEMA */}
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
-                  <Server className="w-8 h-8 text-blue-600" />
-                </div>
-                <span className="text-xs mt-2">System SICE</span>
-              </div>
-
-              {/* FLECHAS ANIMADAS (IDA Y VUELTA REAL) */}
-              <div className="flex flex-col items-center gap-2">
-
-                {/* IDA */}
-                <div className="flex gap-1 text-blue-500">
-                  <span className="animate-[pulse_1s_infinite]">→</span>
-                  <span className="animate-[pulse_1s_infinite_0.2s]">→</span>
-                  <span className="animate-[pulse_1s_infinite_0.4s]">→</span>
-                </div>
-
-                {/* VUELTA */}
-                <div className="flex gap-1 text-green-500">
-                  <span className="animate-[pulse_1s_infinite]">←</span>
-                  <span className="animate-[pulse_1s_infinite_0.2s]">←</span>
-                  <span className="animate-[pulse_1s_infinite_0.4s]">←</span>
-                </div>
-
-              </div>
-
-              {/* AFIP */}
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
-                  <Building2 className="w-8 h-8 text-green-600" />
-                </div>
-                <span className="text-xs mt-2">ARCA</span>
-              </div>
-
-            </div>
-
-            {/* TEXTO */}
-            <p className="text-xs text-muted-foreground text-center animate-pulse">
-              Enviando datos fiscales y esperando validación...
-            </p>
-
-            {/* SPINNER EXTRA */}
-            <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
-
-            {/* BARRA DE PROGRESO */}
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-blue-500 h-2 transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-
-            {/* % opcional */}
-            <span className="text-xs text-muted-foreground">
-              {Math.floor(progress)}%
-            </span>
-
+        {/* SISTEMA */}
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
+            <Server className="w-8 h-8 text-blue-600" />
           </div>
+          <span className="text-base mt-2 text-blue-700 font-medium">
+            SICE
+          </span>
         </div>
-      )}
 
+        {/* FLECHAS ANIMADAS */}
+        <div className="flex flex-col items-center gap-2">
+
+          {/* IDA */}
+          <div className="flex gap-1 text-blue-500 text-lg">
+            <span className="animate-[pulse_1s_infinite]">→</span>
+            <span className="animate-[pulse_1s_infinite_0.2s]">→</span>
+            <span className="animate-[pulse_1s_infinite_0.4s]">→</span>
+          </div>
+
+          {/* VUELTA */}
+          <div className="flex gap-1 text-green-500 text-lg">
+            <span className="animate-[pulse_1s_infinite]">←</span>
+            <span className="animate-[pulse_1s_infinite_0.2s]">←</span>
+            <span className="animate-[pulse_1s_infinite_0.4s]">←</span>
+          </div>
+
+        </div>
+
+        {/* AFIP */}
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
+            <Building2 className="w-8 h-8 text-green-600" />
+          </div>
+          <span className="text-base mt-2 text-green-700 font-medium">
+            ARCA
+          </span>
+        </div>
+
+      </div>
+
+      {/* TEXTO */}
+      <p className="text-sm text-muted-foreground text-center animate-pulse">
+        Enviando datos fiscales y esperando validación...
+      </p>
+
+      {/* SPINNER */}
+      <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+
+      {/* BARRA DE PROGRESO */}
+      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+        <div
+          className="bg-blue-500 h-2 transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      {/* % */}
+      <span className="text-xs text-muted-foreground">
+        {Math.floor(progress)}%
+      </span>
+
+    </div>
+  </div>
+)}
     </PageLayout>
   );
 };

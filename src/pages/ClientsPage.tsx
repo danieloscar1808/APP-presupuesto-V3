@@ -178,7 +178,7 @@ const ClientsPage = () => {
         <div className="space-y-3">
           {filteredClients.map((client) => (
             <div key={client.id} className="card-elevated p-4">
-              <div className="flex items-start justify-between">
+              <div className="flex items-center justify-between">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                     <span className="text-sm font-medium text-primary">
@@ -205,12 +205,12 @@ const ClientsPage = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-1">
+                <div className="flex items-center gap-1 shrink-0">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => openEditDialog(client)}
-                    className="h-8 w-8"
+                    className="h-8 w-8 flex items-center justify-center"
                   >
                     <Edit className="w-4 h-4" />
                   </Button>

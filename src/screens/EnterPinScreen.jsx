@@ -65,7 +65,7 @@ export default function EnterPinScreen({ user_id, onSuccess }) {
 
         {/* TECLADO */}
         <div style={styles.keyboard}>
-          {[1,2,3,4,5,6,7,8,9].map((n) => (
+          {[1,2,3,4,5,6,7,8,9,0].map((n) => (
             <button
               key={n}
               onClick={() => addNumber(n)}
@@ -75,9 +75,7 @@ export default function EnterPinScreen({ user_id, onSuccess }) {
             </button>
           ))}
 
-          <button style={styles.key} onClick={() => setPin("")}>
-            C
-          </button>
+         
 
           <button
             style={{
