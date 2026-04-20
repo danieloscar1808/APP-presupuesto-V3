@@ -21,6 +21,7 @@ import {
 import { ItemsEditor } from "@/components/ItemsEditor";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
+import { LaborCalculator } from "@/components/LaborCalculator";
 
 /* -------------------------------- */
 /* LISTAS                           */
@@ -86,6 +87,8 @@ const NewBudgetPage = () => {
 
   const [laborInput, setLaborInput] = useState("");
   const [discountInput, setDiscountInput] = useState("");
+
+  const [showLaborCalculator, setShowLaborCalculator] = useState(false);
 
   useEffect(() => {
     if (laborCost) {
@@ -160,10 +163,10 @@ const NewBudgetPage = () => {
   }, [clientId, clients]);
 
   useEffect(() => {
-  if (category === "solar" && notes.trim() === "") {
-    setNotes(SOLAR_NOTE);
-  }
-}, [category]);
+    if (category === "solar" && notes.trim() === "") {
+      setNotes(SOLAR_NOTE);
+    }
+  }, [category]);
 
 
   /* GUARDAR */
@@ -412,18 +415,29 @@ const NewBudgetPage = () => {
         {/* COSTOS */}
         <div className="card-elevated p-2 space-y-1">
           <Label>Mano de obra</Label>
-          <Input
-            value={laborInput}
-            onChange={(e) => {
-              const raw = e.target.value.replace(/\D/g, "");
 
-              setLaborInput(
-                new Intl.NumberFormat("es-AR").format(Number(raw || 0))
-              );
+          <div className="flex gap-2">
+            <Input
+              className="flex-1"
+              value={laborInput}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/\D/g, "");
 
-              setLaborCost(Number(raw || 0));
-            }}
-          />
+                setLaborInput(
+                  new Intl.NumberFormat("es-AR").format(Number(raw || 0))
+                );
+
+                setLaborCost(Number(raw || 0));
+              }}
+            />
+
+            <Button
+              variant="outline"
+              onClick={() => setShowLaborCalculator(true)}
+            >
+              🧮
+            </Button>
+          </div>
 
           <Label>Descuento</Label>
           <Input
@@ -459,6 +473,37 @@ const NewBudgetPage = () => {
         </Button>
 
       </div>
+
+      {showLaborCalculator && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+          <div className="bg-white rounded-xl p-4 w-[420px] max-h-[80vh] overflow-y-auto">
+
+            <LaborCalculator
+              onClose={() => setShowLaborCalculator(false)}
+
+              onUseTotal={(total: number) => {
+
+                // 👇 SUMA al valor existente (NO reemplaza)
+                const nuevoTotal = laborCost + total;
+
+                setLaborCost(nuevoTotal);
+
+                setLaborInput(
+                  new Intl.NumberFormat("es-AR").format(nuevoTotal)
+                );
+
+                setShowLaborCalculator(false);
+
+                toast.success("Monto agregado a mano de obra");
+              }}
+            />
+
+          </div>
+
+        </div>
+      )}
+
 
     </PageLayout>
 
