@@ -83,6 +83,7 @@ const parseNumber = (value: string) => {
 const NewBudgetPage = () => {
 
   const [laborCost, setLaborCost] = useState(0);
+  const [laborItems, setLaborItems] = useState<any[]>([]);
   const [discount, setDiscount] = useState(0);
 
   const [laborInput, setLaborInput] = useState("");
@@ -196,6 +197,7 @@ const NewBudgetPage = () => {
       category,
 
       items,
+      laborItems,
 
       laborCost,
       subtotal,
@@ -482,9 +484,8 @@ const NewBudgetPage = () => {
             <LaborCalculator
               onClose={() => setShowLaborCalculator(false)}
 
-              onUseTotal={(total: number) => {
+              onUseTotal={(total, selectedItems) => {
 
-                // 👇 SUMA al valor existente (NO reemplaza)
                 const nuevoTotal = laborCost + total;
 
                 setLaborCost(nuevoTotal);
@@ -493,9 +494,10 @@ const NewBudgetPage = () => {
                   new Intl.NumberFormat("es-AR").format(nuevoTotal)
                 );
 
-                setShowLaborCalculator(false);
+                // 👇 guardar desglose
+                setLaborItems((prev) => [...prev, ...selectedItems]);
 
-                toast.success("Monto agregado a mano de obra");
+                setShowLaborCalculator(false);
               }}
             />
 

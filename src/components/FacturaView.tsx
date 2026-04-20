@@ -1,4 +1,5 @@
 import { QRCodeSVG } from "qrcode.react";
+import logoHeader from "@/assets/logo-header.png";
 
 type Props = {
   factura: any;
@@ -35,13 +36,25 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       )}
 
       {/* HEADER */}
-      <div className="text-center mb-1">
-        <p className="empresa-nombre w-full bg-black text-white py-3 text-[20px] font-bold text-center">
-          {profile?.businessName && profile.businessName.trim() !== ""
-            ? profile.businessName
-            : "SERVICIOS INTEGRALES DE CLIMATIZACION Y ENERGIA"}
-        </p>
-      </div>
+      <div className="mb-1">
+  <div className="w-full bg-black text-white py-2 px-3 flex items-center justify-center gap-3">
+
+    {/* LOGO */}
+    <img
+      src={logoHeader}
+      alt="logo"
+      className="h-10 object-contain"
+    />
+
+    {/* TEXTO */}
+    <span className="text-[18px] font-bold text-center leading-tight">
+      {profile?.businessName && profile.businessName.trim() !== ""
+        ? profile.businessName
+        : "SERVICIOS INTEGRALES DE CLIMATIZACION Y ENERGIA"}
+    </span>
+
+  </div>
+</div>
 
       <div className="px-3 pt-0">
         <h1 className="text-center text-[30px] font-bold mt-0">Factura C</h1>

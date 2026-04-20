@@ -68,7 +68,7 @@ export const LaborCalculator = ({ onClose, onUseTotal }) => {
       </div>
 
       <div className="flex gap-2 pt-2">
-        <button onClick={() => onUseTotal(total)}>
+        <button onClick={() => onUseTotal(total, selected)}>
           Usar
         </button>
 

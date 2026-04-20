@@ -298,7 +298,7 @@ const BudgetDetailPage = () => {
         cae: data.cae,
         vencimiento: data.vencimiento,
         fecha: new Date().toISOString(),
-         qr: data.qr,
+        qr: data.qr,
       };
       console.log("FACTURA FINAL:", dataConNumero);
 
@@ -860,9 +860,8 @@ Gracias por tu confianza.`;
       )}
 
       {/* ITEMS */}
-      <div className="card-elevated p-4 mb-4">
-        <h3 className="text-sm text-muted-foreground mb-3">Detalle</h3>
-
+      <div className="card-elevated p-2 mb-2">
+        <h3 className="font-semibold text-primary text-sm mb-3">Detalle de Materiales</h3>
         <div className="space-y-2">
           {budget.items.map((item) => (
             <div key={item.id} className="flex justify-between text-sm">
@@ -877,8 +876,54 @@ Gracias por tu confianza.`;
           ))}
         </div>
 
+        {/* TOTAL MATERIALES */}
+        <div>
+          <div className="border-t border-border mt-2 pt-2 flex justify-between font-semibold">
+            <span>Total de Materiales</span>
+            <span className="text-primary">
+              ${budget.subtotal.toLocaleString("es-AR", {
+                
+                minimumFractionDigits: 0,
+              })}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* DETALLE DE MANO DE OBRA (SI EXISTE)*/}
+      {budget.laborItems && budget.laborItems.length > 0 && (
+        <div className="card-elevated p-2 mb-2">
+          <h3 className="font-semibold text-primary text-sm mb-3">
+            Detalle de Mano de Obra
+          </h3>
+          <div className="space-y-2">
+            {budget.laborItems.map((item, index) => (
+              <div key={index} className="flex justify-between text-sm">
+                <span className="text-foreground">
+                  {item.name}
+                </span>
+
+                <span className="text-muted-foreground">
+                  ${item.price.toLocaleString("es-AR")}
+                </span>
+              </div>
+            ))}
+          </div>
+          {/* TOTAL */}
+          <div className="border-t border-border mt-2 pt-2 flex justify-between font-semibold">
+            <span>Total Mano de Obra</span>
+            <span>
+              ${budget.laborCost.toLocaleString("es-AR")}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* TOTAL FINAL - MANO DE OBRA + MATERIALES */}
+      <div className="card-elevated p-2 mb-2">
+        <h3 className="font-semibold text-primary text-sm mb-0">Detalle de Materiales + Mano de Obra</h3>
         {/* SUBTOTALS */}
-        <div className="border-t border-border mt-4 pt-4 space-y-2">
+        <div className="border-border mt-2 pt-2 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Materiales</span>
             <span>${budget.subtotal.toLocaleString("es-AR")}</span>
@@ -897,7 +942,7 @@ Gracias por tu confianza.`;
           )}
 
           <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
-            <span>Total</span>
+            <span>Total Final</span>
             <span className="text-primary">
               ${budget.total.toLocaleString("es-AR", {
                 minimumFractionDigits: 0,
@@ -907,9 +952,12 @@ Gracias por tu confianza.`;
         </div>
       </div>
 
+
+
+
       {/* TERMS */}
-      <div className="card-elevated p-4 mb-4">
-        <h3 className="text-sm text-muted-foreground mb-3">Condiciones</h3>
+      <div className="card-elevated p-2 mb-2">
+        <h3 className="font-semibold text-primary text-sm mb-3">Condiciones</h3>
 
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
@@ -1171,84 +1219,84 @@ Gracias por tu confianza.`;
 
 
       {/* ANIMACIÓN AFIP PRO */}
-{loadingAFIP && (
-  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
+      {loadingAFIP && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
 
-    <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
+          <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
 
-      {/* TÍTULO */}
-      <p className="font-semibold text-base">
-        Comunicando con ARCA...
-      </p>
+            {/* TÍTULO */}
+            <p className="font-semibold text-base">
+              Comunicando con ARCA...
+            </p>
 
-      {/* CONTENIDO */}
-      <div className="flex items-center gap-6">
+            {/* CONTENIDO */}
+            <div className="flex items-center gap-6">
 
-        {/* SISTEMA */}
-        <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
-            <Server className="w-8 h-8 text-blue-600" />
+              {/* SISTEMA */}
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
+                  <Server className="w-8 h-8 text-blue-600" />
+                </div>
+                <span className="text-base mt-2 text-blue-700 font-medium">
+                  SICE
+                </span>
+              </div>
+
+              {/* FLECHAS ANIMADAS */}
+              <div className="flex flex-col items-center gap-2">
+
+                {/* IDA */}
+                <div className="flex gap-1 text-blue-500 text-lg">
+                  <span className="animate-[pulse_1s_infinite]">→</span>
+                  <span className="animate-[pulse_1s_infinite_0.2s]">→</span>
+                  <span className="animate-[pulse_1s_infinite_0.4s]">→</span>
+                </div>
+
+                {/* VUELTA */}
+                <div className="flex gap-1 text-green-500 text-lg">
+                  <span className="animate-[pulse_1s_infinite]">←</span>
+                  <span className="animate-[pulse_1s_infinite_0.2s]">←</span>
+                  <span className="animate-[pulse_1s_infinite_0.4s]">←</span>
+                </div>
+
+              </div>
+
+              {/* AFIP */}
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
+                  <Building2 className="w-8 h-8 text-green-600" />
+                </div>
+                <span className="text-base mt-2 text-green-700 font-medium">
+                  ARCA
+                </span>
+              </div>
+
+            </div>
+
+            {/* TEXTO */}
+            <p className="text-sm text-muted-foreground text-center animate-pulse">
+              Enviando datos fiscales y esperando validación...
+            </p>
+
+            {/* SPINNER */}
+            <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+
+            {/* BARRA DE PROGRESO */}
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-blue-500 h-2 transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+
+            {/* % */}
+            <span className="text-xs text-muted-foreground">
+              {Math.floor(progress)}%
+            </span>
+
           </div>
-          <span className="text-base mt-2 text-blue-700 font-medium">
-            SICE
-          </span>
         </div>
-
-        {/* FLECHAS ANIMADAS */}
-        <div className="flex flex-col items-center gap-2">
-
-          {/* IDA */}
-          <div className="flex gap-1 text-blue-500 text-lg">
-            <span className="animate-[pulse_1s_infinite]">→</span>
-            <span className="animate-[pulse_1s_infinite_0.2s]">→</span>
-            <span className="animate-[pulse_1s_infinite_0.4s]">→</span>
-          </div>
-
-          {/* VUELTA */}
-          <div className="flex gap-1 text-green-500 text-lg">
-            <span className="animate-[pulse_1s_infinite]">←</span>
-            <span className="animate-[pulse_1s_infinite_0.2s]">←</span>
-            <span className="animate-[pulse_1s_infinite_0.4s]">←</span>
-          </div>
-
-        </div>
-
-        {/* AFIP */}
-        <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
-            <Building2 className="w-8 h-8 text-green-600" />
-          </div>
-          <span className="text-base mt-2 text-green-700 font-medium">
-            ARCA
-          </span>
-        </div>
-
-      </div>
-
-      {/* TEXTO */}
-      <p className="text-sm text-muted-foreground text-center animate-pulse">
-        Enviando datos fiscales y esperando validación...
-      </p>
-
-      {/* SPINNER */}
-      <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
-
-      {/* BARRA DE PROGRESO */}
-      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-        <div
-          className="bg-blue-500 h-2 transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      {/* % */}
-      <span className="text-xs text-muted-foreground">
-        {Math.floor(progress)}%
-      </span>
-
-    </div>
-  </div>
-)}
+      )}
     </PageLayout>
   );
 };

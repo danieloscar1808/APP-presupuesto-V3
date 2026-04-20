@@ -27,77 +27,67 @@ export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
   let y = 10;
 
   // -----------------------------------------------------
-// ENCABEZADO
-// -----------------------------------------------------
-doc.setFillColor(HEADER_BLUE.r, HEADER_BLUE.g, HEADER_BLUE.b);
-doc.rect(0, 0, pageWidth, 40, "F");
+  // ENCABEZADO
+  // -----------------------------------------------------
+  doc.setFillColor(HEADER_BLUE.r, HEADER_BLUE.g, HEADER_BLUE.b);
+  doc.rect(0, 0, pageWidth, 25, "F");
 
-// LOGO SIN ESTIRAR (altura fija – mantiene proporción)
-const LOGO_HEIGHT = 28;
-doc.addImage(logoHeader, "PNG", 10, 6, 0, LOGO_HEIGHT); // 0 = width auto
+  // LOGO SIN ESTIRAR (altura fija – mantiene proporción)
+  const LOGO_HEIGHT = 20;
+  doc.addImage(logoHeader, "PNG", 10, 2, 0, LOGO_HEIGHT); // 0 = width auto
 
-// -----------------------------------------------------
-// TÍTULO EN 3 LÍNEAS
-// -----------------------------------------------------
-doc.setFont("helvetica", "bold");
-doc.setFontSize(18);
-doc.setTextColor(255, 255, 255);
+  // -----------------------------------------------------
+  // TÍTULO EN 3 LÍNEAS
+  // -----------------------------------------------------
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.setTextColor(255, 255, 255);
 
-// Línea 1
-doc.text("Servicios Integrales", pageWidth / 2, 13, { align: "center" });
+  // Línea 1
+  doc.text("Servicios Integrales de ", pageWidth / 2, 10, { align: "center" });
 
-// Línea 2
-doc.setFontSize(14);
-doc.text("de", pageWidth / 2, 20, { align: "center" });
+  // Línea 2
+  doc.setFontSize(18);
+  doc.text("Climatización y Energía", pageWidth / 2, 17, { align: "center" });
 
-// Línea 3
-doc.setFontSize(18);
-doc.text("Climatización y Energía", pageWidth / 2, 28, { align: "center" });
+  // -----------------------------------------------------
+  // BLOQUE DERECHA - TITULO + NUMERO + FECHA
+  // -----------------------------------------------------
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text("Presupuesto", pageWidth - 12, 9, { align: "right" });
 
-// SUBTÍTULO
-//doc.setFont("helvetica", "normal");
-//doc.setFontSize(11);
-//doc.text("Presupuesto Profesional", pageWidth / 2, 33, { align: "center" });
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
 
+  // Número debajo del título "Presupuesto"
+  doc.text(`Nº: ${budget.number}`, pageWidth - 12, 14, { align: "right" });
 
-// -----------------------------------------------------
-// BLOQUE DERECHA - TITULO + NUMERO + FECHA
-// -----------------------------------------------------
-doc.setFont("helvetica", "bold");
-doc.setFontSize(12);
-doc.text("Presupuesto", pageWidth - 12, 12, { align: "right" });
-
-doc.setFont("helvetica", "normal");
-doc.setFontSize(10);
-
-// Número debajo del título "Presupuesto"
-doc.text(`Nº: ${budget.number}`, pageWidth - 12, 18, { align: "right" });
-
-// Fecha en la linea siguiente
-doc.text(
-  `Fecha: ${new Date(budget.createdAt).toLocaleDateString("es-AR")}`,
-  pageWidth - 12,
-  24,
-  { align: "right" }
-);
+  // Fecha en la linea siguiente
+  doc.text(
+    `Fecha: ${new Date(budget.createdAt).toLocaleDateString("es-AR")}`,
+    pageWidth - 12,
+    19,
+    { align: "right" }
+  );
 
 
   // CLIENTE
-  y = 48;
+  y = 32;
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
+  doc.setFontSize(10);
   doc.setTextColor(0, 0, 0);
   doc.text("Datos del Cliente", 12, y);
   y += 6;
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
+  doc.setFontSize(10);
   doc.text(`Nombre: ${budget.clientName}`, 12, y);
   y += 10;
 
   // TIPO DE INSTALACIÓN
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
+  doc.setFontSize(10);
   doc.text("Tipo de Instalación", 12, y);
   y += 6;
 
@@ -151,19 +141,19 @@ doc.text(
 
   // TABLA DE ITEMS
   const tableData = budget.items.map((i) => {
-  const itemTotal = (Number(i.quantity) || 0) * (Number(i.unitPrice) || 0);
+    const itemTotal = (Number(i.quantity) || 0) * (Number(i.unitPrice) || 0);
 
-  return [
-    i.quantity,
-    i.description,
-    `$${Number(i.unitPrice || 0).toLocaleString("es-AR")}`,
-    `$${itemTotal.toLocaleString("es-AR")}`,
-  ];
-});
+    return [
+      i.quantity,
+      i.description,
+      `$${Number(i.unitPrice || 0).toLocaleString("es-AR")}`,
+      `$${itemTotal.toLocaleString("es-AR")}`,
+    ];
+  });
 
   autoTable(doc, {
     startY: y,
-    head: [["Cant.", "Descripción", "P. Unitario", "Total"]],
+    head: [["Cant.", "Descripción de Items de Materiales", "P. Unitario", "Total"]],
     body: tableData,
     headStyles: {
       fillColor: [HEADER_BLUE.r, HEADER_BLUE.g, HEADER_BLUE.b],
@@ -176,31 +166,67 @@ doc.text(
 
   y = (doc as any).lastAutoTable.finalY + 10;
 
+// -------------------------------------
+// TABLA MANO DE OBRA (ESTILO MATERIALES)
+// -------------------------------------
+if (budget.laborItems && budget.laborItems.length > 0) {
+
+  const laborTableData = budget.laborItems.map((item) => [
+    1, // cantidad fija
+    item.name,
+    `$${Number(item.price || 0).toLocaleString("es-AR")}`,
+    `$${Number(item.price || 0).toLocaleString("es-AR")}`,
+  ]);
+
+  autoTable(doc, {
+    startY: y,
+    head: [["Cant.", "Descripción de Items de Mano de Obra", "P. Unitario", "Total"]],
+    body: laborTableData,
+
+    headStyles: {
+      fillColor: [HEADER_BLUE.r, HEADER_BLUE.g, HEADER_BLUE.b],
+      textColor: 255,
+      fontStyle: "bold",
+    },
+
+    styles: { fontSize: 10 },
+
+    columnStyles: {
+      1: { halign: "left" },
+    },
+  });
+
+  y = (doc as any).lastAutoTable.finalY + 6;
+
+    y += 10;
+}
+
+
   // TOTALES
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
+  doc.setFontSize(11);
   doc.text("Resumen de Costos", 12, y);
   y += 8;
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(11);
+  doc.setFontSize(10);
 
-  doc.text(`Subtotal materiales: $${Number(budget.subtotal || 0).toLocaleString("es-AR")}`,12,y);y += 6;
+  doc.text(`Subtotal materiales: $${Number(budget.subtotal || 0).toLocaleString("es-AR")}`, 12, y); y += 6;
 
-  doc.text(`Mano de Obra: $${Number(budget.laborCost || 0).toLocaleString("es-AR")}`,12,y);y += 6;
+  doc.text(`Mano de Obra: $${Number(budget.laborCost || 0).toLocaleString("es-AR")}`, 12, y); y += 6;
 
   if (budget.taxRate > 0) {
-    doc.text(`IVA (${budget.taxRate}%): $${Number(budget.taxAmount || 0).toLocaleString("es-AR")}`,12,y);y += 6;
+    doc.text(`IVA (${budget.taxRate}%): $${Number(budget.taxAmount || 0).toLocaleString("es-AR")}`, 12, y); y += 6;
   }
 
   if (budget.discount > 0) {
-    doc.text(`Descuento: -$${Number(budget.discount || 0).toLocaleString("es-AR")}`,12,y);y += 6;
+    doc.text(`Descuento: -$${Number(budget.discount || 0).toLocaleString("es-AR")}`, 12, y); y += 6;
   }
 
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(13);
+  doc.setFontSize(12);
   y += 4;
-  doc.text(`TOTAL: $${Number(budget.total || 0).toLocaleString("es-AR", { minimumFractionDigits: 2 })}`,12,y);y += 15;
+  doc.text(`TOTAL: $${Number(budget.total || 0).toLocaleString("es-AR", { minimumFractionDigits: 2 })}`, 12, y); y += 15;
 
   // CONDICIONES
   doc.setFont("helvetica", "bold");
@@ -208,6 +234,7 @@ doc.text(
   y += 7;
 
   doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
   doc.text(`Validez del presupuesto: ${budget.validityDays} días`, 12, y); y += 6;
   doc.text(`Garantía: ${budget.warranty}`, 12, y); y += 6;
   doc.text(`Forma de pago: ${budget.paymentTerms}`, 12, y); y += 10;

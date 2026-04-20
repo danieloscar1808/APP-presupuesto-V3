@@ -36,6 +36,7 @@ const App = () => (
         <Route path="/resumen-impositivo" element={<ResumenImpositivo />} />
         <Route path="*" element={<NotFound />} />
         <Route path="/catalogo-mano-obra" element={<CatalogoManoDeObraPage />} />
+        <Route path="/budgets/edit/:id" element={<NewBudgetPage />} />
       </Routes>
 
     </TooltipProvider>
