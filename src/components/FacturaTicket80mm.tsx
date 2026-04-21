@@ -18,8 +18,18 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
 
 
       {/* EMPRESA */}
-      <div style={{ textAlign: "center", marginBottom: "6px" }}>
-        <strong>{profile?.businessName}</strong>
+      <div style={{ textAlign: "center", marginBottom: "5px" }}>
+        <div style={{ fontWeight: "bold", fontSize: "15px", lineHeight: "1.2" }}>
+          {profile?.businessName}
+        </div>
+
+        {/* SEPARADOR */}
+        <hr />
+
+        {/* FACTURA C */}
+        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+          FACTURA C
+        </div>
       </div>
 
       <hr />
@@ -39,7 +49,9 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
 
       {/* EMISOR */}
       <div>
-        <strong>Emisor</strong>
+        <div style={{ fontWeight: "bold", fontSize: "13px", marginTop: "4px" }}>
+          EMISOR
+        </div>
         <div>{profile?.ownerName || profile?.name}</div>
         <div>CUIT: {profile?.taxId}</div>
         <div>{profile?.address}</div>
@@ -49,7 +61,9 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
 
       {/* CLIENTE */}
       <div>
-        <strong>Cliente</strong>
+        <div style={{ fontWeight: "bold", fontSize: "13px", marginTop: "4px" }}>
+          CLIENTE
+        </div>
         <div>{factura?.cliente || budget?.clientName}</div>
         <div>
           {budget?.clientDocType || "DNI/CUIT"}:{" "}
@@ -63,7 +77,9 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
 
       {/* DATOS DE PAGO */}
       <div>
-        <strong>Datos del Pago</strong>
+        <div style={{ fontWeight: "bold", fontSize: "13px", marginTop: "4px" }}>
+          DATOS DE PAGO
+        </div>
 
         {/* FILAS TIPO TABLA */}
         <div style={{ marginTop: "4px" }}>
