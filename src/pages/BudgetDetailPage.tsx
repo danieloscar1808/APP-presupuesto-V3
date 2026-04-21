@@ -20,6 +20,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 import { Server, Building2 } from "lucide-react";
 
 
+
 const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

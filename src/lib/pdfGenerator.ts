@@ -206,58 +206,100 @@ if (budget.laborItems && budget.laborItems.length > 0) {
 }
 
 
-  // TOTALES
+ // POSICIONES
+const leftX = 12;
+const rightX = 90;
+let yStart = y;
+
+// 🔵 línea superior
+doc.setDrawColor(0);      // negro (más profesional)
+doc.setLineWidth(0.5);    // más grosor
+
+doc.line(10, yStart - 8, pageWidth - 10, yStart - 8);
+
+// ----------------------
+// IZQUIERDA (COSTOS)
+// ----------------------
+let yLeft = yStart;
+
+doc.setFont("helvetica", "bold");
+doc.setFontSize(11);
+doc.text("Resumen de Costos", leftX, yLeft);
+yLeft += 8;
+
+doc.setFont("helvetica", "normal");
+doc.setFontSize(10);
+
+doc.text(`Subtotal materiales: $${Number(budget.subtotal || 0).toLocaleString("es-AR")}`, leftX, yLeft); 
+yLeft += 6;
+
+doc.text(`Mano de Obra: $${Number(budget.laborCost || 0).toLocaleString("es-AR")}`, leftX, yLeft); 
+yLeft += 6;
+
+if (budget.taxRate > 0) {
+  doc.text(`IVA (${budget.taxRate}%): $${Number(budget.taxAmount || 0).toLocaleString("es-AR")}`, leftX, yLeft); 
+  yLeft += 6;
+}
+
+if (budget.discount > 0) {
+  doc.text(`Descuento: -$${Number(budget.discount || 0).toLocaleString("es-AR")}`, leftX, yLeft); 
+  yLeft += 6;
+}
+
+doc.setFont("helvetica", "bold");
+doc.setFontSize(12);
+yLeft += 4;
+doc.text(`TOTAL: $${Number(budget.total || 0).toLocaleString("es-AR", { minimumFractionDigits: 2 })}`, leftX, yLeft);
+
+
+// ----------------------
+// DERECHA (CONDICIONES)
+// ----------------------
+let yRight = yStart;
+
+doc.setFont("helvetica", "bold");
+doc.setFontSize(11);
+doc.text("Condiciones", rightX, yRight);
+yRight += 7;
+
+doc.setFont("helvetica", "normal");
+doc.setFontSize(10);
+
+doc.text(`Validez: ${budget.validityDays} días`, rightX, yRight); 
+yRight += 6;
+
+doc.text(`Garantía: ${budget.warranty}`, rightX, yRight); 
+yRight += 6;
+
+doc.text(`Forma de pago: ${budget.paymentTerms}`, rightX, yRight); 
+yRight += 6;
+
+
+// ----------------------
+// CALCULAR FINAL DE COLUMNAS
+// ----------------------
+y = Math.max(yLeft, yRight) + 10;
+
+// 🔵 línea inferior
+doc.setLineWidth(0.5); // mismo grosor que arriba
+doc.line(10, y - 3, pageWidth - 10, y - 3);
+
+// ----------------------
+// OBSERVACIONES (ABAJO, ANCHO COMPLETO)
+// ----------------------
+if (budget.notes) {
+  y += 6;
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.text("Resumen de Costos", 12, y);
-  y += 8;
+  doc.text("Observaciones:", 12, y);
+  y += 6;
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
 
-  doc.text(`Subtotal materiales: $${Number(budget.subtotal || 0).toLocaleString("es-AR")}`, 12, y); y += 6;
+  const notesWrapped = doc.splitTextToSize(budget.notes, pageWidth - 24);
+  doc.text(notesWrapped, 12, y);
 
-  doc.text(`Mano de Obra: $${Number(budget.laborCost || 0).toLocaleString("es-AR")}`, 12, y); y += 6;
-
-  if (budget.taxRate > 0) {
-    doc.text(`IVA (${budget.taxRate}%): $${Number(budget.taxAmount || 0).toLocaleString("es-AR")}`, 12, y); y += 6;
-  }
-
-  if (budget.discount > 0) {
-    doc.text(`Descuento: -$${Number(budget.discount || 0).toLocaleString("es-AR")}`, 12, y); y += 6;
-  }
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  y += 4;
-  doc.text(`TOTAL: $${Number(budget.total || 0).toLocaleString("es-AR", { minimumFractionDigits: 2 })}`, 12, y); y += 15;
-
-  // CONDICIONES
-  doc.setFont("helvetica", "bold");
-  doc.text("Condiciones", 12, y);
-  y += 7;
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.text(`Validez del presupuesto: ${budget.validityDays} días`, 12, y); y += 6;
-  doc.text(`Garantía: ${budget.warranty}`, 12, y); y += 6;
-  doc.text(`Forma de pago: ${budget.paymentTerms}`, 12, y); y += 10;
-
-  if (budget.notes) {
-    doc.setFont("helvetica", "bold");
-    doc.text("Observaciones:", 12, y);
-    y += 6;
-
-    doc.setFont("helvetica", "normal");
-    const notesWrapped = doc.splitTextToSize(budget.notes, pageWidth - 24);
-    doc.text(notesWrapped, 12, y);
-    y += notesWrapped.length * 5 + 10;
-  }
-
-  // PIE DE PÁGINA
-  
-
- 
+  y += notesWrapped.length * 5 + 10;
+}
 
   return doc;
 };
