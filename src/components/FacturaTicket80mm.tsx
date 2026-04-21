@@ -2,6 +2,9 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
   const formatMoney = (n) =>
     Number(n || 0).toLocaleString("es-AR");
 
+  const puntoVenta = factura?.numero?.split("-")?.[0];
+  const numeroComp = factura?.numero?.split("-")?.[1];
+
   return (
     <div
       style={{
@@ -12,21 +15,34 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
         boxSizing: "border-box",
       }}
     >
+
+
       {/* EMPRESA */}
       <div style={{ textAlign: "center", marginBottom: "6px" }}>
-        <strong style={{ fontSize: "13px" }}>
-          {profile?.businessName}
-        </strong>
-        <div>CUIT: {profile?.taxId}</div>
+        <strong>{profile?.businessName}</strong>
       </div>
 
       <hr />
 
-      {/* FACTURA */}
+      {/* DATOS FACTURA */}
       <div>
-        <div>Pto Vta: {factura?.puntoVenta}</div>
-        <div>Comp: {factura?.numero}</div>
+        <div>Punto de Venta: {puntoVenta}</div>
+        <div>Comprobante Nº: {numeroComp}</div>
+        <div>Ref. Presupuesto: {budget?.number}</div>
         <div>Fecha: {new Date().toLocaleDateString()}</div>
+        <div>Cond. IVA: Monotributista</div>
+        <div>IIBB: {profile?.iibb || "-"}</div>
+        <div>Inicio Actividades: {profile?.startDate || "-"}</div>
+      </div>
+
+      <hr />
+
+      {/* EMISOR */}
+      <div>
+        <strong>Emisor</strong>
+        <div>{profile?.ownerName || profile?.name}</div>
+        <div>CUIT: {profile?.taxId}</div>
+        <div>{profile?.address}</div>
       </div>
 
       <hr />
@@ -35,81 +51,179 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
       <div>
         <strong>Cliente</strong>
         <div>{factura?.cliente || budget?.clientName}</div>
+        <div>
+          {budget?.clientDocType || "DNI/CUIT"}:{" "}
+          {budget?.clientDocNumber}
+        </div>
+        <div>{budget?.clientAddress}</div>
+        <div>Cond. IVA: {budget?.clientIvaCondition || "Consumidor Final"}</div>
       </div>
 
       <hr />
 
-      {/* ITEMS */}
-      {budget.items?.map((item, i) => (
-        <div key={i} style={{ marginBottom: "4px" }}>
-          <div>{item.description}</div>
+      {/* DATOS DE PAGO */}
+      <div>
+        <strong>Datos del Pago</strong>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+        {/* FILAS TIPO TABLA */}
+        <div style={{ marginTop: "4px" }}>
+
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>Moneda</span>
             <span>
-              {item.quantity} x ${formatMoney(item.unitPrice)}
+              {(factura?.currency || budget?.facturaPreliminar?.currency) === "USD"
+                ? "Dólares Estadounidenses (USD)"
+                : "Pesos Argentinos (ARS)"}
             </span>
-            <span>${formatMoney(item.quantity * item.unitPrice)}</span>
           </div>
-        </div>
-      ))}
 
-      {/* MANO DE OBRA */}
-      {budget.laborCost > 0 && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <span>Mano de obra</span>
-          <span>${formatMoney(budget.laborCost)}</span>
-        </div>
-      )}
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>Forma de pago</span>
+            <span>
+              {factura?.formaPago || budget?.facturaPreliminar?.formaPago}
+            </span>
+          </div>
 
-      {/* DESCUENTO */}
-      {budget.discount > 0 && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <span>Descuento</span>
-          <span>-${formatMoney(budget.discount)}</span>
+          {(factura?.currency === "USD" || budget?.facturaPreliminar?.currency === "USD") && (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>Tipo de cambio</span>
+                <span>
+                  {Number(
+                    factura?.exchangeRate || budget?.facturaPreliminar?.exchangeRate || 0
+                  ).toLocaleString("es-AR")}
+                </span>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>Total USD</span>
+                <span>
+                  {Number(factura?.totalUSD || 0).toLocaleString("es-AR")}
+                </span>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span>Total ARS</span>
+                <span>
+                  ${Number(factura?.total || budget.total).toLocaleString("es-AR")}
+                </span>
+              </div>
+            </>
+          )}
         </div>
-      )}
+      </div>
 
       <hr />
 
-      {/* TOTAL */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontWeight: "bold",
-          fontSize: "13px",
-        }}
-      >
-        <span>TOTAL</span>
-        <span>${formatMoney(factura?.total || budget.total)}</span>
+
+
+      {/* TABLA OPTIMIZADA PARA IMPRESORA */}
+      <div style={{ marginTop: "6px" }}>
+
+        {/* HEADER */}
+        <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold" }}>
+          <span>Descripción</span>
+          <span>Importe</span>
+        </div>
+
+        {/* SEPARADOR */}
+        <div style={{ borderTop: "1px dashed black", margin: "2px 0" }} />
+
+        {/* FILAS */}
+        <div>
+
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>Materiales</span>
+            <span>${Number(budget.subtotal || 0).toLocaleString("es-AR")}</span>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>Mano de obra</span>
+            <span>${Number(budget.laborCost || 0).toLocaleString("es-AR")}</span>
+          </div>
+
+          {budget.discount > 0 && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Descuento</span>
+              <span>
+                -${Number(budget.discount).toLocaleString("es-AR")}
+              </span>
+            </div>
+          )}
+
+        </div>
+
+        {/* SEPARADOR FINAL */}
+        <div style={{ borderTop: "1px dashed black", marginTop: "2px" }} />
+
+      </div>
+
+
+
+      {/* TOTALES DERECHA */}
+      <div style={{ textAlign: "right", marginTop: "6px" }}>
+
+        <div>
+          Subtotal: $
+          {Number(
+            (budget.subtotal || 0) + (budget.laborCost || 0)
+          ).toLocaleString("es-AR")}
+        </div>
+
+        {budget.discount > 0 && (
+          <div style={{ color: "#010000" }}>
+            Descuento: -${Number(budget.discount).toLocaleString("es-AR")}
+          </div>
+        )}
+
+        <div style={{ fontWeight: "bold", fontSize: "13px" }}>
+          Total: ${Number(factura?.total || budget.total).toLocaleString("es-AR")}
+        </div>
+
       </div>
 
       <hr />
 
       {/* CAE */}
-      <div style={{ textAlign: "center", marginTop: "6px" }}>
-        CAE: {factura?.cae}
+
+
+      {/* CAE + VENCIMIENTO */}
+      <div style={{ marginTop: "4px" }}>
+
+        <div>
+          CAE: {factura?.CAE || "SIMULADO"}
+        </div>
+
+        <div>
+          Vencimiento CAE:{" "}
+          {(() => {
+            const raw = factura?.vencimiento;
+
+            if (!raw) return "-";
+
+            const value = String(raw);
+
+            // formato YYYYMMDD
+            if (value.length === 8 && !value.includes("-")) {
+              const formatted = `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
+              return new Date(formatted).toLocaleDateString("es-AR");
+            }
+
+            // formato ISO u otro
+            return new Date(value).toLocaleDateString("es-AR");
+          })()}
+        </div>
+
       </div>
 
-      {/* QR */}
+
+
       {factura?.qr && (
         <div style={{ textAlign: "center", marginTop: "8px" }}>
-          <img src={factura.qr} style={{ width: "120px" }} />
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(factura.qr)}`}
+            style={{ width: 100 }}
+          />
         </div>
       )}
 

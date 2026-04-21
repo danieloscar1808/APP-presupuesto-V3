@@ -18,7 +18,8 @@ import { saveBudget } from "@/lib/storage";
 import { useFacturasStore } from "../store/facturasStore";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Server, Building2 } from "lucide-react";
-
+import { FacturaTicket80mm } from "@/components/FacturaTicket80mm";
+import ReactDOMServer from "react-dom/server";
 
 
 const BudgetDetailPage = () => {
@@ -259,7 +260,7 @@ const BudgetDetailPage = () => {
           subtotal: totalFinal,
           iva: 0,
           invoiceType: "C",
-          ivaCondition,
+          ivaCondition: "Monotributista",
           currency,
           exchangeRate,
           totalUSD,
@@ -522,104 +523,50 @@ const BudgetDetailPage = () => {
     });
   };
 
-  const imprimirTicket80mm = () => {
-    const contenido = facturaRef.current;
-    if (!contenido) return;
+ const imprimirTicket80mm = () => {
+  const ventana = window.open("", "_blank");
 
-    const ventana = window.open("", "_blank");
+  const html = ReactDOMServer.renderToString(
+    <FacturaTicket80mm
+      profile={profile}
+      factura={factura}
+      budget={budget}
+    />
+  );
 
-    const estilos = Array.from(document.styleSheets)
-      .map((styleSheet) => {
-        try {
-          return Array.from(styleSheet.cssRules)
-            .map((rule) => rule.cssText)
-            .join("");
-        } catch (e) {
-          return "";
-        }
-      })
-      .join("\n");
-
-    ventana.document.write(`
+  ventana.document.write(`
     <html>
       <head>
         <title>Ticket 80mm</title>
-    <style>
-  ${estilos}
+        <style>
+          @page {
+            size: 80mm auto;
+            margin: 0;
+          }
 
-  @page {
-    size: 80mm auto;
-    margin: 0;
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-    width: 80mm;
-    background: white;
-  }
-
-  .print-area {
-    width: 80mm !important;
-    padding: 4mm !important;
-    box-sizing: border-box;
-  }
-
-  .empresa-nombre {
-  font-size: 13px !important;
-  }    
-
-  /* 🔥 COMPACTO REAL */
-  h1 { font-size: 26px !important; }
-  h2 { font-size: 15px !important; }
-
-  p, span, div {
-    font-size: 11px !important;
-    line-height: 1.2 !important;
-  }
-
-  table {
-    font-size: 11px !important;
-  }
-
-  /* 🔥 OCULTAR BOTÓN AL IMPRIMIR */
-  @media print {
-    button {
-      display: none !important;
-    }
-  }
-
-</style>
+          body {
+            margin: 0;
+            padding: 0;
+            width: 80mm;
+          }
+        </style>
       </head>
-      
-  <body>
 
-  <!-- 🔹 CONTENIDO DEL TICKET -->
-  <div class="print-area">
-    ${contenido.outerHTML}
-  </div>
+      <body>
+        ${html}
 
-  <!-- 🔹 BOTÓN IMPRIMIR -->
-  <div style="text-align:center; margin-top:10px;">
-    <button onclick="window.print()" style="
-      padding:10px;
-      font-size:14px;
-      background:black;
-      color:white;
-      border:none;
-      border-radius:5px;
-      width:90%;
-    ">
-      Imprimir Ticket
-    </button>
-  </div>
-
-</body>
+        <div style="text-align:center; margin-top:10px;">
+          <button onclick="window.print()"
+            style="padding:10px; background:black; color:white; border:none; width:90%;">
+            Imprimir
+          </button>
+        </div>
+      </body>
     </html>
   `);
 
-    ventana.document.close();
-  };
+  ventana.document.close();
+};
 
 
   const formatearTelefono = (telefono: string) => {
@@ -1314,6 +1261,7 @@ Gracias por tu confianza.`;
         </div>
       )}
     </PageLayout>
+  
   );
 };
 

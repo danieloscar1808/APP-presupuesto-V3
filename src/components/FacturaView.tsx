@@ -89,7 +89,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
         <h2 className="font-semibold text-[16px]">Emisor</h2>
         <p>{profile?.name || "Tu Empresa"}</p>
         <p>CUIT: {profile?.taxId || "CUIT no cargado"}</p>
-        <p>Condición frente al IVA: {datos?.ivaCondition || "Monotributista"}</p>
+        <p>Condición frente al IVA: Monotributista</p>
         <p>{profile?.address || "Dirección no definida"}</p>
         <p>IIBB: {profile.iibb}</p>
         <p>Inicio de actividades: {profile.startDate}</p>
