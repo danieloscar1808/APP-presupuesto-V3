@@ -44,11 +44,15 @@ export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
   doc.setTextColor(255, 255, 255);
 
   // Línea 1
-  doc.text("Servicios Integrales de ", pageWidth / 2, 10, { align: "center" });
+  doc.text("Servicios Integrales de ", pageWidth / 2, 8, { align: "center" });
 
   // Línea 2
   doc.setFontSize(18);
-  doc.text("Climatización y Energía", pageWidth / 2, 17, { align: "center" });
+  doc.text("Climatización y Energía", pageWidth / 2, 15, { align: "center" });
+
+  // Línea 3
+  doc.setFontSize(10);
+   doc.text(`${profile.phone} - ${profile.email}`, pageWidth / 2, 22, { align: "center" });
 
   // -----------------------------------------------------
   // BLOQUE DERECHA - TITULO + NUMERO + FECHA
@@ -251,21 +255,9 @@ if (budget.laborItems && budget.laborItems.length > 0) {
   }
 
   // PIE DE PÁGINA
-  const footerY = 287;
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(10);
-  doc.setTextColor(HEADER_BLUE.r, HEADER_BLUE.g, HEADER_BLUE.b);
+  
 
-  doc.text(profile.businessName || profile.name, pageWidth / 2, footerY, {
-    align: "center",
-  });
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(0, 0, 0);
-  doc.text(`${profile.phone} - ${profile.email}`, pageWidth / 2, footerY + 6, {
-    align: "center",
-  });
+ 
 
   return doc;
 };

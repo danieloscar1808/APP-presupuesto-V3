@@ -19,6 +19,7 @@ import { useFacturasStore } from "../store/facturasStore";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Server, Building2 } from "lucide-react";
 
+
 const BudgetDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -985,14 +986,28 @@ Gracias por tu confianza.`;
       </div>
 
       {/* SHARE / ACTIONS */}
-      <div className="card-elevated p-4">
-        <ShareOptions
-          budget={budget}
-          profile={profile}
-          onStatusChange={loadData}
-          disabled={isLocked}
-        />
-      </div>
+      <div className="card-elevated p-4 space-y-3">
+
+  {/* BOTÓN MODIFICAR */}
+    {!isLocked && budget && (
+    <Button
+      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+      onClick={() => navigate(`/budgets/edit/${budget.id}`)}
+    >
+      Modificar Presupuesto
+    </Button>
+  )}
+
+  <ShareOptions
+    budget={budget}
+    profile={profile}
+    onStatusChange={loadData}
+    disabled={isLocked}
+  />
+</div>
+
+
+      
 
       {/* FACTURAR */}
       <div className="mt-4">
