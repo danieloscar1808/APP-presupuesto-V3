@@ -25,14 +25,14 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
 
 
       {/* Encabezado */}
-      <div style={{ textAlign: "center", marginBottom: "5px" }}>
+      <div style={{ textAlign: "center", marginBottom: "0px" }}>
         {/* LOGO */}
         <img
           src={logoTickettt}
           alt="Logo"
           style={{
-            width: "100%",
-            marginBottom: "5px"
+            width: "90%",
+            marginBottom: "2px"
           }}
         />
       </div>
