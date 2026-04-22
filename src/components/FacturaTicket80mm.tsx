@@ -1,9 +1,14 @@
+import logoTicket from "@/assets/Logo-Ticket.png";
+import logoTickettt from "@/assets/Logo-Tickettt.png";
+
 export const FacturaTicket80mm = ({ profile, factura, budget }) => {
   const formatMoney = (n) =>
     Number(n || 0).toLocaleString("es-AR");
 
   const puntoVenta = factura?.numero?.split("-")?.[0];
   const numeroComp = factura?.numero?.split("-")?.[1];
+
+
 
   return (
     <div
@@ -17,19 +22,19 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
     >
 
 
-      {/* EMPRESA */}
+
+
+      {/* Encabezado */}
       <div style={{ textAlign: "center", marginBottom: "5px" }}>
-        <div style={{ fontWeight: "bold", fontSize: "15px", lineHeight: "1.2" }}>
-          {profile?.businessName}
-        </div>
-
-        {/* SEPARADOR */}
-        <hr />
-
-        {/* FACTURA C */}
-        <div style={{ fontSize: "20px", fontWeight: "bold" }}>
-          FACTURA C
-        </div>
+        {/* LOGO */}
+        <img
+          src={logoTickettt}
+          alt="Logo"
+          style={{
+            width: "100%",
+            marginBottom: "5px"
+          }}
+        />
       </div>
 
       <hr />
