@@ -9,7 +9,6 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
   const numeroComp = factura?.numero?.split("-")?.[1];
 
 
-
   return (
     <div
       style={{
@@ -20,10 +19,6 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
         boxSizing: "border-box",
       }}
     >
-
-
-
-
       {/* Encabezado */}
       <div style={{ textAlign: "center", marginBottom: "0px" }}>
         {/* LOGO */}
@@ -37,7 +32,28 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
         />
       </div>
 
-      <hr />
+      <hr style={{ border: "none", borderTop: "1px solid black", margin: "2px 0" }}/>
+
+      <div style={{ textAlign: "center" }}>
+  <h1
+    style={{
+      fontSize: "28px",
+      fontWeight: "bold",
+      margin: "0",
+      textAlign: "center"
+    }}
+  >
+    FACTURA C
+  </h1>
+</div>
+
+      <hr
+        style={{
+          border: "none",
+          borderTop: "1px solid black",
+          margin: "2px 0"
+        }}
+      />
 
       {/* DATOS FACTURA */}
       <div>
@@ -136,8 +152,6 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
 
       <hr />
 
-
-
       {/* TABLA OPTIMIZADA PARA IMPRESORA */}
       <div style={{ marginTop: "6px" }}>
 
@@ -179,8 +193,6 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
 
       </div>
 
-
-
       {/* TOTALES DERECHA */}
       <div style={{ textAlign: "right", marginTop: "6px" }}>
 
@@ -203,10 +215,7 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
 
       </div>
 
-      <hr />
-
-      {/* CAE */}
-
+      <hr style={{ border: "none", borderTop: "1px solid black", margin: "2px 0" }}/>
 
       {/* CAE + VENCIMIENTO */}
       <div style={{ marginTop: "4px" }}>
@@ -236,8 +245,6 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
         </div>
 
       </div>
-
-
 
       {factura?.qr && (
         <div style={{ textAlign: "center", marginTop: "8px" }}>

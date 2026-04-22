@@ -20,6 +20,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 import { Server, Building2 } from "lucide-react";
 import { FacturaTicket80mm } from "@/components/FacturaTicket80mm";
 import ReactDOMServer from "react-dom/server";
+import { FacturaA4 } from "@/components/FacturaA4";
 
 
 const BudgetDetailPage = () => {
@@ -371,170 +372,61 @@ const BudgetDetailPage = () => {
     }
   };
 
-  const imprimirFactura = () => {
-    const contenido = facturaRef.current;
-    if (!contenido) return;
 
-    // 🔥 CLONAR CONTENIDO (NO TOCAR ORIGINAL)
-    const clon = contenido.cloneNode(true) as HTMLElement;
+  const descargarPDFA4 = () => {
+    console.log("🔥 USANDO FACTURA A4");
 
-    // 🔥 APLICAR ESTILOS A4 CENTRALIZADOS
-    const aplicarEstilosA4 = (root: HTMLElement) => {
+    const contenido = document.getElementById("factura-a4");
 
-      const reglas: { selector: string; estilos: Partial<CSSStyleDeclaration> }[] = [
+    if (!contenido) {
+      console.error("No se encontró factura A4");
+      return;
+    }
 
-        // CONTENEDOR GENERAL
-        {
-          selector: "div",
-          estilos: {
-            fontSize: "10px",
-            lineHeight: "1.3",
-          }
-        },
-
-        // TITULO PRINCIPAL
-        {
-          selector: "h1",
-          estilos: {
-            fontSize: "40px",
-          }
-        },
-
-        // SUBTITULOS
-        {
-          selector: "h2",
-          estilos: {
-            fontSize: "12px",
-          }
-        },
-
-        // TEXTO GENERAL
-        {
-          selector: "p, span",
-          estilos: {
-            fontSize: "10px",
-          }
-        },
-
-        // TABLAS
-        {
-          selector: "table",
-          estilos: {
-            fontSize: "9px",
-            width: "100%",
-            borderCollapse: "collapse",
-          }
-        },
-
-        // CELDAS
-        {
-          selector: "th, td",
-          estilos: {
-            padding: "4px",
-          }
-        },
-
-        // EMPRESA (tu clase específica)
-        {
-          selector: ".empresa-nombre",
-          estilos: {
-            fontSize: "12px",
-            fontWeight: "bold",
-          }
-        },
-
-      ];
-
-      reglas.forEach(({ selector, estilos }) => {
-        root.querySelectorAll(selector).forEach(el => {
-          Object.assign((el as HTMLElement).style, estilos);
-        });
-      });
-    };
-
-    // 🔥 aplicar estilos
-    aplicarEstilosA4(clon);
-
-    // 🔥 abrir ventana
     const ventana = window.open("", "_blank");
-    if (!ventana) return;
 
-    // 🔥 escribir HTML LIMPIO (sin copiar estilos rotos)
     ventana.document.write(`
     <html>
       <head>
-        <title>Factura</title>
+        <title>Factura A4</title>
         <style>
           @page {
             size: A4;
-            margin: 8mm;
+            margin: 10mm;
           }
 
           body {
             margin: 0;
             font-family: Arial, sans-serif;
+            background: white;
           }
         </style>
       </head>
       <body>
-        ${clon.outerHTML}
+        ${contenido.innerHTML}
       </body>
     </html>
   `);
 
     ventana.document.close();
-
-    ventana.onload = () => {
-      ventana.focus();
-      ventana.print();
-      ventana.close();
-    };
+    ventana.focus();
+    ventana.print();
   };
 
 
 
-  const descargarPDF = () => {
-    const elemento = facturaRef.current;
-    if (!elemento) return;
+  const imprimirTicket80mm = () => {
+    const ventana = window.open("", "_blank");
 
-    // 🔧 ESCALA SOLO PARA PDF
-    elemento.style.transform = "scale(0.88)";
-    elemento.style.transformOrigin = "top left";
+    const html = ReactDOMServer.renderToString(
+      <FacturaTicket80mm
+        profile={profile}
+        factura={factura}
+        budget={budget}
+      />
+    );
 
-    // 🔧 AJUSTE SOLO PARA PDF
-    const header = elemento.querySelector(".empresa-nombre");
-    const titulo = elemento.querySelector(".titulo-factura");
-    if (header) header.style.marginBottom = "-20px";
-    if (titulo) titulo.style.marginTop = "-20px";
-
-    const opt = {
-      margin: [0, 63, 0, 55],
-      filename: `Factura_${factura?.numero || "sin-numero"}_${budget?.clientName || "cliente"}.pdf`,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
-    };
-    html2pdf().set(opt).from(elemento).save().then(() => {
-
-      // 🔄 Restaurar estilos
-      if (header) header.style.marginBottom = "";
-      if (titulo) titulo.style.marginTop = "";
-      elemento.style.transform = "";
-    });
-  };
-
- const imprimirTicket80mm = () => {
-  const ventana = window.open("", "_blank");
-
-  const html = ReactDOMServer.renderToString(
-    <FacturaTicket80mm
-      profile={profile}
-      factura={factura}
-      budget={budget}
-    />
-  );
-
-  ventana.document.write(`
+    ventana.document.write(`
     <html>
       <head>
         <title>Ticket 80mm</title>
@@ -565,8 +457,8 @@ const BudgetDetailPage = () => {
     </html>
   `);
 
-  ventana.document.close();
-};
+    ventana.document.close();
+  };
 
 
   const formatearTelefono = (telefono: string) => {
@@ -723,545 +615,551 @@ Gracias por tu confianza.`;
 
 
   return (
-    <PageLayout>
-      {/* HEADER */}
-      <div className="sticky top-0 z-50 flex items-center gap-3 bg-background py-3 px-2">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/budgets")}>
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
+    <>
+      <PageLayout>
+        {/* HEADER */}
+        <div className="sticky top-0 z-50 flex items-center gap-3 bg-background py-3 px-2">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/budgets")}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
 
-        <div className="flex-1">
-          <h1 className="font-bold text-lg text-foreground whitespace-nowrap">Presupuesto #{budget.number}</h1>
+          <div className="flex-1">
+            <h1 className="font-bold text-lg text-foreground whitespace-nowrap">Presupuesto #{budget.number}</h1>
+          </div>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleDelete}
+            className="text-destructive"
+          >
+            <Trash2 className="w-5 h-5" />
+          </Button>
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleDelete}
-          className="text-destructive"
-        >
-          <Trash2 className="w-5 h-5" />
-        </Button>
-      </div>
+        {/* STATUS + CATEGORY */}
+        <div className="flex gap-2 mb-4">
+          <span
+            className={cn(
+              "text-xs px-3 py-1 rounded-full",
+              CATEGORY_COLORS[budget.category]
+            )}
+          >
+            {CATEGORY_LABELS[budget.category]}
+          </span>
 
-      {/* STATUS + CATEGORY */}
-      <div className="flex gap-2 mb-4">
-        <span
-          className={cn(
-            "text-xs px-3 py-1 rounded-full",
-            CATEGORY_COLORS[budget.category]
-          )}
-        >
-          {CATEGORY_LABELS[budget.category]}
-        </span>
+          <span
+            className={cn(
+              "text-xs px-3 py-1 rounded-full",
+              statusStyles[budget.status]
+            )}
+          >
+            {statusLabels[budget.status]}
+          </span>
+        </div>
 
-        <span
-          className={cn(
-            "text-xs px-3 py-1 rounded-full",
-            statusStyles[budget.status]
-          )}
-        >
-          {statusLabels[budget.status]}
-        </span>
-      </div>
-
-      {/* CLIENTE */}
-      <div className="card-elevated p-3 space-y-1 text-[15px]">
-        <h3 className="font-semibold text-primary text-sm">Cliente</h3>
-        <p className="text-foreground">{budget.clientName}</p>
-      </div>
-
-      {/* TIPO DE INSTALACIÓN */}
-      <div className="card-elevated p-3 space-y-1 text-[15px]">
-        <h3 className="font-semibold text-primary text-sm">Tipo de Instalación</h3>
-        <p className="text-foreground">
-          {CATEGORY_LABELS[budget.category]}
-        </p>
-      </div>
-
-      {/* DETALLES POR CATEGORÍA */}
-      {budget.category === "ac" && budget.acEquipment && (
+        {/* CLIENTE */}
         <div className="card-elevated p-3 space-y-1 text-[15px]">
-          <h3 className="font-semibold text-primary text-sm">Datos del Equipo</h3>
-          <p>Capacidad: {budget.acEquipment.capacity} frigorías</p>
-          <p>Tecnología: {budget.acEquipment.technology}</p>
-          <p>Estado: {budget.acEquipment.status}</p>
+          <h3 className="font-semibold text-primary text-sm">Cliente</h3>
+          <p className="text-foreground">{budget.clientName}</p>
         </div>
-      )}
 
-      {budget.category === "solar" && budget.solarSystem && (
-        <div className="card-elevated p-3 space-y-1 text-[15px] ">
-          <h3 className="font-semibold text-primary text-sm">Datos del Sistema FV</h3>
-          <p>Tipo de sistema: {budget.solarSystem.systemType}</p>
-          <p>Panel: {budget.solarSystem.panelType} - {budget.solarSystem.panelPower} W</p>
-          <p>Cantidad de paneles: {budget.solarSystem.quantity}</p>
-          <p>Potencia total: {budget.solarSystem.totalPower} W</p>
-        </div>
-      )}
-
-      {budget.category === "electric" && budget.electricWorkDescription && (
+        {/* TIPO DE INSTALACIÓN */}
         <div className="card-elevated p-3 space-y-1 text-[15px]">
-          <h3 className="font-semibold text-primary text-sm ">Descripción del Trabajo</h3>
-          <p className="whitespace-pre-line text-foreground">
-            {budget.electricWorkDescription}
+          <h3 className="font-semibold text-primary text-sm">Tipo de Instalación</h3>
+          <p className="text-foreground">
+            {CATEGORY_LABELS[budget.category]}
           </p>
         </div>
-      )}
 
-      {/* ITEMS */}
-      <div className="card-elevated p-2 mb-2">
-        <h3 className="font-semibold text-primary text-sm mb-3">Detalle de Materiales</h3>
-        <div className="space-y-2">
-          {budget.items.map((item) => (
-            <div key={item.id} className="flex justify-between text-sm">
-              <span className="text-foreground">
-                {item.quantity}x {item.description}
-              </span>
-
-              <span className="text-muted-foreground">
-                ${(item.quantity * item.unitPrice).toLocaleString("es-AR")}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* TOTAL MATERIALES */}
-        <div>
-          <div className="border-t border-border mt-2 pt-2 flex justify-between font-semibold">
-            <span>Total de Materiales</span>
-            <span className="text-primary">
-              ${budget.subtotal.toLocaleString("es-AR", {
-                
-                minimumFractionDigits: 0,
-              })}
-            </span>
+        {/* DETALLES POR CATEGORÍA */}
+        {budget.category === "ac" && budget.acEquipment && (
+          <div className="card-elevated p-3 space-y-1 text-[15px]">
+            <h3 className="font-semibold text-primary text-sm">Datos del Equipo</h3>
+            <p>Capacidad: {budget.acEquipment.capacity} frigorías</p>
+            <p>Tecnología: {budget.acEquipment.technology}</p>
+            <p>Estado: {budget.acEquipment.status}</p>
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* DETALLE DE MANO DE OBRA (SI EXISTE)*/}
-      {budget.laborItems && budget.laborItems.length > 0 && (
+        {budget.category === "solar" && budget.solarSystem && (
+          <div className="card-elevated p-3 space-y-1 text-[15px] ">
+            <h3 className="font-semibold text-primary text-sm">Datos del Sistema FV</h3>
+            <p>Tipo de sistema: {budget.solarSystem.systemType}</p>
+            <p>Panel: {budget.solarSystem.panelType} - {budget.solarSystem.panelPower} W</p>
+            <p>Cantidad de paneles: {budget.solarSystem.quantity}</p>
+            <p>Potencia total: {budget.solarSystem.totalPower} W</p>
+          </div>
+        )}
+
+        {budget.category === "electric" && budget.electricWorkDescription && (
+          <div className="card-elevated p-3 space-y-1 text-[15px]">
+            <h3 className="font-semibold text-primary text-sm ">Descripción del Trabajo</h3>
+            <p className="whitespace-pre-line text-foreground">
+              {budget.electricWorkDescription}
+            </p>
+          </div>
+        )}
+
+        {/* ITEMS */}
         <div className="card-elevated p-2 mb-2">
-          <h3 className="font-semibold text-primary text-sm mb-3">
-            Detalle de Mano de Obra
-          </h3>
+          <h3 className="font-semibold text-primary text-sm mb-3">Detalle de Materiales</h3>
           <div className="space-y-2">
-            {budget.laborItems.map((item, index) => (
-              <div key={index} className="flex justify-between text-sm">
+            {budget.items.map((item) => (
+              <div key={item.id} className="flex justify-between text-sm">
                 <span className="text-foreground">
-                  {item.name}
+                  {item.quantity}x {item.description}
                 </span>
 
                 <span className="text-muted-foreground">
-                  ${item.price.toLocaleString("es-AR")}
+                  ${(item.quantity * item.unitPrice).toLocaleString("es-AR")}
                 </span>
               </div>
             ))}
           </div>
-          {/* TOTAL */}
-          <div className="border-t border-border mt-2 pt-2 flex justify-between font-semibold">
-            <span>Total Mano de Obra</span>
-            <span>
-              ${budget.laborCost.toLocaleString("es-AR")}
-            </span>
+
+          {/* TOTAL MATERIALES */}
+          <div>
+            <div className="border-t border-border mt-2 pt-2 flex justify-between font-semibold">
+              <span>Total de Materiales</span>
+              <span className="text-primary">
+                ${budget.subtotal.toLocaleString("es-AR", {
+
+                  minimumFractionDigits: 0,
+                })}
+              </span>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* TOTAL FINAL - MANO DE OBRA + MATERIALES */}
-      <div className="card-elevated p-2 mb-2">
-        <h3 className="font-semibold text-primary text-sm mb-0">Detalle de Materiales + Mano de Obra</h3>
-        {/* SUBTOTALS */}
-        <div className="border-border mt-2 pt-2 space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Materiales</span>
-            <span>${budget.subtotal.toLocaleString("es-AR")}</span>
+        {/* DETALLE DE MANO DE OBRA (SI EXISTE)*/}
+        {budget.laborItems && budget.laborItems.length > 0 && (
+          <div className="card-elevated p-2 mb-2">
+            <h3 className="font-semibold text-primary text-sm mb-3">
+              Detalle de Mano de Obra
+            </h3>
+            <div className="space-y-2">
+              {budget.laborItems.map((item, index) => (
+                <div key={index} className="flex justify-between text-sm">
+                  <span className="text-foreground">
+                    {item.name}
+                  </span>
+
+                  <span className="text-muted-foreground">
+                    ${item.price.toLocaleString("es-AR")}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {/* TOTAL */}
+            <div className="border-t border-border mt-2 pt-2 flex justify-between font-semibold">
+              <span>Total Mano de Obra</span>
+              <span>
+                ${budget.laborCost.toLocaleString("es-AR")}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* TOTAL FINAL - MANO DE OBRA + MATERIALES */}
+        <div className="card-elevated p-2 mb-2">
+          <h3 className="font-semibold text-primary text-sm mb-0">Detalle de Materiales + Mano de Obra</h3>
+          {/* SUBTOTALS */}
+          <div className="border-border mt-2 pt-2 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Materiales</span>
+              <span>${budget.subtotal.toLocaleString("es-AR")}</span>
+            </div>
+
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Mano de Obra</span>
+              <span>${budget.laborCost.toLocaleString("es-AR")}</span>
+            </div>
+
+            {budget.discount > 0 && (
+              <div className="flex justify-between text-sm text-accent">
+                <span>Descuento</span>
+                <span>-${budget.discount.toLocaleString("es-AR")}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
+              <span>Total Final</span>
+              <span className="text-primary">
+                ${budget.total.toLocaleString("es-AR", {
+                  minimumFractionDigits: 0,
+                })}
+              </span>
+            </div>
+          </div>
+        </div>
+
+
+        {/* TERMS */}
+        <div className="card-elevated p-2 mb-2">
+          <h3 className="font-semibold text-primary text-sm mb-3">Condiciones</h3>
+
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Validez</span>
+              <span>{budget.validityDays} días</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Garantía</span>
+              <span>{budget.warranty}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Forma de Pago</span>
+              <span>{budget.paymentTerms}</span>
+            </div>
           </div>
 
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Mano de Obra</span>
-            <span>${budget.laborCost.toLocaleString("es-AR")}</span>
-          </div>
-
-          {budget.discount > 0 && (
-            <div className="flex justify-between text-sm text-accent">
-              <span>Descuento</span>
-              <span>-${budget.discount.toLocaleString("es-AR")}</span>
+          {budget.notes && (
+            <div className="mt-3 pt-3 border-t border-border">
+              <p className="text-sm text-muted-foreground">Observaciones:</p>
+              <p className="text-sm mt-1">{budget.notes}</p>
             </div>
           )}
-
-          <div className="flex justify-between font-semibold text-lg pt-2 border-t border-border">
-            <span>Total Final</span>
-            <span className="text-primary">
-              ${budget.total.toLocaleString("es-AR", {
-                minimumFractionDigits: 0,
-              })}
-            </span>
-          </div>
-        </div>
-      </div>
-
-
-
-
-      {/* TERMS */}
-      <div className="card-elevated p-2 mb-2">
-        <h3 className="font-semibold text-primary text-sm mb-3">Condiciones</h3>
-
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Validez</span>
-            <span>{budget.validityDays} días</span>
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Garantía</span>
-            <span>{budget.warranty}</span>
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Forma de Pago</span>
-            <span>{budget.paymentTerms}</span>
-          </div>
         </div>
 
-        {budget.notes && (
-          <div className="mt-3 pt-3 border-t border-border">
-            <p className="text-sm text-muted-foreground">Observaciones:</p>
-            <p className="text-sm mt-1">{budget.notes}</p>
-          </div>
-        )}
-      </div>
+        {/* SHARE / ACTIONS */}
+        <div className="card-elevated p-4 space-y-3">
 
-      {/* SHARE / ACTIONS */}
-      <div className="card-elevated p-4 space-y-3">
+          {/* BOTÓN MODIFICAR */}
+          {!isLocked && budget && (
+            <Button
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+              onClick={() => navigate(`/budgets/edit/${budget.id}`)}
+            >
+              Modificar Presupuesto
+            </Button>
+          )}
 
-  {/* BOTÓN MODIFICAR */}
-    {!isLocked && budget && (
-    <Button
-      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-      onClick={() => navigate(`/budgets/edit/${budget.id}`)}
-    >
-      Modificar Presupuesto
-    </Button>
-  )}
-
-  <ShareOptions
-    budget={budget}
-    profile={profile}
-    onStatusChange={loadData}
-    disabled={isLocked}
-  />
-</div>
+          <ShareOptions
+            budget={budget}
+            profile={profile}
+            onStatusChange={loadData}
+            disabled={isLocked}
+          />
+        </div>
 
 
-      
+        {/* FACTURAR */}
+        <div className="mt-4">
 
-      {/* FACTURAR */}
-      <div className="mt-4">
+          {budget.status === "facturado" ? (
 
-        {budget.status === "facturado" ? (
+            // 🟢 FACTURA GENERADA
+            <div className="flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-md font-semibold">
+              <CheckCircle className="w-5 h-5" />
+              Factura generada
+            </div>
 
-          // 🟢 FACTURA GENERADA
-          <div className="flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-md font-semibold">
-            <CheckCircle className="w-5 h-5" />
-            Factura generada
-          </div>
+          ) : budget.status === "cancelado" ? (
 
-        ) : budget.status === "cancelado" ? (
+            // 🔴 FACTURA CANCELADA
+            <div className="flex items-center justify-center gap-2 bg-red-600 text-white py-3 rounded-md font-semibold">
+              <XCircle className="w-5 h-5" />
+              Factura cancelada
+            </div>
 
-          // 🔴 FACTURA CANCELADA
-          <div className="flex items-center justify-center gap-2 bg-red-600 text-white py-3 rounded-md font-semibold">
-            <XCircle className="w-5 h-5" />
-            Factura cancelada
-          </div>
+          ) : (
 
-        ) : (
+            // 🔵 BOTÓN NORMAL
+            <Button
+              className="w-full btn-gradient"
+              onClick={() => setShowFiscalModal(true)}
+            >
+              Introducir datos fiscales
+            </Button>
 
-          // 🔵 BOTÓN NORMAL
-          <Button
-            className="w-full btn-gradient"
-            onClick={() => setShowFiscalModal(true)}
-          >
-            Introducir datos fiscales
-          </Button>
+          )}
 
-        )}
+        </div>
 
-      </div>
+        {/* FACTURA preliminar */}
+        {(factura || budget.facturaPreliminar) && profile && budget && (
+          <>
+            <div ref={facturaRef} className="mt-4 print-area pb-4">
+              <FacturaView
+                factura={factura || budget.facturaPreliminar}
+                profile={profile}
+                budget={budget}
+                preliminar={budget.status === "listo_para_facturar"}
+              />
+            </div>
 
-      {/* FACTURA preliminar */}
-      {(factura || budget.facturaPreliminar) && profile && budget && (
-        <>
-          <div ref={facturaRef} className="mt-4 print-area pb-4">
-            <FacturaView
-              factura={factura || budget.facturaPreliminar}
-              profile={profile}
-              budget={budget}
-              preliminar={budget.status === "listo_para_facturar"}
-            />
-          </div>
+            {budget.status === "listo_para_facturar" && (
+              <div className="mt-2">
+                <Button
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={generarFactura}
+                >
+                  Emitir Factura
+                </Button>
+              </div>
+            )}
 
-          {budget.status === "listo_para_facturar" && (
+            {/* BOTÓN PDF */}
             <div className="mt-2">
               <Button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={generarFactura}
+                className="w-full"
+                onClick={() => setShowDownloadOptions(true)}
               >
-                Emitir Factura
+                Descargar Factura
               </Button>
-            </div>
-          )}
 
-          {/* BOTÓN PDF */}
-          <div className="mt-2">
-            <Button
-              className="w-full"
-              onClick={() => setShowDownloadOptions(true)}
-            >
-              Descargar Factura
-            </Button>
-
-            <Button
-              className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
-              onClick={enviarWhatsApp}
-            >
-              Enviar por WhatsApp
-            </Button>
-
-            {budget.notaCredito ? (
-
-              <div className="w-full mt-2">
-                <div className="w-full h-10 bg-red-600 text-white rounded-md flex items-center justify-center font-medium">
-                  Factura cancelada correctamente
-                </div>
-              </div>
-
-            ) : (
               <Button
-                className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
-                onClick={cancelarFactura}
+                className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
+                onClick={enviarWhatsApp}
               >
-                Cancelar Factura
+                Enviar por WhatsApp
               </Button>
-            )}
-          </div>
-        </>
-      )}
 
-      {showFiscalModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-full max-w-md space-y-4">
+              {budget.notaCredito ? (
 
-            <h2 className="text-lg font-bold">Datos Fiscales</h2>
+                <div className="w-full mt-2">
+                  <div className="w-full h-10 bg-red-600 text-white rounded-md flex items-center justify-center font-medium">
+                    Factura cancelada correctamente
+                  </div>
+                </div>
 
-            <div>
-              <label className="text-sm">Condición frente al IVA</label>
-              <select
-                className="w-full border p-2 rounded"
-                value={ivaCondition}
-                onChange={(e) => setIvaCondition(e.target.value)}
-              >
-                <option>Consumidor Final</option>
-                <option>Responsable Inscripto</option>
-                <option>Monotributista</option>
-                <option>Exento</option>
-              </select>
+              ) : (
+                <Button
+                  className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
+                  onClick={cancelarFactura}
+                >
+                  Cancelar Factura
+                </Button>
+              )}
             </div>
+          </>
+        )}
 
-            {/* MONEDA */}
-            <div>
-              <label className="text-sm">Moneda</label>
-              <select
-                className="w-full border p-2 rounded"
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-              >
-                <option value="ARS">Pesos</option>
-                <option value="USD">USD</option>
-              </select>
-            </div>
+        {showFiscalModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl w-full max-w-md space-y-4">
 
-            {/* FORMA DE PAGO */}
-            <div>
-              <label className="text-sm">Forma de pago</label>
-              <select
-                className="w-full border p-2 rounded"
-                value={formaPago}
-                onChange={(e) => setFormaPago(e.target.value)}
-              >
-                <option>Efectivo / Contado</option>
-                <option>Transferencia</option>
-                <option>Mercado Pago</option>
-                <option>Tarjeta de Débito</option>
-                <option>Tarjeta de Crédito</option>
-                <option>Cuenta Corriente</option>
-                <option>Otro</option>
-              </select>
-            </div>
+              <h2 className="text-lg font-bold">Datos Fiscales</h2>
 
-            {/* TIPO DE CAMBIO */}
-            {currency === "USD" && (
               <div>
-                <label className="text-sm">Tipo de cambio</label>
-                <input
+                <label className="text-sm">Condición frente al IVA</label>
+                <select
                   className="w-full border p-2 rounded"
-                  value={exchangeRate}
-                  onChange={(e) => setExchangeRate(e.target.value)}
-                  placeholder="Ej: 1000"
-                />
+                  value={ivaCondition}
+                  onChange={(e) => setIvaCondition(e.target.value)}
+                >
+                  <option>Consumidor Final</option>
+                  <option>Responsable Inscripto</option>
+                  <option>Monotributista</option>
+                  <option>Exento</option>
+                </select>
               </div>
-            )}
 
-            {/* BOTONES */}
-            <div className="flex gap-2">
+              {/* MONEDA */}
+              <div>
+                <label className="text-sm">Moneda</label>
+                <select
+                  className="w-full border p-2 rounded"
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                >
+                  <option value="ARS">Pesos</option>
+                  <option value="USD">USD</option>
+                </select>
+              </div>
+
+              {/* FORMA DE PAGO */}
+              <div>
+                <label className="text-sm">Forma de pago</label>
+                <select
+                  className="w-full border p-2 rounded"
+                  value={formaPago}
+                  onChange={(e) => setFormaPago(e.target.value)}
+                >
+                  <option>Efectivo / Contado</option>
+                  <option>Transferencia</option>
+                  <option>Mercado Pago</option>
+                  <option>Tarjeta de Débito</option>
+                  <option>Tarjeta de Crédito</option>
+                  <option>Cuenta Corriente</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+
+              {/* TIPO DE CAMBIO */}
+              {currency === "USD" && (
+                <div>
+                  <label className="text-sm">Tipo de cambio</label>
+                  <input
+                    className="w-full border p-2 rounded"
+                    value={exchangeRate}
+                    onChange={(e) => setExchangeRate(e.target.value)}
+                    placeholder="Ej: 1000"
+                  />
+                </div>
+              )}
+
+              {/* BOTONES */}
+              <div className="flex gap-2">
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={() => setShowFiscalModal(false)}
+                >
+                  Cancelar
+                </Button>
+
+                <Button
+                  className="w-full"
+                  onClick={() => {
+                    generarPreliminar(); // usamos tu función actual por ahora
+                    setShowFiscalModal(false);
+                  }}
+                >
+                  Generar Factura Preliminar
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showDownloadOptions && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+            <div className="bg-white p-6 rounded-xl w-[280px] space-y-4">
+
+              <h2 className="text-center font-bold">Elegir formato</h2>
+
+              {/* PDF A4 */}
               <Button
                 className="w-full"
+                onClick={() => {
+                  descargarPDFA4();
+                  setShowDownloadOptions(false);
+                }}
+              >
+                📄 PDF A4
+              </Button>
+
+              {/* TICKET */}
+              <Button
+                className="w-full bg-gray-800 text-white"
+                onClick={() => {
+                  imprimirTicket80mm();
+                  setShowDownloadOptions(false);
+                }}
+              >
+                🧾 Ticket 80mm
+              </Button>
+
+              {/* CANCELAR */}
+              <Button
                 variant="outline"
-                onClick={() => setShowFiscalModal(false)}
+                className="w-full"
+                onClick={() => setShowDownloadOptions(false)}
               >
                 Cancelar
               </Button>
 
-              <Button
-                className="w-full"
-                onClick={() => {
-                  generarPreliminar(); // usamos tu función actual por ahora
-                  setShowFiscalModal(false);
-                }}
-              >
-                Generar Factura Preliminar
-              </Button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {showDownloadOptions && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-
-          <div className="bg-white p-6 rounded-xl w-[280px] space-y-4">
-
-            <h2 className="text-center font-bold">Elegir formato</h2>
-
-            {/* PDF A4 */}
-            <Button
-              className="w-full"
-              onClick={() => {
-                descargarPDF();
-                setShowDownloadOptions(false);
-              }}
-            >
-              📄 PDF A4
-            </Button>
-
-            {/* TICKET */}
-            <Button
-              className="w-full bg-gray-800 text-white"
-              onClick={() => {
-                imprimirTicket80mm();
-                setShowDownloadOptions(false);
-              }}
-            >
-              🧾 Ticket 80mm
-            </Button>
-
-            {/* CANCELAR */}
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => setShowDownloadOptions(false)}
-            >
-              Cancelar
-            </Button>
 
           </div>
-
-        </div>
-      )}
+        )}
 
 
-      {/* ANIMACIÓN AFIP PRO */}
-      {loadingAFIP && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
+        {/* ANIMACIÓN AFIP PRO */}
+        {loadingAFIP && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
 
-          <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
+            <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
 
-            {/* TÍTULO */}
-            <p className="font-semibold text-base">
-              Comunicando con ARCA...
-            </p>
+              {/* TÍTULO */}
+              <p className="font-semibold text-base">
+                Comunicando con ARCA...
+              </p>
 
-            {/* CONTENIDO */}
-            <div className="flex items-center gap-6">
+              {/* CONTENIDO */}
+              <div className="flex items-center gap-6">
 
-              {/* SISTEMA */}
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
-                  <Server className="w-8 h-8 text-blue-600" />
-                </div>
-                <span className="text-base mt-2 text-blue-700 font-medium">
-                  SICE
-                </span>
-              </div>
-
-              {/* FLECHAS ANIMADAS */}
-              <div className="flex flex-col items-center gap-2">
-
-                {/* IDA */}
-                <div className="flex gap-1 text-blue-500 text-lg">
-                  <span className="animate-[pulse_1s_infinite]">→</span>
-                  <span className="animate-[pulse_1s_infinite_0.2s]">→</span>
-                  <span className="animate-[pulse_1s_infinite_0.4s]">→</span>
+                {/* SISTEMA */}
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
+                    <Server className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <span className="text-base mt-2 text-blue-700 font-medium">
+                    SICE
+                  </span>
                 </div>
 
-                {/* VUELTA */}
-                <div className="flex gap-1 text-green-500 text-lg">
-                  <span className="animate-[pulse_1s_infinite]">←</span>
-                  <span className="animate-[pulse_1s_infinite_0.2s]">←</span>
-                  <span className="animate-[pulse_1s_infinite_0.4s]">←</span>
+                {/* FLECHAS ANIMADAS */}
+                <div className="flex flex-col items-center gap-2">
+
+                  {/* IDA */}
+                  <div className="flex gap-1 text-blue-500 text-lg">
+                    <span className="animate-[pulse_1s_infinite]">→</span>
+                    <span className="animate-[pulse_1s_infinite_0.2s]">→</span>
+                    <span className="animate-[pulse_1s_infinite_0.4s]">→</span>
+                  </div>
+
+                  {/* VUELTA */}
+                  <div className="flex gap-1 text-green-500 text-lg">
+                    <span className="animate-[pulse_1s_infinite]">←</span>
+                    <span className="animate-[pulse_1s_infinite_0.2s]">←</span>
+                    <span className="animate-[pulse_1s_infinite_0.4s]">←</span>
+                  </div>
+
+                </div>
+
+                {/* AFIP */}
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
+                    <Building2 className="w-8 h-8 text-green-600" />
+                  </div>
+                  <span className="text-base mt-2 text-green-700 font-medium">
+                    ARCA
+                  </span>
                 </div>
 
               </div>
 
-              {/* AFIP */}
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
-                  <Building2 className="w-8 h-8 text-green-600" />
-                </div>
-                <span className="text-base mt-2 text-green-700 font-medium">
-                  ARCA
-                </span>
+              {/* TEXTO */}
+              <p className="text-sm text-muted-foreground text-center animate-pulse">
+                Enviando datos fiscales y esperando validación...
+              </p>
+
+              {/* SPINNER */}
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+
+              {/* BARRA DE PROGRESO */}
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-blue-500 h-2 transition-all duration-300"
+                  style={{ width: `${progress}%` }}
+                />
               </div>
 
+              {/* % */}
+              <span className="text-xs text-muted-foreground">
+                {Math.floor(progress)}%
+              </span>
+
             </div>
-
-            {/* TEXTO */}
-            <p className="text-sm text-muted-foreground text-center animate-pulse">
-              Enviando datos fiscales y esperando validación...
-            </p>
-
-            {/* SPINNER */}
-            <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
-
-            {/* BARRA DE PROGRESO */}
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-blue-500 h-2 transition-all duration-300"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-
-            {/* % */}
-            <span className="text-xs text-muted-foreground">
-              {Math.floor(progress)}%
-            </span>
-
           </div>
-        </div>
-      )}
-    </PageLayout>
-  
+        )}
+      </PageLayout>
+
+      {/* 🔴 FACTURA A4 OCULTA */}
+      <div style={{ display: "none" }} id="factura-a4">
+        <FacturaA4
+          profile={profile}
+          factura={factura}
+          budget={budget}
+        />
+      </div>
+    </>
   );
 };
 
