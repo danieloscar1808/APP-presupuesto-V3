@@ -21,6 +21,8 @@ import { Server, Building2 } from "lucide-react";
 import { FacturaTicket80mm } from "@/components/FacturaTicket80mm";
 import ReactDOMServer from "react-dom/server";
 import { FacturaA4 } from "@/components/FacturaA4";
+import supabase from "../database/supabaseClient.js";
+import { ReciboA4 } from "@/components/ReciboA4";
 
 
 const BudgetDetailPage = () => {
@@ -44,7 +46,8 @@ const BudgetDetailPage = () => {
   const [loadingAFIP, setLoadingAFIP] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
-
+  const [recibo, setRecibo] = useState(null);
+  const [confirmandoPago, setConfirmandoPago] = useState(false);
 
   useEffect(() => {
     if (!loadingAFIP) return;
@@ -374,31 +377,31 @@ const BudgetDetailPage = () => {
 
 
   const descargarPDFA4 = () => {
-  const contenido = document.getElementById("factura-a4");
-  if (!contenido) return;
+    const contenido = document.getElementById("factura-a4");
+    if (!contenido) return;
 
-  const ventana = window.open("", "_blank");
+    const ventana = window.open("", "_blank");
 
-  // 🔥 CLONAR
-  const clon = contenido.cloneNode(true);
+    // 🔥 CLONAR
+    const clon = contenido.cloneNode(true);
 
-  // 🔥 ESPERAR IMÁGENES
-  const images = clon.querySelectorAll("img");
+    // 🔥 ESPERAR IMÁGENES
+    const images = clon.querySelectorAll("img");
 
-  let loaded = 0;
+    let loaded = 0;
 
-  images.forEach((img) => {
-    img.onload = () => {
-      loaded++;
-      if (loaded === images.length) imprimir();
-    };
+    images.forEach((img) => {
+      img.onload = () => {
+        loaded++;
+        if (loaded === images.length) imprimir();
+      };
 
-    // forzar reload
-    img.src = img.src;
-  });
+      // forzar reload
+      img.src = img.src;
+    });
 
-  const imprimir = () => {
-    ventana.document.write(`
+    const imprimir = () => {
+      ventana.document.write(`
       <html>
         <head>
           <title>Factura A4</title>
@@ -418,11 +421,11 @@ const BudgetDetailPage = () => {
       </html>
     `);
 
-    ventana.document.close();
-    ventana.focus();
-    ventana.print();
+      ventana.document.close();
+      ventana.focus();
+      ventana.print();
+    };
   };
-};
 
 
   const imprimirTicket80mm = () => {
@@ -622,6 +625,70 @@ Gracias por tu confianza.`;
 
 
 
+
+  const registrarPago = async () => {
+    try {
+      const response = await fetch("https://facturacion-server-backend.onrender.com/api/recibo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          factura_id: factura?.numero,
+          cliente: factura?.cliente,
+          monto: factura?.total,
+          forma_pago: "Transferencia",
+          moneda: "ARS",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert("Error al registrar pago");
+        return;
+      }
+
+      setConfirmandoPago(false); // 🔥 cerrar confirmación
+      setRecibo(data[0]); // ya lo tenías
+
+      console.log("RECIBO CREADO:", data);
+
+      setRecibo(data[0]); // 🔥 GUARDAMOS EL RECIBO
+
+      alert("✅ Pago registrado");
+    } catch (error) {
+      console.error(error);
+      alert("Error de conexión");
+    }
+  };
+
+
+
+  const imprimirRecibo = () => {
+    const contenido = document.getElementById("recibo-a4");
+    if (!contenido) return;
+
+    const ventana = window.open("", "_blank");
+
+    ventana.document.write(`
+    <html>
+      <head>
+        <title>Recibo</title>
+        <style>
+          @page { size: A4; margin: 10mm; }
+          body { margin: 0; }
+        </style>
+      </head>
+      <body>
+        ${contenido.innerHTML}
+      </body>
+    </html>
+  `);
+
+    ventana.document.close();
+    ventana.print();
+  };
 
 
   return (
@@ -922,6 +989,44 @@ Gracias por tu confianza.`;
               </Button>
 
               <Button
+                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white mt-2"
+                onClick={() => setConfirmandoPago(true)}>
+                Registrar pago
+              </Button>
+
+              {confirmandoPago && (
+                <div style={{
+                  background: "#fff3cd",
+                  padding: "10px",
+                  borderRadius: "6px",
+                  marginTop: "10px",
+                  textAlign: "center"
+                }}>
+                  <p>¿Confirmar registro de pago?</p>
+
+                  <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+                    <Button onClick={registrarPago}>
+                      ✅ Sí
+                    </Button>
+
+                    <Button variant="outline" onClick={() => setConfirmandoPago(false)}>
+                      ❌ Cancelar
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {recibo && (
+                <Button
+                  className="w-full bg-gray-500 hover:bg-gray-700 text-white mt-2"
+                  onClick={() => imprimirRecibo()}>
+                  Imprimir Recibo
+                </Button>
+              )}
+
+
+
+              <Button
                 className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
                 onClick={enviarWhatsApp}
               >
@@ -1169,6 +1274,13 @@ Gracias por tu confianza.`;
           budget={budget}
         />
       </div>
+
+      {recibo && (
+        <div style={{ display: "none" }} id="recibo-a4">
+          <ReciboA4 recibo={recibo} />
+        </div>
+      )}
+
     </>
   );
 };
