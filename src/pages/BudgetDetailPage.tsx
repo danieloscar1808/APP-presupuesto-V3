@@ -253,6 +253,8 @@ const BudgetDetailPage = () => {
       // -----------------------------------------
       // 🔗 BACKEND
       // -----------------------------------------
+      const esUSD = currency === "USD";
+
       const response = await fetch("https://facturacion-server-backend.onrender.com/api/factura", {
         method: "POST",
         headers: {
@@ -260,14 +262,17 @@ const BudgetDetailPage = () => {
         },
         body: JSON.stringify({
           cliente: budget.clientName,
-          total: totalFinal,
-          subtotal: totalFinal,
+
+          // 🔥 TOTAL REAL (NO CONVERTIR)
+          total: esUSD ? totalUSD : totalFinal,
+          subtotal: esUSD ? totalUSD : totalFinal,
+
+          moneda: esUSD ? "USD" : "ARS",
+          tipoCambio: esUSD ? exchangeRate : 1,
+
           iva: 0,
           invoiceType: "C",
           ivaCondition: "Monotributista",
-          currency,
-          exchangeRate,
-          totalUSD,
           formaPago,
           descripcion: "Trabajo de instalación"
         })
