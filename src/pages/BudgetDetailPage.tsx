@@ -374,45 +374,55 @@ const BudgetDetailPage = () => {
 
 
   const descargarPDFA4 = () => {
-    console.log("🔥 USANDO FACTURA A4");
+  const contenido = document.getElementById("factura-a4");
+  if (!contenido) return;
 
-    const contenido = document.getElementById("factura-a4");
+  const ventana = window.open("", "_blank");
 
-    if (!contenido) {
-      console.error("No se encontró factura A4");
-      return;
-    }
+  // 🔥 CLONAR
+  const clon = contenido.cloneNode(true);
 
-    const ventana = window.open("", "_blank");
+  // 🔥 ESPERAR IMÁGENES
+  const images = clon.querySelectorAll("img");
 
+  let loaded = 0;
+
+  images.forEach((img) => {
+    img.onload = () => {
+      loaded++;
+      if (loaded === images.length) imprimir();
+    };
+
+    // forzar reload
+    img.src = img.src;
+  });
+
+  const imprimir = () => {
     ventana.document.write(`
-    <html>
-      <head>
-        <title>Factura A4</title>
-        <style>
-          @page {
-            size: A4;
-            margin: 10mm;
-          }
-
-          body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: white;
-          }
-        </style>
-      </head>
-      <body>
-        ${contenido.innerHTML}
-      </body>
-    </html>
-  `);
+      <html>
+        <head>
+          <title>Factura A4</title>
+          <style>
+            @page {
+              size: A4;
+              margin: 10mm;
+            }
+            body {
+              margin: 0;
+            }
+          </style>
+        </head>
+        <body>
+          ${clon.innerHTML}
+        </body>
+      </html>
+    `);
 
     ventana.document.close();
     ventana.focus();
     ventana.print();
   };
-
+};
 
 
   const imprimirTicket80mm = () => {
