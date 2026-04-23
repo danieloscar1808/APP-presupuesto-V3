@@ -5,7 +5,7 @@
   "start_url": "/APP-presupuesto-V3/",
   "scope": "/APP-presupuesto-V3/",
   "display": "standalone",
-  "background_color": "#f9ebdc",
+  "background_color": "#ffffff",
   "theme_color": "#f9ebdc",
   "orientation": "portrait-primary",
   "icons": [
