@@ -31,7 +31,14 @@ export const LaborCalculator = ({ onClose, onUseTotal }) => {
 
   return (
     <div className="space-y-3">
+<<<<<<< HEAD
       <h2 className="font-semibold">Calculadora mano de obra</h2>
+=======
+
+      <h2 className="font-semibold text-lg">
+        Calculadora de mano de obra
+      </h2>
+>>>>>>> 239c794996703f618bd05dd7ac954e799b03fbee
 
       <input
         placeholder="Buscar trabajo..."
@@ -42,10 +49,14 @@ export const LaborCalculator = ({ onClose, onUseTotal }) => {
 
       <div className="max-h-40 overflow-y-auto space-y-1">
         {filtered.map((item) => (
+<<<<<<< HEAD
           <div
             key={item.id}
             className="flex justify-between text-sm border p-1 rounded"
           >
+=======
+          <div key={item.id} className="flex justify-between border p-2 rounded">
+>>>>>>> 239c794996703f618bd05dd7ac954e799b03fbee
             <span>{item.name}</span>
             <button onClick={() => addItem(item)}>+</button>
           </div>
@@ -67,6 +78,7 @@ export const LaborCalculator = ({ onClose, onUseTotal }) => {
         Total: ${total.toLocaleString("es-AR")}
       </div>
 
+<<<<<<< HEAD
       <div className="flex gap-2">
         <button
           onClick={() => navigator.clipboard.writeText(total.toString())}
@@ -75,6 +87,10 @@ export const LaborCalculator = ({ onClose, onUseTotal }) => {
         </button>
 
         <button onClick={() => onUseTotal(total)}>
+=======
+      <div className="flex gap-2 pt-2">
+        <button onClick={() => onUseTotal(total, selected)}>
+>>>>>>> 239c794996703f618bd05dd7ac954e799b03fbee
           Usar
         </button>
 
@@ -82,6 +98,10 @@ export const LaborCalculator = ({ onClose, onUseTotal }) => {
           Cerrar
         </button>
       </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 239c794996703f618bd05dd7ac954e799b03fbee
     </div>
   );
 };

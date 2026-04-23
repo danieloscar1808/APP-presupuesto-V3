@@ -1,4 +1,6 @@
 import { QRCodeSVG } from "qrcode.react";
+import logoHeader from "@/assets/logo-header.png";
+import logoTickettt from "@/assets/Logo-Tickettt.png";
 
 type Props = {
   factura: any;
@@ -35,16 +37,34 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       )}
 
       {/* HEADER */}
-      <div className="text-center mb-1">
-        <p className="empresa-nombre w-full bg-black text-white py-3 text-[20px] font-bold text-center">
-          {profile?.businessName && profile.businessName.trim() !== ""
-            ? profile.businessName
-            : "SERVICIOS INTEGRALES DE CLIMATIZACION Y ENERGIA"}
-        </p>
+      <div className="mb-0">
+        <div className="text-white py-3 px-3 flex flex-col items-center justify-center">
+
+          {/* LOGO */}
+          <img
+            src={logoTickettt}
+            alt="logo"
+            style={{
+              width: "80%",
+              marginBottom: "1px"
+            }}
+          />
+        </div>
       </div>
 
+      <hr style={{ borderColor: "black" }} />
+
       <div className="px-3 pt-0">
-        <h1 className="text-center text-[30px] font-bold mt-0">Factura C</h1>
+        <h1 className="text-center text-[40px] font-bold mt-0">Factura C</h1>
+
+
+        <hr
+          style={{
+            border: "none",
+            borderTop: "1px solid black",
+            margin: "4px -12px" // 🔥 compensa el padding (px-3 = 12px)
+          }}
+        />
 
         <div className="text-gray-600 text-[14px] leading-[1.3]">
 
@@ -67,6 +87,15 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
           <div>
             Fecha: {new Date().toLocaleDateString()}
           </div>
+
+          <div>
+            IIBB: {profile?.iibb || "—"}
+          </div>
+
+          <div>
+            Inicio de actividades: {profile?.startDate || "—"}
+          </div>
+
         </div>
       </div>
 
@@ -76,10 +105,8 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
         <h2 className="font-semibold text-[16px]">Emisor</h2>
         <p>{profile?.name || "Tu Empresa"}</p>
         <p>CUIT: {profile?.taxId || "CUIT no cargado"}</p>
-        <p>Condición frente al IVA: {datos?.ivaCondition || "Monotributista"}</p>
+        <p>Condición frente al IVA: Monotributista</p>
         <p>{profile?.address || "Dirección no definida"}</p>
-        <p>IIBB: {profile.iibb}</p>
-        <p>Inicio de actividades: {profile.startDate}</p>
       </div>
 
       {/* CLIENTE */}
@@ -199,7 +226,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
       {/* TOTAL */}
       <div className="px-3 pt-0 flex justify-end mb-3">
-        <div className="text-right space-y-1">
+        <div className="text-right space-y-0">
 
           <p>
             Subtotal: $
@@ -221,12 +248,17 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
         </div>
       </div>
 
-
+      <hr
+        style={{
+          border: "none",
+          borderTop: "1px solid black",
+          margin: "4px -12px" // 🔥 compensa el padding (px-3 = 12px)
+        }}
+      />
 
       {/* 🔹 CAE SIEMPRE DESDE LA FACTURA ORIGINAL */}
       {!preliminar && (factura?.cae || budget?.factura?.cae) && (
-        <div className="px-3 pt-0 border-t pt-1 text-[14px] leading-[1.3]">
-
+        <div className="px-3 pt-0 pt-1 text-[14px] leading-[1.3]">
           <p>
             <strong>CAE:</strong>{" "}
             {factura?.cae || budget?.factura?.cae || "-"}

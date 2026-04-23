@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { getBudgets } from "@/lib/storage";
 
 import { PageLayout } from "@/components/PageLayout";
 import { Client, Budget, BudgetCategory } from "@/types";
@@ -21,6 +22,8 @@ import {
 import { ItemsEditor } from "@/components/ItemsEditor";
 import { toast } from "sonner";
 import { v4 as uuid } from "uuid";
+import { LaborCalculator } from "@/components/LaborCalculator";
+
 
 /* -------------------------------- */
 /* LISTAS                           */
@@ -79,13 +82,19 @@ const parseNumber = (value: string) => {
 /* -------------------------------- */
 /* COMPONENTE                       */
 /* -------------------------------- */
-const NewBudgetPage = () => {
+  const NewBudgetPage = () => {
+
+  const { id } = useParams();
+  const isEditMode = !!id;
 
   const [laborCost, setLaborCost] = useState(0);
+  const [laborItems, setLaborItems] = useState<any[]>([]);
   const [discount, setDiscount] = useState(0);
 
   const [laborInput, setLaborInput] = useState("");
   const [discountInput, setDiscountInput] = useState("");
+
+  const [showLaborCalculator, setShowLaborCalculator] = useState(false);
 
   useEffect(() => {
     if (laborCost) {
@@ -160,10 +169,58 @@ const NewBudgetPage = () => {
   }, [clientId, clients]);
 
   useEffect(() => {
-  if (category === "solar" && notes.trim() === "") {
-    setNotes(SOLAR_NOTE);
-  }
-}, [category]);
+    if (category === "solar" && notes.trim() === "") {
+      setNotes(SOLAR_NOTE);
+    }
+  }, [category]);
+
+
+useEffect(() => {
+  const loadBudget = async () => {
+    if (isEditMode) {
+      const budgets = await getBudgets(); // 👈 ACA
+
+      const existing = budgets.find((b) => String(b.id) === String(id));
+
+      if (existing) {
+        setClientId(existing.clientId);
+        setClientName(existing.clientName);
+        setClientDocType(existing.clientDocType || "");
+        setClientDocNumber(existing.clientDocNumber || "");
+        setClientAddress(existing.clientAddress || "");
+
+        setCategory(existing.category);
+        setItems(existing.items || []);
+        setLaborItems(existing.laborItems || []);
+
+        setLaborCost(existing.laborCost || 0);
+        setDiscount(existing.discount || 0);
+
+        setNotes(existing.notes || "");
+        setValidityDays(existing.validityDays || 7);
+        setWarranty(existing.warranty || "");
+        setPaymentTerms(existing.paymentTerms || "");
+
+        if (existing.acEquipment) {
+          setAcCapacity(existing.acEquipment.capacity || "");
+          setAcTechnology(existing.acEquipment.technology || "");
+          setAcStatus(existing.acEquipment.status || "");
+        }
+
+        setElectricWorkDescription(existing.electricWorkDescription || "");
+
+        if (existing.solarSystem) {
+          setSolarType(existing.solarSystem.systemType || "");
+          setSolarPanelType(existing.solarSystem.panelType || "");
+          setSolarPanelPower(existing.solarSystem.panelPower || "");
+          setSolarQty(existing.solarSystem.quantity || 0);
+        }
+      }
+    }
+  };
+
+  loadBudget();
+}, [id]);
 
 
   /* GUARDAR */
@@ -173,7 +230,16 @@ const NewBudgetPage = () => {
       return;
     }
 
-    const numeroPresupuesto = generarNumeroPresupuesto();
+let numeroPresupuesto;// = generarNumeroPresupuesto();//
+
+if (isEditMode) {// Si estamos editando, mantenemos el mismo número de presupuesto//
+  const budgets = await getBudgets();
+  const existing = budgets.find((b) => String(b.id) === String(id));
+  numeroPresupuesto = existing?.number;
+} else {
+  numeroPresupuesto = generarNumeroPresupuesto();
+}
+
 
     const subtotal = items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
     const total =
@@ -182,7 +248,7 @@ const NewBudgetPage = () => {
       Number(discount || 0);
     const budget: Budget = {
 
-      id: uuid(),
+      id: isEditMode ? id : uuid(),// Si es edición, reutilizamos el mismo ID, sino generamos uno nuevo//
       number: numeroPresupuesto,
 
       clientId,
@@ -193,6 +259,7 @@ const NewBudgetPage = () => {
       category,
 
       items,
+      laborItems,
 
       laborCost,
       subtotal,
@@ -235,13 +302,30 @@ const NewBudgetPage = () => {
 
     };
 
-    await saveBudget(budget);
+    if (isEditMode) {// Si estamos editando, actualizamos el presupuesto existente en lugar de crear uno nuevo//
+  const budgets = await getBudgets();
 
-    toast.success("Presupuesto creado correctamente");
+  const updated = budgets.map((b) => {
+  if (String(b.id) === String(id)) {
+    return { ...b, ...budget };
+  }
+  return b;
+});
 
-    navigate("/");
+  await saveBudget(updated.find(b => String(b.id) === String(id)));
 
-  };
+  toast.success("Presupuesto actualizado correctamente");
+
+  navigate(`/budgets/${id}`);
+
+} else {
+  await saveBudget(budget);
+
+  toast.success("Presupuesto creado correctamente");
+
+  navigate("/");
+}
+};
 
 
   return (
@@ -412,18 +496,29 @@ const NewBudgetPage = () => {
         {/* COSTOS */}
         <div className="card-elevated p-2 space-y-1">
           <Label>Mano de obra</Label>
-          <Input
-            value={laborInput}
-            onChange={(e) => {
-              const raw = e.target.value.replace(/\D/g, "");
 
-              setLaborInput(
-                new Intl.NumberFormat("es-AR").format(Number(raw || 0))
-              );
+          <div className="flex gap-2">
+            <Input
+              className="flex-1"
+              value={laborInput}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/\D/g, "");
 
-              setLaborCost(Number(raw || 0));
-            }}
-          />
+                setLaborInput(
+                  new Intl.NumberFormat("es-AR").format(Number(raw || 0))
+                );
+
+                setLaborCost(Number(raw || 0));
+              }}
+            />
+
+            <Button
+              variant="outline"
+              onClick={() => setShowLaborCalculator(true)}
+            >
+              🧮
+            </Button>
+          </div>
 
           <Label>Descuento</Label>
           <Input
@@ -455,10 +550,41 @@ const NewBudgetPage = () => {
 
 
         <Button className="btn-accent w-full" onClick={handleSubmit}>
-          Guardar Presupuesto
+          {isEditMode ? "Actualizar Presupuesto" : "Guardar Presupuesto"}
         </Button>
 
       </div>
+
+      {showLaborCalculator && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+          <div className="bg-white rounded-xl p-4 w-[420px] max-h-[80vh] overflow-y-auto">
+
+            <LaborCalculator
+              onClose={() => setShowLaborCalculator(false)}
+
+              onUseTotal={(total, selectedItems) => {
+
+                const nuevoTotal = laborCost + total;
+
+                setLaborCost(nuevoTotal);
+
+                setLaborInput(
+                  new Intl.NumberFormat("es-AR").format(nuevoTotal)
+                );
+
+                // 👇 guardar desglose
+                setLaborItems((prev) => [...prev, ...selectedItems]);
+
+                setShowLaborCalculator(false);
+              }}
+            />
+
+          </div>
+
+        </div>
+      )}
+
 
     </PageLayout>
 

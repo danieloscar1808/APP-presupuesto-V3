@@ -171,9 +171,7 @@ const CatalogPage = () => {
     };
 
     await saveCatalogItem(catalogItem);
-
   }
-
 };
 
   // ---------------------------------------------------------
@@ -214,7 +212,7 @@ const CatalogPage = () => {
         {/* Import / Export */}
         <div className="flex gap-2">
           <Button variant="outline" className="flex-1" onClick={handleImport}>
-            <Upload className="w-4 h-4 mr-2" />
+            <Download className="w-4 h-4 mr-2" />
             Importar
           </Button>
 
@@ -224,7 +222,7 @@ const CatalogPage = () => {
             onClick={handleExport}
             disabled={items.length === 0}
           >
-            <Download className="w-4 h-4 mr-2" />
+            <Upload className="w-4 h-4 mr-2" />
             Exportar
           </Button>
         </div>
