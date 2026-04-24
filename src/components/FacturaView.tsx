@@ -2,6 +2,13 @@ import { QRCodeSVG } from "qrcode.react";
 import logoHeader from "@/assets/logo-header.png";
 import logoTickettt from "@/assets/Logo-Tickettt.png";
 
+const formatMoney = (value: number) => {
+  return new Intl.NumberFormat("es-AR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value || 0);
+};
+
 type Props = {
   factura: any;
   profile: any;
@@ -24,7 +31,20 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
   if (!factura || !budget) return null;
 
   const datos = preliminar ? budget.facturaPreliminar : factura;
-  const totalFinal = budget.total;
+  const subtotal =
+    Number(budget?.subtotal || 0) + Number(budget?.laborCost || 0);
+
+  const descuento = Number(budget?.discount || 0);
+
+  const totalARS = Math.round(subtotal - descuento);
+
+  const tipoCambio =
+    datos?.tipo_cambio || datos?.exchangeRate || 1;
+
+  const totalUSD =
+    datos?.moneda === "USD"
+      ? Math.round(totalARS / Number(tipoCambio))
+      : null;
   console.log("FACTURA:", factura);
   console.log("QR:", factura?.qr);
 
@@ -127,7 +147,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
             <p>Dirección: {budget.clientAddress}</p>
             <p>
               Condición frente al IVA:{" "}
-              {factura?.ivaCondition || "Consumidor Final"}
+              {factura?.ivaCondition || budget?.facturaPreliminar?.ivaCondition || "Consumidor Final"}
             </p>
           </>
         )}
@@ -143,7 +163,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
           <div className="flex justify-between">
             <span className="text-gray-600">Moneda</span>
             <span>
-              {datos?.currency === "USD"
+              {datos?.moneda === "USD"
                 ? "Dólares Estadounidenses (USD)"
                 : "Pesos Argentinos (ARS)"}
             </span>
@@ -154,33 +174,11 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
             <span>{datos?.formaPago || "Transferencia"}</span>
           </div>
 
-          {datos?.currency === "USD" && (
-            <>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Tipo de cambio</span>
-                <span>{datos?.exchangeRate || "-"}</span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total USD</span>
-                <span>
-                  {preliminar
-                    ? Math.floor(Number(budget.total) / Number(datos?.exchangeRate || 1)).toLocaleString("es-AR")
-                    : factura?.totalUSD
-                      ? Number(factura.totalUSD).toLocaleString("es-AR")
-                      : "-"}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total ARS</span>
-                <span>
-                  ${Number(
-                    preliminar ? budget.total : factura?.total || 0
-                  ).toLocaleString("es-AR")}
-                </span>
-              </div>
-            </>
+          {datos?.moneda === "USD" && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">Tipo de cambio</span>
+              <span>{datos?.tipo_cambio || "-"}</span>
+            </div>
           )}
 
         </div>
@@ -224,26 +222,42 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
       </div>
 
 
-      {/* TOTAL */}
+      {/* SUBTOTAL + DESCUENTO + TOTAL +TOTAL EN DOLARES */}
       <div className="px-3 pt-0 flex justify-end mb-3">
         <div className="text-right space-y-0">
 
           <p>
             Subtotal: $
-            {(Number(budget?.subtotal || 0) + Number(budget?.laborCost || 0))
-              .toLocaleString("es-AR")}
+            {Math.round(
+              Number(budget?.subtotal || 0) + Number(budget?.laborCost || 0)
+            ).toLocaleString("es-AR")}
           </p>
 
           {Number(budget?.discount || 0) > 0 && (
             <p className="text-red-600">
               Descuento: -$
-              {Number(budget.discount).toLocaleString("es-AR")}
+              {Math.round(Number(budget.discount)).toLocaleString("es-AR")}
             </p>
           )}
 
-          <p className="text-lg font-bold">
-            Total: ${Number(totalFinal || 0).toLocaleString("es-AR")}
+          {/* 🔥 SIEMPRE ARS */}
+          <p>
+            Total ARS:{" "}
+            <strong>
+              $ {totalARS.toLocaleString("es-AR")}
+            </strong>
           </p>
+
+          {/* 🔥 SOLO USD */}
+          {datos?.moneda === "USD" && (
+            <p>
+              Total USD:{" "}
+              <strong>
+                U$S{" "}
+                {totalUSD?.toLocaleString("es-AR")}
+              </strong>
+            </p>
+          )}
 
         </div>
       </div>
@@ -275,7 +289,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
               : "-"}
           </p>
 
-          {!preliminar && factura?.qr && (
+          {!preliminar && (
             <div
               className="qr-print"
               style={{
@@ -286,7 +300,14 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
               }}
             >
 
-              <QRCodeSVG value={factura.qr} size={90} />
+              <QRCodeSVG
+                value={factura?.qr || JSON.stringify({
+                  total: factura?.total,
+                  cliente: factura?.cliente,
+                  fecha: factura?.fecha
+                })}
+                size={90}
+              />
 
               <p style={{ fontSize: "12px", marginTop: 6 }}>
                 Comprobante autorizado por AFIP

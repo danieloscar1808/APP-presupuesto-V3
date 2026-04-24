@@ -48,6 +48,7 @@ const BudgetDetailPage = () => {
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const [recibo, setRecibo] = useState(null);
   const [confirmandoPago, setConfirmandoPago] = useState(false);
+  
 
   useEffect(() => {
     if (!loadingAFIP) return;
@@ -240,13 +241,15 @@ const BudgetDetailPage = () => {
       const ivaAmount = 0;
 
       // 👉 USD DESPUÉS DEL IVA
-      let totalUSD = "";
+      const totalARS = Math.round(Number(budget.total || 0));
+
+      let totalUSD = null;
 
       if (currency === "USD") {
         const rate = Number(exchangeRate || 0);
 
         if (rate > 0) {
-          totalUSD = String(Math.floor(totalFinal / rate));
+          totalUSD = Math.round(totalARS / rate);
         }
       }
 
@@ -263,22 +266,18 @@ const BudgetDetailPage = () => {
         body: JSON.stringify({
           cliente: budget.clientName,
 
-          // 🔥 TOTAL REAL (NO CONVERTIR)
-          total: esUSD ? totalUSD : totalFinal,
-          subtotal: esUSD ? totalUSD : totalFinal,
+          // 🔥 CLAVE
+          total: totalARS,        // 🔥 SIEMPRE ARS
+          subtotal: totalARS,
 
           moneda: esUSD ? "USD" : "ARS",
-          tipoCambio: esUSD ? exchangeRate : 1,
+          tipoCambio: esUSD ? Number(exchangeRate) : 1,
+
+          totalUSD: totalUSD,     // 🔥 NUEVO
 
           iva: 0,
           invoiceType: "C",
           ivaCondition: "Monotributista",
-<<<<<<< HEAD
-          moneda: budget.facturaPreliminar?.currency || "ARS",
-          tipoCambio: budget.facturaPreliminar?.exchangeRate || 1,
-          totalUsd: totalUSD,
-=======
->>>>>>> 3326edcc0a9dea944e3907474458c2071dc35e77
           formaPago,
           descripcion: "Trabajo de instalación"
         })
@@ -310,7 +309,9 @@ const BudgetDetailPage = () => {
         currency: budget.facturaPreliminar?.currency || currency,
         exchangeRate: budget.facturaPreliminar?.exchangeRate || exchangeRate,
 
-        totalUSD,
+        total_usd: totalUSD,
+        moneda: currency,
+        tipo_cambio: Number(exchangeRate) || null,
         formaPago: budget.facturaPreliminar?.formaPago || formaPago,
 
         cae: data.cae,
@@ -554,8 +555,18 @@ Gracias por tu confianza.`;
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            facturaNumero: budget.factura.numero,
-            total: budget.factura.total
+            facturaNumero: factura.numero,
+
+            total: factura.total, // 🔥 SIEMPRE ARS
+
+            moneda: factura.moneda || "ARS",
+
+            tipoCambio: factura.tipoCambio || null,
+
+            totalUSD:
+              factura.moneda === "USD"
+                ? Number(factura.total) / Number(factura.tipoCambio || 1)
+                : null,
           })
         }
       );
@@ -605,36 +616,33 @@ Gracias por tu confianza.`;
   const generarPreliminar = async () => {
     if (!budget) return;
 
+    const totalARS = Math.round(Number(budget.total || 0));
+
+    let totalUSD = null;
+
+    if (currency === "USD") {
+      const rate = Number(exchangeRate || 0);
+      if (rate > 0) {
+        totalUSD = Math.round(totalARS / rate);
+      }
+    }
+
     const updatedBudget = {
       ...budget,
       facturaPreliminar: {
         ivaCondition,
-        currency,
-        exchangeRate,
+        moneda: currency,
+        tipo_cambio: Number(exchangeRate) || null,
         formaPago,
+        total: totalARS,
+        total_usd: totalUSD,
       },
       status: "listo_para_facturar",
     };
 
-    const budgetLimpio = {
-      ...updatedBudget,
-      notaCredito: null // 🔥 clave
-    };
-
-    console.log("ANTES DE GUARDAR:", updatedBudget);
-
-    await saveBudget(budgetLimpio);
-    setBudget(budgetLimpio);
-
-    setTimeout(() => {
-      facturaRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }, 100);
+    await saveBudget(updatedBudget);
+    setBudget(updatedBudget);
   };
-
-
 
 
   const registrarPago = async () => {
@@ -647,9 +655,16 @@ Gracias por tu confianza.`;
         body: JSON.stringify({
           factura_id: factura?.numero,
           cliente: factura?.cliente,
+
           monto: factura?.total,
-          forma_pago: "Transferencia",
-          moneda: "ARS",
+
+          moneda: factura?.moneda || "ARS",
+
+          tipoCambio: factura?.tipoCambio || 1,
+
+          totalUSD: factura?.total_usd || null,
+
+          forma_pago: factura?.formaPago,
         }),
       });
 
@@ -660,12 +675,18 @@ Gracias por tu confianza.`;
         return;
       }
 
-      setConfirmandoPago(false); // 🔥 cerrar confirmación
-      setRecibo(data[0]); // ya lo tenías
+      if (!response.ok) {
+        alert("Error al registrar pago");
+        return;
+      }
+
+      // 🔥 primero guardás el recibo
+      setRecibo(data[0]);
+
+      // 🔥 después cerrás confirmación
+      setConfirmandoPago(false);
 
       console.log("RECIBO CREADO:", data);
-
-      setRecibo(data[0]); // 🔥 GUARDAMOS EL RECIBO
 
       alert("✅ Pago registrado");
     } catch (error) {
@@ -999,41 +1020,59 @@ Gracias por tu confianza.`;
                 Descargar Factura
               </Button>
 
-              <Button
-                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white mt-2"
-                onClick={() => setConfirmandoPago(true)}>
-                Registrar pago
-              </Button>
+              {/* 🔥 CONTROL TOTAL DEL FLUJO */}
 
-              {confirmandoPago && (
-                <div style={{
-                  background: "#fff3cd",
-                  padding: "10px",
-                  borderRadius: "6px",
-                  marginTop: "10px",
-                  textAlign: "center"
-                }}>
-                  <p>¿Confirmar registro de pago?</p>
+              {/* SOLO cuando factura está emitida */}
+              {factura?.cae && !recibo && !confirmandoPago && (
+                <Button
+                  className="w-full bg-yellow-600 hover:bg-yellow-700 text-white mt-2"
+                  onClick={() => setConfirmandoPago(true)}
+                >
+                  Registrar pago
+                </Button>
+              )}
 
-                  <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+              {/* CONFIRMACION */}
+              {factura?.cae && confirmandoPago && !recibo && (
+                <div
+                  style={{
+                    background: "#fff3cd",
+                    padding: "10px",
+                    borderRadius: "6px",
+                    marginTop: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between"
+                  }}
+                >
+                  <span>¿Confirmar pago?</span>
+
+                  <div style={{ display: "flex", gap: "10px" }}>
                     <Button onClick={registrarPago}>
-                      ✅ Sí
+                      SI
                     </Button>
 
-                    <Button variant="outline" onClick={() => setConfirmandoPago(false)}>
-                      ❌ Cancelar
+                    <Button
+                      variant="outline"
+                      onClick={() => setConfirmandoPago(false)}
+                    >
+                      NO
                     </Button>
                   </div>
                 </div>
               )}
 
-              {recibo && (
+              {/* RECIBO LISTO */}
+              {factura?.cae && recibo && (
                 <Button
                   className="w-full bg-gray-500 hover:bg-gray-700 text-white mt-2"
-                  onClick={() => imprimirRecibo()}>
+                  onClick={imprimirRecibo}
+                >
                   Imprimir Recibo
                 </Button>
               )}
+
+              
 
 
 

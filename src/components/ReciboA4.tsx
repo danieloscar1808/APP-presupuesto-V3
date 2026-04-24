@@ -56,11 +56,14 @@ export const ReciboA4 = ({ recibo }) => {
           </p>
 
           <p>
-            La suma de:{" "}
-            <strong style={{ fontSize: "18px" }}>
-              ${formatMoney(recibo.monto)}
-            </strong>
-          </p>
+  La suma de:{" "}
+  <strong style={{ fontSize: "18px" }}>
+    {recibo.moneda === "USD"
+      ? `U$S ${formatMoney(recibo.monto_usd || 0)}`
+      : `$ ${formatMoney(recibo.monto || 0)}`
+    }
+  </strong>
+</p>
 
           <p>
             En concepto de: Pago correspondiente a factura{" "}
@@ -75,8 +78,9 @@ export const ReciboA4 = ({ recibo }) => {
             Moneda:{" "}
             <strong>
               {recibo.moneda === "USD"
-                ? "Dólares (USD)"
-                : "Pesos (ARS)"}
+                ? "Dólares Estadounidenses (USD)"
+                : "Pesos (ARS)"
+              }
             </strong>
           </p>
 
