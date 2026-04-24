@@ -265,9 +265,9 @@ const BudgetDetailPage = () => {
           iva: 0,
           invoiceType: "C",
           ivaCondition: "Monotributista",
-          currency,
-          exchangeRate,
-          totalUSD,
+          moneda: budget.facturaPreliminar?.currency || "ARS",
+          tipoCambio: budget.facturaPreliminar?.exchangeRate || 1,
+          totalUsd: totalUSD,
           formaPago,
           descripcion: "Trabajo de instalación"
         })
