@@ -46,9 +46,36 @@ const BudgetDetailPage = () => {
   const [loadingAFIP, setLoadingAFIP] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
-  const [recibo, setRecibo] = useState(null);
   const [confirmandoPago, setConfirmandoPago] = useState(false);
-  
+  const [procesandoPago, setProcesandoPago] = useState(false);
+  const [recibo, setRecibo] = useState(null);
+
+
+  useEffect(() => {
+    const obtenerRecibo = async () => {
+      try {
+        const res = await fetch(
+          `https://facturacion-server-backend.onrender.com/api/recibo/${factura?.numero}`
+        );
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        if (data) {
+          setRecibo(data);
+        }
+
+      } catch (err) {
+        console.error("Error cargando recibo:", err);
+      }
+    };
+
+    if (factura?.numero) {
+      obtenerRecibo();
+    }
+  }, [factura]);
+
 
   useEffect(() => {
     if (!loadingAFIP) return;
@@ -647,51 +674,43 @@ Gracias por tu confianza.`;
 
   const registrarPago = async () => {
     try {
-      const response = await fetch("https://facturacion-server-backend.onrender.com/api/recibo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          factura_id: factura?.numero,
-          cliente: factura?.cliente,
+      setProcesandoPago(true); // 🔥 inicia animación
 
-          monto: factura?.total,
-
-          moneda: factura?.moneda || "ARS",
-
-          tipoCambio: factura?.tipoCambio || 1,
-
-          totalUSD: factura?.total_usd || null,
-
-          forma_pago: factura?.formaPago,
-        }),
-      });
+      const response = await fetch(
+        "https://facturacion-server-backend.onrender.com/api/recibo",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            factura_id: factura?.numero,
+            cliente: factura?.cliente,
+            monto: factura?.total,
+            forma_pago: factura?.formaPago,
+            moneda: factura?.moneda,
+            tipoCambio: factura?.tipo_cambio,
+            totalUSD: factura?.total_usd
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
         alert("Error al registrar pago");
+        setProcesandoPago(false);
         return;
       }
 
-      if (!response.ok) {
-        alert("Error al registrar pago");
-        return;
-      }
-
-      // 🔥 primero guardás el recibo
       setRecibo(data[0]);
 
-      // 🔥 después cerrás confirmación
-      setConfirmandoPago(false);
+      setProcesandoPago(false); // 🔥 termina animación
 
-      console.log("RECIBO CREADO:", data);
-
-      alert("✅ Pago registrado");
     } catch (error) {
       console.error(error);
       alert("Error de conexión");
+      setProcesandoPago(false);
     }
   };
 
@@ -1011,6 +1030,44 @@ Gracias por tu confianza.`;
               </div>
             )}
 
+            {/* SOLO cuando factura está emitida */}
+            {/* 🔥 FLUJO AUTOMÁTICO */}
+
+            {factura?.cae && !recibo && !procesandoPago && (
+              <Button
+                className="w-full bg-yellow-600 hover:bg-yellow-700 text-white mt-2"
+                onClick={registrarPago}
+              >
+                Registrar pago
+              </Button>
+            )}
+
+            {procesandoPago && (
+              <div
+                className="w-full mt-2 flex items-center justify-center rounded-md border"
+                style={{
+                  height: "42px",
+                  background: "#e3f2fd",
+                  color: "#0d47a1",
+                  fontWeight: "500"
+                }}
+              >
+                Procesando pago...
+              </div>
+            )}
+
+            {factura?.cae && recibo && !procesandoPago && (
+              <Button
+                className="w-full bg-gray-500 hover:bg-gray-700 text-white mt-2"
+                onClick={imprimirRecibo}
+              >
+                Imprimir Recibo
+              </Button>
+            )}
+
+
+
+
             {/* BOTÓN PDF */}
             <div className="mt-2">
               <Button
@@ -1019,61 +1076,6 @@ Gracias por tu confianza.`;
               >
                 Descargar Factura
               </Button>
-
-              {/* 🔥 CONTROL TOTAL DEL FLUJO */}
-
-              {/* SOLO cuando factura está emitida */}
-              {factura?.cae && !recibo && !confirmandoPago && (
-                <Button
-                  className="w-full bg-yellow-600 hover:bg-yellow-700 text-white mt-2"
-                  onClick={() => setConfirmandoPago(true)}
-                >
-                  Registrar pago
-                </Button>
-              )}
-
-              {/* CONFIRMACION */}
-              {factura?.cae && confirmandoPago && !recibo && (
-                <div
-                  style={{
-                    background: "#fff3cd",
-                    padding: "10px",
-                    borderRadius: "6px",
-                    marginTop: "10px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between"
-                  }}
-                >
-                  <span>¿Confirmar pago?</span>
-
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <Button onClick={registrarPago}>
-                      SI
-                    </Button>
-
-                    <Button
-                      variant="outline"
-                      onClick={() => setConfirmandoPago(false)}
-                    >
-                      NO
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* RECIBO LISTO */}
-              {factura?.cae && recibo && (
-                <Button
-                  className="w-full bg-gray-500 hover:bg-gray-700 text-white mt-2"
-                  onClick={imprimirRecibo}
-                >
-                  Imprimir Recibo
-                </Button>
-              )}
-
-              
-
 
 
               <Button
