@@ -21,8 +21,10 @@ import { useFacturasStore } from "../store/facturasStore";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Server, Building2 } from "lucide-react";
 import { FacturaTicket80mm } from "@/components/FacturaTicket80mm";
+import { NotaCreditoTicket80mm } from "@/components/NotaCreditoTicket80mm";
 import ReactDOMServer from "react-dom/server";
 import { FacturaA4 } from "@/components/FacturaA4";
+import { NotaCreditoA4 } from "@/components/NotaCreditoA4";
 import supabase from "../database/supabaseClient.js";
 import { ReciboA4 } from "@/components/ReciboA4";
 import { ReciboTicket80mm } from "@/components/ReciboTicket80mm";
@@ -49,6 +51,20 @@ const BudgetDetailPage = () => {
   const [loadingAFIP, setLoadingAFIP] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showDownloadOptions, setShowDownloadOptions] = useState(false);
+  const [showNotaCreditoDownloadOptions, setShowNotaCreditoDownloadOptions] = useState(false);
+  const [showCancelReasonModal, setShowCancelReasonModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState<string>("Anulación total de la operación");
+  const [cancelReasonOther, setCancelReasonOther] = useState("");
+  const cancelReasonOptions = [
+    "Anulación total de la operación",
+    "Error en datos del cliente",
+    "Error en importe",
+    "Bonificación / descuento",
+    "Devolución de productos",
+    "Rescisión de servicio",
+    "Ajuste administrativo",
+    "Otro (especificar)",
+  ];
   const [confirmandoPago, setConfirmandoPago] = useState(false);
   const [procesandoPago, setProcesandoPago] = useState(false);
   const [recibo, setRecibo] = useState(null);
@@ -473,6 +489,52 @@ const BudgetDetailPage = () => {
     }, 1000);
   };
 
+  const descargarNotaCreditoPDFA4 = () => {
+    if (!budget?.notaCredito) return;
+
+    const contenido = document.getElementById("nota-credito-a4");
+    if (!contenido) return;
+
+    const clientNameSanitized = budget.clientName.replace(/[^a-zA-Z0-9]/g, '_').replace(/\s+/g, '_');
+    const filename = `NotaCredito_${clientNameSanitized}_${budget.notaCredito.numero}.pdf`;
+
+    contenido.style.display = "block";
+    contenido.style.top = "0";
+    contenido.style.left = "0";
+
+    setTimeout(() => {
+      html2canvas(contenido, { scale: 2, useCORS: true }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+
+        if (imgHeight <= pageHeight) {
+          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        } else {
+          let heightLeft = imgHeight;
+          let position = 0;
+
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          while (heightLeft > pageHeight) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+        }
+
+        pdf.save(filename);
+        contenido.style.display = "none";
+        contenido.style.top = "-9999px";
+        contenido.style.left = "-9999px";
+      });
+    }, 1000);
+  };
+
 
   const imprimirTicket80mm = () => {
     const clientNameSanitized = budget.clientName.replace(/[^a-zA-Z0-9]/g, '_').replace(/\s+/g, '_');
@@ -484,6 +546,62 @@ const BudgetDetailPage = () => {
       <FacturaTicket80mm
         profile={profile}
         factura={factura}
+        budget={budget}
+      />
+    );
+
+    ventana.document.write(`
+    <html>
+      <head>
+        <title>${title}</title>
+        <style>
+          @page {
+            size: 80mm auto;
+            margin: 0;
+          }
+
+          body {
+            margin: 0;
+            padding: 0;
+            width: 80mm;
+          }
+        </style>
+      </head>
+
+      <body>
+        ${html}
+
+        <div style="text-align:center; margin-top:10px;">
+          <button onclick="window.print()"
+            style="padding:10px; background:black; color:white; border:none; width:90%;">
+            Imprimir
+          </button>
+        </div>
+      </body>
+    </html>
+  `);
+
+    ventana.document.close();
+  };
+
+  const imprimirNotaCreditoTicket80mm = () => {
+    if (!budget?.notaCredito) return;
+
+    const notaFactura = {
+      ...budget.factura,
+      ...budget.notaCredito,
+      numero: budget.notaCredito?.numero,
+    };
+
+    const clientNameSanitized = budget.clientName.replace(/[^a-zA-Z0-9]/g, '_').replace(/\s+/g, '_');
+    const title = `NotaCredito_${clientNameSanitized}_${budget.notaCredito.numero}`;
+
+    const ventana = window.open("", "_blank");
+
+    const html = ReactDOMServer.renderToString(
+      <NotaCreditoTicket80mm
+        profile={profile}
+        factura={notaFactura}
         budget={budget}
       />
     );
@@ -633,25 +751,27 @@ Gracias por tu confianza.`;
     window.open(url, "_blank");
   };
 
-  const cancelarFactura = async () => {
-
-    // 🔒 EVITA DOBLE CLICK
-    if (loadingAFIP) return;
-
-    if (budget.notaCredito) {
+  const handleStartCancelFactura = () => {
+    if (budget?.notaCredito) {
       alert("Esta factura ya fue cancelada");
       return;
     }
 
-    if (!budget.factura) {
+    if (!budget?.factura) {
       alert("No hay factura para cancelar");
       return;
     }
 
-    const confirmar = confirm("¿Deseás cancelar esta factura?");
-    if (!confirmar) return;
+    setCancelReason("Anulación total de la operación");
+    setCancelReasonOther("");
+    setShowCancelReasonModal(true);
+  };
 
-    setLoadingAFIP(true); // 🔥 ACTIVA ANIMACIÓN
+  const cancelarFactura = async (motivo: string) => {
+    if (loadingAFIP) return;
+
+    setLoadingAFIP(true);
+    setShowCancelReasonModal(false);
 
     try {
       const response = await fetch(
@@ -663,17 +783,14 @@ Gracias por tu confianza.`;
           },
           body: JSON.stringify({
             facturaNumero: factura.numero,
-
-            total: factura.total, // 🔥 SIEMPRE ARS
-
+            total: factura.total,
             moneda: factura.moneda || "ARS",
-
             tipoCambio: factura.tipoCambio || null,
-
             totalUSD:
               factura.moneda === "USD"
                 ? Number(factura.total) / Number(factura.tipoCambio || 1)
                 : null,
+            motivo,
           })
         }
       );
@@ -682,12 +799,13 @@ Gracias por tu confianza.`;
 
       const dataConNumero = {
         numero: data.numero,
-        facturaAsociada: data.facturaAsociada,
+        facturaAsociada: data.facturaAsociada || factura.numero,
         total: Math.round(Number(data.total || 0)),
         CAE: data.CAE,
         vencimiento: data.vencimiento,
         fecha: new Date().toISOString(),
-        qr: data.qr
+        qr: data.qr,
+        motivo,
       };
 
       cancelarFacturaStore(
@@ -701,23 +819,27 @@ Gracias por tu confianza.`;
         status: "cancelado"
       };
 
-      // ✅ TODO ADENTRO DEL TRY
       await saveBudget(updatedBudgetCancelado);
       setBudget(updatedBudgetCancelado);
 
-      // 🔥 FINAL PROCESO
       setProgress(100);
 
       setTimeout(() => {
         setLoadingAFIP(false);
       }, 500);
-
     } catch (error) {
       console.error("Error al cancelar factura", error);
-
-      // 🔴 IMPORTANTE
       setLoadingAFIP(false);
     }
+  };
+
+  const handleConfirmCancelFactura = async () => {
+    const reason = cancelReason === "Otro (especificar)" ? cancelReasonOther.trim() : cancelReason;
+    if (!reason) {
+      alert("Por favor ingresa una razón para la cancelación.");
+      return;
+    }
+    await cancelarFactura(reason);
   };
 
   const generarPreliminar = async () => {
@@ -1204,6 +1326,14 @@ Gracias por tu confianza.`;
                 Descargar Factura
               </Button>
 
+              {budget?.notaCredito && (
+                <Button
+                  className="w-full bg-slate-800 hover:bg-slate-900 text-white mt-2"
+                  onClick={() => setShowNotaCreditoDownloadOptions(true)}
+                >
+                  Descargar Nota de Crédito
+                </Button>
+              )}
 
               <Button
                 className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
@@ -1223,7 +1353,7 @@ Gracias por tu confianza.`;
               ) : (
                 <Button
                   className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
-                  onClick={cancelarFactura}
+                  onClick={handleStartCancelFactura}
                 >
                   Cancelar Factura
                 </Button>
@@ -1363,6 +1493,93 @@ Gracias por tu confianza.`;
           </div>
         )}
 
+        {showNotaCreditoDownloadOptions && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl w-[280px] space-y-4">
+              <h2 className="text-center font-bold">Elegir formato</h2>
+
+              <Button
+                className="w-full"
+                onClick={() => {
+                  descargarNotaCreditoPDFA4();
+                  setShowNotaCreditoDownloadOptions(false);
+                }}
+              >
+                📄 Nota de Crédito A4
+              </Button>
+
+              <Button
+                className="w-full bg-gray-800 text-white"
+                onClick={() => {
+                  imprimirNotaCreditoTicket80mm();
+                  setShowNotaCreditoDownloadOptions(false);
+                }}
+              >
+                🧾 Nota de Crédito 80mm
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => setShowNotaCreditoDownloadOptions(false)}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {showCancelReasonModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+              <h2 className="text-xl font-bold text-center">Motivo de la cancelación</h2>
+              <p className="text-sm text-muted-foreground text-center">
+                Selecciona una razón para justificar la anulación de la factura.
+              </p>
+
+              <div className="space-y-2 max-h-64 overflow-auto">
+                {cancelReasonOptions.map((option) => (
+                  <label key={option} className="flex items-center gap-3 rounded-xl border p-3 cursor-pointer hover:bg-slate-50">
+                    <input
+                      type="radio"
+                      name="cancelReason"
+                      value={option}
+                      checked={cancelReason === option}
+                      onChange={() => setCancelReason(option)}
+                      className="h-4 w-4"
+                    />
+                    <span className="text-sm">{option}</span>
+                  </label>
+                ))}
+              </div>
+
+              {cancelReason === "Otro (especificar)" && (
+                <textarea
+                  value={cancelReasonOther}
+                  onChange={(event) => setCancelReasonOther(event.target.value)}
+                  placeholder="Describe el motivo"
+                  className="w-full rounded-xl border p-3 text-sm resize-none h-24"
+                />
+              )}
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setShowCancelReasonModal(false)}
+                >
+                  Volver
+                </Button>
+                <Button
+                  className="w-full"
+                  onClick={handleConfirmCancelFactura}
+                >
+                  Aceptar
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ANIMACIÓN AFIP PRO */}
         {loadingAFIP && (
@@ -1453,6 +1670,16 @@ Gracias por tu confianza.`;
           budget={budget}
         />
       </div>
+
+      {budget?.notaCredito && (
+        <div style={{ display: "none", position: "absolute", top: "-9999px", left: "-9999px" }} id="nota-credito-a4">
+          <NotaCreditoA4
+            profile={profile}
+            factura={budget.notaCredito}
+            budget={budget}
+          />
+        </div>
+      )}
 
       {recibo && (
         <div style={{ position: "absolute", left: "-9999px", top: "0" }} id="recibo-a4">

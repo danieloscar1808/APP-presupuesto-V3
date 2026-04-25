@@ -325,33 +325,39 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
             ⚠️ Factura anulada mediante Nota de Crédito
           </p>
 
-          {budget?.notaCredito?.numero && (
-            <div className="mt-2 p-2 border rounded bg-red-50 text-red-700">
-              <p className="font-bold text-[15px] mb-1">NOTA DE CRÉDITO C</p>
+          <div className="mt-2 p-2 border rounded bg-red-50 text-red-700">
+            <p className="font-bold text-[15px] mb-1">NOTA DE CRÉDITO C</p>
 
-              <p>Número NC: {budget.notaCredito.numero}</p>
+            <p>Número NC: {budget.notaCredito.numero || "—"}</p>
 
+            <p>
+              <strong>Cae:</strong> {budget.notaCredito.CAE || budget.notaCredito.cae || "-"}
+            </p>
+
+            <p>
+              <strong>Vencimiento Cae:</strong>{" "}
+              {budget.notaCredito.vencimiento
+                ? new Date(budget.notaCredito.vencimiento).toLocaleDateString()
+                : budget.notaCredito.vencimiento
+                ? new Date(budget.notaCredito.vencimiento).toLocaleDateString()
+                : "-"}
+            </p>
+
+            <p>
+              Factura Asociada: {budget.notaCredito.facturaAsociada || factura?.numero || "—"}
+            </p>
+
+            {budget?.notaCredito?.motivo && (
               <p>
-                <strong>Cae:</strong> {budget.notaCredito.CAE || "-"}
+                <strong>Motivo:</strong> {budget.notaCredito.motivo}
               </p>
+            )}
 
-              <p>
-                <strong>Vencimiento Cae:</strong>{" "}
-                {budget.notaCredito.vencimiento
-                  ? new Date(budget.notaCredito.vencimiento).toLocaleDateString()
-                  : "-"}
-              </p>
-
-              <p>
-                Factura Asociada: {factura?.numero || "—"}
-              </p>
-
-              <p>
-                Total: $
-                {Number(budget?.notaCredito?.total || 0).toLocaleString("es-AR")}
-              </p>
-            </div>
-          )}
+            <p>
+              Total: $
+              {Number(budget?.notaCredito?.total || 0).toLocaleString("es-AR")}
+            </p>
+          </div>
         </div>
       )}
     </div>
