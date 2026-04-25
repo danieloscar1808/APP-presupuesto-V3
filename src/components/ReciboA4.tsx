@@ -1,16 +1,109 @@
 import logoTickettt from "@/assets/Logo-Tickettt.png";
 
+const numeroALetras = (num, moneda) => {
+  const unidades = [
+    "", "uno", "dos", "tres", "cuatro", "cinco",
+    "seis", "siete", "ocho", "nueve"
+  ];
+
+  const especiales = [
+    "diez", "once", "doce", "trece", "catorce",
+    "quince", "dieciséis", "diecisiete",
+    "dieciocho", "diecinueve"
+  ];
+
+  const decenas = [
+    "", "", "veinte", "treinta", "cuarenta",
+    "cincuenta", "sesenta", "setenta",
+    "ochenta", "noventa"
+  ];
+
+  const centenas = [
+    "", "ciento", "doscientos", "trescientos",
+    "cuatrocientos", "quinientos",
+    "seiscientos", "setecientos",
+    "ochocientos", "novecientos"
+  ];
+
+  const convertir = (n) => {
+    if (n === 0) return "cero";
+    if (n === 100) return "cien";
+
+    let texto = "";
+
+    const c = Math.floor(n / 100);
+    const d = Math.floor((n % 100) / 10);
+    const u = n % 10;
+
+    if (c > 0) texto += centenas[c] + " ";
+
+    if (d === 1) {
+      texto += especiales[u];
+    } else if (d === 2 && u !== 0) {
+      texto += "veinti" + unidades[u];
+    } else {
+      if (d > 1) {
+        texto += decenas[d];
+        if (u > 0) texto += " y ";
+      }
+      if (u > 0) texto += unidades[u];
+    }
+
+    return texto.trim();
+  };
+
+  const numero = Math.round(num);
+
+  let resultado = "";
+
+  if (numero >= 1000) {
+    const miles = Math.floor(numero / 1000);
+    const resto = numero % 1000;
+
+    if (miles === 1) {
+      resultado = "mil";
+    } else {
+      resultado = convertir(miles) + " mil";
+    }
+
+    if (resto > 0) {
+      resultado += " " + convertir(resto);
+    }
+  } else {
+    resultado = convertir(numero);
+  }
+
+  resultado =
+    resultado.charAt(0).toUpperCase() + resultado.slice(1);
+
+  if (moneda === "USD") {
+    return resultado + " dólares estadounidenses";
+  }
+
+  return resultado + " pesos argentinos";
+};
+
+
+
 export const ReciboA4 = ({ recibo }) => {
   const formatMoney = (n) =>
     Number(n || 0).toLocaleString("es-AR");
 
+  const montoARS = Number(recibo.monto || 0);
+  const montoUSD = Number(recibo.monto_usd || 0);
+
+  const montoMostrado =
+    recibo.moneda === "USD" ? montoUSD : montoARS;
+
+
   return (
     <div
+      id="recibo-a4"
       style={{
         width: "210mm",
         minHeight: "297mm",
         margin: "0 auto",
-        padding: "10mm",
+        padding: "40mm",
         background: "white",
         fontFamily: "Arial, sans-serif"
       }}
@@ -34,7 +127,7 @@ export const ReciboA4 = ({ recibo }) => {
         >
           <img
             src={logoTickettt}
-            style={{ width: "180px" }}
+            style={{ width: "50%" }}
           />
 
           <div style={{ textAlign: "right" }}>
@@ -56,14 +149,21 @@ export const ReciboA4 = ({ recibo }) => {
           </p>
 
           <p>
-  La suma de:{" "}
-  <strong style={{ fontSize: "18px" }}>
-    {recibo.moneda === "USD"
-      ? `U$S ${formatMoney(recibo.monto_usd || 0)}`
-      : `$ ${formatMoney(recibo.monto || 0)}`
-    }
-  </strong>
-</p>
+            La suma de:{" "}
+            <strong style={{ fontSize: "18px" }}>
+              {recibo.moneda === "USD"
+                ? `U$S ${formatMoney(recibo.monto_usd || 0)}`
+                : `$ ${formatMoney(recibo.monto || 0)}`
+              }
+            </strong>
+          </p>
+
+          <p>
+            Son:{" "}
+            <strong>
+              {numeroALetras(montoMostrado, recibo.moneda)}
+            </strong>
+          </p>
 
           <p>
             En concepto de: Pago correspondiente a factura{" "}
@@ -84,12 +184,40 @@ export const ReciboA4 = ({ recibo }) => {
             </strong>
           </p>
 
+          {recibo.moneda === "USD" && (
+            <p>
+              Tipo de cambio:{" "}
+              <strong>{formatMoney(recibo.tipo_cambio)}</strong>
+            </p>
+          )}
+
           {recibo.observaciones && (
             <p>
               Observaciones: {recibo.observaciones}
             </p>
           )}
         </div>
+
+        <div style={{ marginTop: "10px", fontSize: "15px" }}>
+
+          <p>
+            Total ARS:{" "}
+            <strong>
+              $ {formatMoney(montoARS)}
+            </strong>
+          </p>
+
+          {recibo.moneda === "USD" && (
+            <p>
+              Total USD:{" "}
+              <strong>
+                U$S {formatMoney(montoUSD)}
+              </strong>
+            </p>
+          )}
+
+        </div>
+
 
         <hr style={{ margin: "20px 0" }} />
 

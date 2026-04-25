@@ -23,6 +23,7 @@ import ReactDOMServer from "react-dom/server";
 import { FacturaA4 } from "@/components/FacturaA4";
 import supabase from "../database/supabaseClient.js";
 import { ReciboA4 } from "@/components/ReciboA4";
+import { ReciboTicket80mm } from "@/components/ReciboTicket80mm";
 
 
 const BudgetDetailPage = () => {
@@ -49,6 +50,7 @@ const BudgetDetailPage = () => {
   const [confirmandoPago, setConfirmandoPago] = useState(false);
   const [procesandoPago, setProcesandoPago] = useState(false);
   const [recibo, setRecibo] = useState(null);
+  const [showReciboOptions, setShowReciboOptions] = useState(false);
 
 
   useEffect(() => {
@@ -511,6 +513,70 @@ const BudgetDetailPage = () => {
 
     ventana.document.close();
   };
+
+  const imprimirReciboA4 = () => {
+    const contenido = document.getElementById("recibo-a4");
+
+    const ventana = window.open("", "", "width=800,height=600");
+
+    ventana.document.write(`
+    <html>
+      <head>
+        <title>Recibo</title>
+      </head>
+      <body>
+        ${contenido.innerHTML}
+      </body>
+    </html>
+  `);
+
+    ventana.document.close();
+    ventana.print();
+  };
+
+
+  const imprimirReciboTicket80mm = () => {
+    const ventana = window.open("", "_blank");
+
+    const html = ReactDOMServer.renderToString(
+      <ReciboTicket80mm recibo={recibo} />
+    );
+
+    ventana.document.write(`
+    <html>
+      <head>
+        <title>Recibo 80mm</title>
+        <style>
+          @page {
+            size: 80mm auto;
+            margin: 0;
+          }
+
+          body {
+            margin: 0;
+            padding: 0;
+            width: 80mm;
+            font-family: monospace;
+          }
+        </style>
+      </head>
+
+      <body>
+        ${html}
+
+        <div style="text-align:center; margin-top:10px;">
+          <button onclick="window.print()"
+            style="padding:10px; background:black; color:white; border:none; width:90%;">
+            Imprimir
+          </button>
+        </div>
+      </body>
+    </html>
+  `);
+
+    ventana.document.close();
+  };
+
 
 
   const formatearTelefono = (telefono: string) => {
@@ -1059,10 +1125,54 @@ Gracias por tu confianza.`;
             {factura?.cae && recibo && !procesandoPago && (
               <Button
                 className="w-full bg-gray-500 hover:bg-gray-700 text-white mt-2"
-                onClick={imprimirRecibo}
+                onClick={() => setShowReciboOptions(true)}
               >
                 Imprimir Recibo
               </Button>
+            )}
+
+
+            {showReciboOptions && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+                <div className="bg-white p-6 rounded-xl w-[280px] space-y-4">
+
+                  <h2 className="text-center font-bold">Elegir formato</h2>
+
+                  {/* PDF A4 */}
+                  <Button
+                    className="w-full"
+                    onClick={() => {
+                      imprimirReciboA4();
+                      setShowReciboOptions(false);
+                    }}
+                  >
+                    📄 Recibo A4
+                  </Button>
+
+                  {/* TICKET */}
+                  <Button
+                    className="w-full bg-gray-800 text-white"
+                    onClick={() => {
+                      imprimirReciboTicket80mm();
+                      setShowReciboOptions(false);
+                    }}
+                  >
+                    🧾 Recibo 80mm
+                  </Button>
+
+                  {/* CANCELAR */}
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => setShowReciboOptions(false)}
+                  >
+                    Cancelar
+                  </Button>
+
+                </div>
+
+              </div>
             )}
 
 
@@ -1208,7 +1318,7 @@ Gracias por tu confianza.`;
                   setShowDownloadOptions(false);
                 }}
               >
-                📄 PDF A4
+                📄 Factura A4
               </Button>
 
               {/* TICKET */}
@@ -1219,7 +1329,7 @@ Gracias por tu confianza.`;
                   setShowDownloadOptions(false);
                 }}
               >
-                🧾 Ticket 80mm
+                🧾 Factura 80mm
               </Button>
 
               {/* CANCELAR */}
@@ -1330,6 +1440,12 @@ Gracias por tu confianza.`;
       {recibo && (
         <div style={{ display: "none" }} id="recibo-a4">
           <ReciboA4 recibo={recibo} />
+        </div>
+      )}
+
+      {recibo && (
+        <div style={{ display: "none" }}>
+          <ReciboTicket80mm recibo={recibo} />
         </div>
       )}
 
