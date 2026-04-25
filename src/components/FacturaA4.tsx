@@ -9,6 +9,24 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
   const puntoVenta = factura?.numero?.split("-")?.[0];
   const numeroComp = factura?.numero?.split("-")?.[1];
 
+  const datos = factura;
+
+  const subtotal =
+    Number(budget?.subtotal || 0) +
+    Number(budget?.laborCost || 0);
+
+  const descuento = Number(budget?.discount || 0);
+
+  const totalARS = Math.round(subtotal - descuento);
+
+  const tipoCambio =
+    datos?.tipo_cambio || datos?.exchangeRate || 1;
+
+  const totalUSD =
+    datos?.moneda === "USD"
+      ? Math.round(totalARS / Number(tipoCambio))
+      : null;
+
   return (
     <div
       style={{
@@ -70,7 +88,13 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
             <div>{factura?.cliente || budget?.clientName}</div>
             <div>{budget?.clientDocType}: {budget?.clientDocNumber}</div>
             <div>{budget?.clientAddress}</div>
-            <div>Cond. IVA: {budget?.clientIvaCondition || "Consumidor Final"}</div>
+            <div>
+              Cond. IVA:{" "}
+              {factura?.ivaCondition ||
+                budget?.facturaPreliminar?.ivaCondition ||
+                budget?.clientIvaCondition ||
+                "Consumidor Final"}
+            </div>
           </div>
 
         </div>
@@ -84,29 +108,22 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span>Moneda</span>
             <span>
-              {(factura?.currency || budget?.facturaPreliminar?.currency) === "USD"
-                ? "Dólares (USD)"
-                : "Pesos (ARS)"}
+              {datos?.moneda === "USD"
+                ? "Dólares Estadounidenses (USD)"
+                : "Pesos Argentinos (ARS)"}
             </span>
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span>Forma de pago</span>
-            <span>{factura?.formaPago || budget?.facturaPreliminar?.formaPago}</span>
+            <span>{datos?.formaPago}</span>
           </div>
 
-          {(factura?.currency === "USD" || budget?.facturaPreliminar?.currency === "USD") && (
-            <>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Tipo de cambio</span>
-                <span>{formatMoney(factura?.exchangeRate)}</span>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Total USD</span>
-                <span>{formatMoney(factura?.totalUSD)}</span>
-              </div>
-            </>
+          {datos?.moneda === "USD" && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Tipo de cambio</span>
+              <span>{formatMoney(tipoCambio)}</span>
+            </div>
           )}
         </div>
 
@@ -147,18 +164,27 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
         <div style={{ textAlign: "right", marginTop: "10px" }}>
           <div>
             Subtotal: $
-            {formatMoney((budget.subtotal || 0) + (budget.laborCost || 0))}
+            {Math.round(subtotal).toLocaleString("es-AR")}
           </div>
 
-          {budget.discount > 0 && (
+          {descuento > 0 && (
             <div>
-              Descuento: -${formatMoney(budget.discount)}
+              Descuento: -$
+              {Math.round(descuento).toLocaleString("es-AR")}
             </div>
           )}
 
-          <div style={{ fontWeight: "bold", fontSize: "16px" }}>
-            TOTAL: ${formatMoney(factura?.total || budget.total)}
+          <div style={{ fontWeight: "bold" }}>
+            Total ARS: $
+            {totalARS.toLocaleString("es-AR")}
           </div>
+
+          {datos?.moneda === "USD" && (
+            <div style={{ fontWeight: "bold" }}>
+              Total USD: U$S{" "}
+              {totalUSD?.toLocaleString("es-AR")}
+            </div>
+          )}
         </div>
 
         <hr />
@@ -202,6 +228,6 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
 
       </div>
 
-    </div>
+    </div >
   );
 };

@@ -8,6 +8,23 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
   const puntoVenta = factura?.numero?.split("-")?.[0];
   const numeroComp = factura?.numero?.split("-")?.[1];
 
+  const datos = factura;
+
+  const subtotal =
+    Number(budget?.subtotal || 0) +
+    Number(budget?.laborCost || 0);
+
+  const descuento = Number(budget?.discount || 0);
+
+  const totalARS = Math.round(subtotal - descuento);
+
+  const tipoCambio =
+    datos?.tipo_cambio || datos?.exchangeRate || 1;
+
+  const totalUSD =
+    datos?.moneda === "USD"
+      ? Math.round(totalARS / Number(tipoCambio))
+      : null;
 
   return (
     <div
@@ -32,20 +49,20 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
         />
       </div>
 
-      <hr style={{ border: "none", borderTop: "1px solid black", margin: "2px 0" }}/>
+      <hr style={{ border: "none", borderTop: "1px solid black", margin: "2px 0" }} />
 
       <div style={{ textAlign: "center" }}>
-  <h1
-    style={{
-      fontSize: "28px",
-      fontWeight: "bold",
-      margin: "0",
-      textAlign: "center"
-    }}
-  >
-    FACTURA C
-  </h1>
-</div>
+        <h1
+          style={{
+            fontSize: "28px",
+            fontWeight: "bold",
+            margin: "0",
+            textAlign: "center"
+          }}
+        >
+          FACTURA C
+        </h1>
+      </div>
 
       <hr
         style={{
@@ -91,7 +108,13 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
           {budget?.clientDocNumber}
         </div>
         <div>{budget?.clientAddress}</div>
-        <div>Cond. IVA: {budget?.clientIvaCondition || "Consumidor Final"}</div>
+        <div>
+          Cond. IVA:{" "}
+          {factura?.ivaCondition ||
+            budget?.facturaPreliminar?.ivaCondition ||
+            budget?.clientIvaCondition ||
+            "Consumidor Final"}
+        </div>
       </div>
 
       <hr />
@@ -108,7 +131,7 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span>Moneda</span>
             <span>
-              {(factura?.currency || budget?.facturaPreliminar?.currency) === "USD"
+              {datos?.moneda === "USD"
                 ? "Dólares Estadounidenses (USD)"
                 : "Pesos Argentinos (ARS)"}
             </span>
@@ -116,37 +139,16 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
 
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span>Forma de pago</span>
-            <span>
-              {factura?.formaPago || budget?.facturaPreliminar?.formaPago}
-            </span>
+            <span>{datos?.formaPago}</span>
           </div>
 
-          {(factura?.currency === "USD" || budget?.facturaPreliminar?.currency === "USD") && (
-            <>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Tipo de cambio</span>
-                <span>
-                  {Number(
-                    factura?.exchangeRate || budget?.facturaPreliminar?.exchangeRate || 0
-                  ).toLocaleString("es-AR")}
-                </span>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Total USD</span>
-                <span>
-                  {Number(factura?.totalUSD || 0).toLocaleString("es-AR")}
-                </span>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>Total ARS</span>
-                <span>
-                  ${Number(factura?.total || budget.total).toLocaleString("es-AR")}
-                </span>
-              </div>
-            </>
+          {datos?.moneda === "USD" && (
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span>Tipo de cambio</span>
+              <span>{formatMoney(tipoCambio)}</span>
+            </div>
           )}
+
         </div>
       </div>
 
@@ -198,24 +200,31 @@ export const FacturaTicket80mm = ({ profile, factura, budget }) => {
 
         <div>
           Subtotal: $
-          {Number(
-            (budget.subtotal || 0) + (budget.laborCost || 0)
-          ).toLocaleString("es-AR")}
+          {Math.round(subtotal).toLocaleString("es-AR")}
         </div>
 
-        {budget.discount > 0 && (
-          <div style={{ color: "#010000" }}>
-            Descuento: -${Number(budget.discount).toLocaleString("es-AR")}
+        {descuento > 0 && (
+          <div>
+            Descuento: -$
+            {Math.round(descuento).toLocaleString("es-AR")}
           </div>
         )}
 
-        <div style={{ fontWeight: "bold", fontSize: "13px" }}>
-          Total: ${Number(factura?.total || budget.total).toLocaleString("es-AR")}
+        <div style={{ fontWeight: "bold" }}>
+          Total ARS: $
+          {totalARS.toLocaleString("es-AR")}
         </div>
+
+        {datos?.moneda === "USD" && (
+          <div style={{ fontWeight: "bold" }}>
+            Total USD: U$S{" "}
+            {totalUSD?.toLocaleString("es-AR")}
+          </div>
+        )}
 
       </div>
 
-      <hr style={{ border: "none", borderTop: "1px solid black", margin: "2px 0" }}/>
+      <hr style={{ border: "none", borderTop: "1px solid black", margin: "2px 0" }} />
 
       {/* CAE + VENCIMIENTO */}
       <div style={{ marginTop: "4px" }}>
