@@ -315,14 +315,16 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
 
             </div>
           )}
+        </div>
+      )}
 
-          {budget?.notaCredito && (
-            <p className="text-red-600 font-bold text-[13px] text-center mt-2 mb-3">
-              ⚠️ Factura anulada mediante Nota de Crédito
-            </p>
-          )}
+      {/* NOTA DE CRÉDITO - FUERA DE LA CONDICIÓN DE CAE */}
+      {budget?.notaCredito && (
+        <div className="px-3 pt-0 pt-1">
+          <p className="text-red-600 font-bold text-[13px] text-center mt-2 mb-3">
+            ⚠️ Factura anulada mediante Nota de Crédito
+          </p>
 
-          {/* NOTA DE CRÉDITO */}
           {budget?.notaCredito?.numero && (
             <div className="mt-2 p-2 border rounded bg-red-50 text-red-700">
               <p className="font-bold text-[15px] mb-1">NOTA DE CRÉDITO C</p>
@@ -351,7 +353,6 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
             </div>
           )}
         </div>
-
       )}
     </div>
   );

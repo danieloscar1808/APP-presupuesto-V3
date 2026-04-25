@@ -1,7 +1,18 @@
 import logoTickettt from "@/assets/Logo-Tickettt.png";
 import { QRCodeSVG } from "qrcode.react";
+import { useEffect, useState } from "react";
+import QRCode from "qrcode";
 
 export const FacturaA4 = ({ profile, factura, budget }) => {
+  const [qrDataURL, setQrDataURL] = useState("");
+
+  useEffect(() => {
+    if (factura?.qr) {
+      QRCode.toDataURL(factura.qr, { width: 120, margin: 0 }, (err, url) => {
+        if (!err) setQrDataURL(url);
+      });
+    }
+  }, [factura?.qr]);
 
   const formatMoney = (n) =>
     Number(n || 0).toLocaleString("es-AR");
@@ -31,7 +42,7 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
     <div
       style={{
         width: "210mm",
-        minHeight: "297mm",
+        height: "auto",
         padding: "40mm",
         background: "white",
         color: "black",
@@ -50,7 +61,7 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
       >
 
         {/* 🔷 HEADER */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
           <img src={logoTickettt} crossOrigin="anonymous" style={{ width: "50%" }} />
 
           <div style={{ textAlign: "right" }}>
@@ -61,7 +72,7 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
           </div>
         </div>
 
-        <hr />
+        <hr style={{ margin: "10px 0" }} />
 
         {/* 🔷 DATOS FISCALES */}
         <div style={{ marginBottom: "10px" }}>
@@ -99,7 +110,7 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
 
         </div>
 
-        <hr />
+        <hr style={{ margin: "10px 0" }} />
 
         {/* 🔷 DATOS DE PAGO */}
         <div style={{ marginTop: "10px" }}>
@@ -127,21 +138,21 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
           )}
         </div>
 
-        <hr />
+        <hr style={{ margin: "10px 0" }} />
 
         {/* 🔷 TABLA */}
-        <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "10px" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "18px", paddingTop: "10px" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid black" }}>
-              <th style={{ textAlign: "left" }}>Descripción</th>
-              <th style={{ textAlign: "right" }}>Importe</th>
+            <tr style={{ borderBottom: "2px solid black", paddingBottom: "8px" }}>
+              <th style={{ textAlign: "left", paddingBottom: "8px" }}>Descripción</th>
+              <th style={{ textAlign: "right", paddingBottom: "8px" }}>Importe</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr>
-              <td>Materiales</td>
-              <td style={{ textAlign: "right" }}>${formatMoney(budget.subtotal)}</td>
+            <tr style={{ paddingTop: "10px" }}>
+              <td style={{ paddingTop: "10px" }}>Materiales</td>
+              <td style={{ textAlign: "right", paddingTop: "10px" }}>${formatMoney(budget.subtotal)}</td>
             </tr>
 
             <tr>
@@ -187,7 +198,7 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
           )}
         </div>
 
-        <hr />
+        <hr style={{ margin: "10px 0" }} />
 
         {/* 🔷 CAE */}
         <div>
@@ -212,13 +223,9 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
         </div>
 
         {/* 🔷 QR */}
-        {factura?.qr && (
-          <div style={{ textAlign: "center", marginTop: "20px" }}>
-            {factura?.qr && (
-              <div style={{ textAlign: "center", marginTop: "20px" }}>
-                <QRCodeSVG value={factura.qr} size={120} />
-              </div>
-            )}
+        {qrDataURL && (
+          <div style={{ textAlign: "center", marginTop: "20px", display: "flex", justifyContent: "center" }}>
+            <img src={qrDataURL} alt="QR Code" style={{ width: "120px", height: "120px" }} />
           </div>
         )}
 

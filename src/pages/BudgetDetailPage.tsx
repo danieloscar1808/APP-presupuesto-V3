@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ArrowLeft, Trash2 } from "lucide-react";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import FacturaView from "@/components/FacturaView";
@@ -421,55 +423,61 @@ const BudgetDetailPage = () => {
     const contenido = document.getElementById("factura-a4");
     if (!contenido) return;
 
-    const ventana = window.open("", "_blank");
+    // Generar nombre del archivo
+    const clientNameSanitized = budget.clientName.replace(/[^a-zA-Z0-9]/g, '_').replace(/\s+/g, '_');
+    const filename = `Factura_${clientNameSanitized}_${factura.numero}.pdf`;
 
-    // 🔥 CLONAR
-    const clon = contenido.cloneNode(true);
-
-    // 🔥 ESPERAR IMÁGENES
-    const images = clon.querySelectorAll("img");
-
-    let loaded = 0;
-
-    images.forEach((img) => {
-      img.onload = () => {
-        loaded++;
-        if (loaded === images.length) imprimir();
-      };
-
-      // forzar reload
-      img.src = img.src;
-    });
-
-    const imprimir = () => {
-      ventana.document.write(`
-      <html>
-        <head>
-          <title>Factura A4</title>
-          <style>
-            @page {
-              size: A4;
-              margin: 10mm;
-            }
-            body {
-              margin: 0;
-            }
-          </style>
-        </head>
-        <body>
-          ${clon.innerHTML}
-        </body>
-      </html>
-    `);
-
-      ventana.document.close();
-      ventana.focus();
-      ventana.print();
+    const options = {
+      filename: filename
     };
+
+    // Mostrar temporalmente el contenido para capturarlo
+    contenido.style.display = "block";
+    contenido.style.top = "0";
+    contenido.style.left = "0";
+
+    // Usar setTimeout para asegurar que se renderice completamente
+    setTimeout(() => {
+      html2canvas(contenido, { scale: 2, useCORS: true }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+
+        // Solo agregar más páginas si realmente se necesitan
+        if (imgHeight <= pageHeight) {
+          // El contenido cabe en una página
+          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        } else {
+          // Dividir en múltiples páginas si es necesario
+          let heightLeft = imgHeight;
+          let position = 0;
+
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+
+          while (heightLeft > pageHeight) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+          }
+        }
+
+        pdf.save(filename);
+        contenido.style.display = "none";
+        contenido.style.top = "-9999px";
+        contenido.style.left = "-9999px";
+      });
+    }, 1000);
   };
 
 
   const imprimirTicket80mm = () => {
+    const clientNameSanitized = budget.clientName.replace(/[^a-zA-Z0-9]/g, '_').replace(/\s+/g, '_');
+    const title = `Factura_${clientNameSanitized}_${factura.numero}`;
+
     const ventana = window.open("", "_blank");
 
     const html = ReactDOMServer.renderToString(
@@ -483,7 +491,7 @@ const BudgetDetailPage = () => {
     ventana.document.write(`
     <html>
       <head>
-        <title>Ticket 80mm</title>
+        <title>${title}</title>
         <style>
           @page {
             size: 80mm auto;
@@ -515,6 +523,9 @@ const BudgetDetailPage = () => {
   };
 
   const imprimirReciboA4 = () => {
+    const clientNameSanitized = budget.clientName.replace(/[^a-zA-Z0-9]/g, '_').replace(/\s+/g, '_');
+    const title = `Recibo_${clientNameSanitized}_${factura.numero}_recibo ${recibo.numero}`;
+
     const contenido = document.getElementById("recibo-a4");
 
     const ventana = window.open("", "", "width=800,height=600");
@@ -522,7 +533,7 @@ const BudgetDetailPage = () => {
     ventana.document.write(`
     <html>
       <head>
-        <title>Recibo</title>
+        <title>${title}</title>
       </head>
       <body>
         ${contenido.innerHTML}
@@ -536,6 +547,9 @@ const BudgetDetailPage = () => {
 
 
   const imprimirReciboTicket80mm = () => {
+    const clientNameSanitized = budget.clientName.replace(/[^a-zA-Z0-9]/g, '_').replace(/\s+/g, '_');
+    const title = `Recibo_${clientNameSanitized}_${factura.numero}_recibo ${recibo.numero}`;
+
     const ventana = window.open("", "_blank");
 
     const html = ReactDOMServer.renderToString(
@@ -545,7 +559,7 @@ const BudgetDetailPage = () => {
     ventana.document.write(`
     <html>
       <head>
-        <title>Recibo 80mm</title>
+        <title>${title}</title>
         <style>
           @page {
             size: 80mm auto;
@@ -783,6 +797,9 @@ Gracias por tu confianza.`;
 
 
   const imprimirRecibo = () => {
+    const clientNameSanitized = budget.clientName.replace(/[^a-zA-Z0-9]/g, '_').replace(/\s+/g, '_');
+    const title = `Recibo_${clientNameSanitized}_${factura.numero}_recibo ${recibo.numero}`;
+
     const contenido = document.getElementById("recibo-a4");
     if (!contenido) return;
 
@@ -791,7 +808,7 @@ Gracias por tu confianza.`;
     ventana.document.write(`
     <html>
       <head>
-        <title>Recibo</title>
+        <title>${title}</title>
         <style>
           @page { size: A4; margin: 10mm; }
           body { margin: 0; }
@@ -1429,7 +1446,7 @@ Gracias por tu confianza.`;
       </PageLayout>
 
       {/* 🔴 FACTURA A4 OCULTA */}
-      <div style={{ display: "none" }} id="factura-a4">
+      <div style={{ display: "none", position: "absolute", top: "-9999px", left: "-9999px" }} id="factura-a4">
         <FacturaA4
           profile={profile}
           factura={factura}
@@ -1438,13 +1455,13 @@ Gracias por tu confianza.`;
       </div>
 
       {recibo && (
-        <div style={{ display: "none" }} id="recibo-a4">
+        <div style={{ position: "absolute", left: "-9999px", top: "0" }} id="recibo-a4">
           <ReciboA4 recibo={recibo} />
         </div>
       )}
 
       {recibo && (
-        <div style={{ display: "none" }}>
+        <div style={{ position: "absolute", left: "-9999px", top: "0" }}>
           <ReciboTicket80mm recibo={recibo} />
         </div>
       )}
