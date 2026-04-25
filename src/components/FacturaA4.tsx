@@ -62,7 +62,7 @@ export const FacturaA4 = ({ profile, factura, budget }) => {
 
         {/* 🔷 HEADER */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-          <img src={logoTickettt} crossOrigin="anonymous" style={{ width: "50%" }} />
+          <img src={logoTickettt} crossOrigin="anonymous" style={{ width: "45%" }} />
 
           <div style={{ textAlign: "right" }}>
             <h1 style={{ margin: 0 }}>FACTURA C</h1>

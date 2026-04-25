@@ -73,7 +73,7 @@ export const NotaCreditoA4 = ({ profile, factura, budget }) => {
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-          <img src={logoTickettt} crossOrigin="anonymous" style={{ width: "50%" }} />
+          <img src={logoTickettt} crossOrigin="anonymous" style={{ width: "45%" }} />
 
           <div style={{ textAlign: "right" }}>
             <h1 style={{ margin: 0 }}>NOTA DE CRÉDITO C</h1>
