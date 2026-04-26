@@ -43,7 +43,7 @@ export const FABMenu = () => {
       {/* Botón principal */}
       <button
         onClick={() => setOpen(!open)}
-        className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center shadow-lg"
+        className="w-14 h-14 rounded-full bg-primary text-black flex items-center justify-center shadow-lg"
       >
         {open ? <X /> : <Menu />}
       </button>

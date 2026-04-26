@@ -190,7 +190,6 @@ const BudgetsListPage = () => {
             onClick={() => setFilter(btn.id)}
             className={cn(
               "shrink-0",
-              filter === btn.id && "btn-gradient"
             )}
           >
             {btn.label}
