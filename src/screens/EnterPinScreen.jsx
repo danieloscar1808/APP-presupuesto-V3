@@ -6,13 +6,12 @@ const MODO = "simulation";
 export default function EnterPinScreen({ user_id, onSuccess }) {
   const [pin, setPin] = useState("");
   const [error, setError] = useState(false);
+  const pinGuardado = localStorage.getItem("pin_demo") || "";
 
   const handleValidate = () => {
     if (pin.length !== 4) return;
 
     if (MODO === "simulation") {
-      const pinGuardado = localStorage.getItem("pin_demo");
-
       if (pin === pinGuardado) {
         setError(false);
         onSuccess();
@@ -37,6 +36,11 @@ export default function EnterPinScreen({ user_id, onSuccess }) {
     setPin((prev) => prev.slice(0, -1));
   };
 
+  const getPinColor = (index) => {
+    if (!pin[index]) return "#e5e7eb";
+    return pin[index] === pinGuardado[index] ? "#16a34a" : "#dc2626";
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.card}>
@@ -50,7 +54,7 @@ export default function EnterPinScreen({ user_id, onSuccess }) {
               key={i}
               style={{
                 ...styles.pinCircle,
-                background: pin[i] ? "#2563eb" : "#e5e7eb",
+                background: getPinColor(i),
                 transform: error ? "translateX(-5px)" : "none",
                 transition: "all 0.2s"
               }}

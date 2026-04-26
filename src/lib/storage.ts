@@ -14,10 +14,10 @@ class AppDB extends Dexie {
     super('PresupuestoDB');
 
     this.version(1).stores({
-      profile: '&id',       // clave fija
+      profile: '&id',
       clients: 'id, name',
       budgets: 'id, clientId',
-      catalog: 'id, name'
+      catalog: 'id, name',
     });
   }
 }
@@ -28,11 +28,11 @@ export const db = new AppDB();
 // PROFILE
 // -----------------------------------------------------
 export const getProfile = async (): Promise<Profile | null> => {
-  return await db.profile.get("profile") || null;
+  return (await db.profile.get('profile')) || null;
 };
 
 export const saveProfile = async (profile: Profile): Promise<void> => {
-  profile.id = "profile";  // clave fija
+  profile.id = 'profile';
   await db.profile.put(profile);
 };
 
@@ -51,7 +51,9 @@ export const deleteClient = async (id: string): Promise<void> => {
   await db.clients.delete(id);
 };
 
-export const getClientById = async (id: string): Promise<Client | undefined> => {
+export const getClientById = async (
+  id: string
+): Promise<Client | undefined> => {
   return await db.clients.get(id);
 };
 
@@ -64,29 +66,34 @@ export const getBudgets = async (): Promise<Budget[]> => {
 
 export const saveBudget = async (budget: Budget): Promise<void> => {
   await db.budgets.put(budget, budget.id);
-};  
+};
 
 export const deleteBudget = async (id: string): Promise<void> => {
   await db.budgets.delete(id);
 };
 
-export const getBudgetById = async (id: string): Promise<Budget | undefined> => {
+export const getBudgetById = async (
+  id: string
+): Promise<Budget | undefined> => {
   return await db.budgets.get(id);
 };
 
-export const updateBudgetStatus = async (id: string, status: Budget['status']): Promise<void> => {
+export const updateBudgetStatus = async (
+  id: string,
+  status: Budget['status']
+): Promise<void> => {
   const budget = await db.budgets.get(id);
   if (!budget) return;
 
-  // 🔒 BLOQUEO GLOBAL
-if (
-  budget.status === "facturado" ||
-  budget.status === "cancelado" ||
-  budget.status === "listo_para_facturar"
-) {
-  console.warn("No se puede modificar este presupuesto en este estado");
-  return;
-}
+  // Bloqueo global
+  if (
+    budget.status === 'facturado' ||
+    budget.status === 'cancelado' ||
+    budget.status === 'listo_para_facturar'
+  ) {
+    console.warn('No se puede modificar este presupuesto en este estado');
+    return;
+  }
 
   budget.status = status;
 
@@ -112,12 +119,14 @@ export const deleteCatalogItem = async (id: string): Promise<void> => {
   await db.catalog.delete(id);
 };
 
-export const getCatalogItemByName = async (name: string): Promise<CatalogItem | undefined> => {
+export const getCatalogItemByName = async (
+  name: string
+): Promise<CatalogItem | undefined> => {
   const items = await db.catalog.toArray();
-  return items.find(i => i.name.toLowerCase() === name.toLowerCase());
+  return items.find((item) => item.name.toLowerCase() === name.toLowerCase());
 };
 
-const LABOR_KEY = "catalog_labor";
+const LABOR_KEY = 'catalog_labor';
 
 // -------------------------------
 // OBTENER MANO DE OBRA
@@ -132,8 +141,7 @@ export const getLaborItems = async (): Promise<CatalogItem[]> => {
 // -------------------------------
 export const saveLaborItem = async (item: CatalogItem) => {
   const items = await getLaborItems();
-
-  const existingIndex = items.findIndex(i => i.id === item.id);
+  const existingIndex = items.findIndex((existing) => existing.id === item.id);
 
   if (existingIndex >= 0) {
     items[existingIndex] = item;
@@ -149,11 +157,10 @@ export const saveLaborItem = async (item: CatalogItem) => {
 // -------------------------------
 export const deleteLaborItem = async (id: string) => {
   const items = await getLaborItems();
-  const updated = items.filter(i => i.id !== id);
+  const updated = items.filter((item) => item.id !== id);
 
   localStorage.setItem(LABOR_KEY, JSON.stringify(updated));
 };
-
 
 // -----------------------------------------------------
 // BACKUP
@@ -163,29 +170,31 @@ export async function generateBackup(): Promise<any> {
   const clients = await getClients();
   const budgets = await getBudgets();
   const catalog = await getCatalogItems();
+  const laborCatalog = await getLaborItems();
 
   const backup = {
     profile,
     clients,
     budgets,
     catalog,
+    laborCatalog,
     timestamp: new Date().toISOString(),
   };
 
-  localStorage.setItem("lastBackup", JSON.stringify(backup));
+  localStorage.setItem('lastBackup', JSON.stringify(backup));
 
   return backup;
 }
 
 // -----------------------------------------------------
-// IMPORTAR BACKUP (FUNCIONA 100%)
+// IMPORTAR BACKUP
 // -----------------------------------------------------
 export async function importBackup(backup: any): Promise<void> {
-  console.log(">>> IMPORT BACKUP INICIADO");
-  console.log("Backup recibido:", backup);
+  console.log('>>> IMPORT BACKUP INICIADO');
+  console.log('Backup recibido:', backup);
 
   if (!backup) {
-    console.error("Backup vacío");
+    console.error('Backup vacio');
     return;
   }
 
@@ -194,37 +203,44 @@ export async function importBackup(backup: any): Promise<void> {
   await db.clients.clear();
   await db.budgets.clear();
   await db.catalog.clear();
+  localStorage.removeItem(LABOR_KEY);
 
-  // 2. Restaurar Perfil (id fijo)
+  // 2. Restaurar perfil
   if (backup.profile) {
-    const fixedProfile = { ...backup.profile, id: "profile" };
-    console.log("Restaurando perfil:", fixedProfile);
+    const fixedProfile = { ...backup.profile, id: 'profile' };
+    console.log('Restaurando perfil:', fixedProfile);
     await db.profile.put(fixedProfile);
   }
 
   // 3. Restaurar clientes
   if (Array.isArray(backup.clients)) {
-    console.log("Restaurando clientes:", backup.clients.length);
-    for (const c of backup.clients) {
-      if (c.id) await db.clients.put(c);
+    console.log('Restaurando clientes:', backup.clients.length);
+    for (const client of backup.clients) {
+      if (client.id) await db.clients.put(client);
     }
   }
 
   // 4. Restaurar presupuestos
   if (Array.isArray(backup.budgets)) {
-    console.log("Restaurando presupuestos:", backup.budgets.length);
-    for (const b of backup.budgets) {
-      if (b.id) await db.budgets.put(b);
+    console.log('Restaurando presupuestos:', backup.budgets.length);
+    for (const budget of backup.budgets) {
+      if (budget.id) await db.budgets.put(budget);
     }
   }
 
-  // 5. Restaurar catálogo
+  // 5. Restaurar catalogo de materiales
   if (Array.isArray(backup.catalog)) {
-    console.log("Restaurando items catálogo:", backup.catalog.length);
+    console.log('Restaurando items catalogo:', backup.catalog.length);
     for (const item of backup.catalog) {
       if (item.id) await db.catalog.put(item);
     }
   }
 
-  console.log(">>> IMPORT TERMINADO");
+  // 6. Restaurar catalogo de mano de obra
+  if (Array.isArray(backup.laborCatalog)) {
+    console.log('Restaurando mano de obra:', backup.laborCatalog.length);
+    localStorage.setItem(LABOR_KEY, JSON.stringify(backup.laborCatalog));
+  }
+
+  console.log('>>> IMPORT TERMINADO');
 }

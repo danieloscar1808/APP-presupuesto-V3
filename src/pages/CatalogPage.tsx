@@ -8,6 +8,7 @@ import {
   Plus,
   Trash2,
   Search,
+  Filter,
   Package,
   Download,
   Upload,
@@ -46,6 +47,9 @@ import { toast } from "sonner";
 const CatalogPage = () => {
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<
+    "all" | "general" | "ac" | "electric" | "solar"
+  >("all");
 
   const [newItem, setNewItem] = useState({
     name: "",
@@ -194,9 +198,17 @@ const CatalogPage = () => {
   };
 
   // FILTRO
-  const filteredItems = items.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredItems = items.filter((item) => {
+    const matchesSearch = item.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+
+    const itemCategory = item.category || "general";
+    const matchesCategory =
+      categoryFilter === "all" || itemCategory === categoryFilter;
+
+    return matchesSearch && matchesCategory;
+  });
 
   const getCategoryLabel = (cat?: BudgetCategory | "general") => {
     if (!cat || cat === "general") return "General";
@@ -236,6 +248,30 @@ const CatalogPage = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
           />
+        </div>
+
+        <div className="relative">
+          <Filter className="absolute left-3 top-1/2 z-10 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Select
+            value={categoryFilter}
+            onValueChange={(value) =>
+              setCategoryFilter(
+                value as "all" | "general" | "ac" | "electric" | "solar"
+              )
+            }
+          >
+            <SelectTrigger className="pl-10 text-left">
+              <SelectValue placeholder="Filtrar por categoría" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectItem value="all">Todas las categorías</SelectItem>
+              <SelectItem value="general">General</SelectItem>
+              <SelectItem value="ac">Aire Acond.</SelectItem>
+              <SelectItem value="electric">Eléctrico</SelectItem>
+              <SelectItem value="solar">Solar</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Nuevo Ítem */}

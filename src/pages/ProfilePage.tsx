@@ -233,7 +233,7 @@ if (!autorizado) {
 
             const a = document.createElement("a");
             a.href = url;
-            a.download = `backup_${new Date().toISOString().slice(0, 10)}.json`;
+            a.download = "Perfil SICE.json";
             a.click();
 
             URL.revokeObjectURL(url);

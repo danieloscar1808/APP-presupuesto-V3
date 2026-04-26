@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const MODO = "simulation";
 
 export default function CreatePinScreen({ user_id, onSuccess }) {
   const [pin, setPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
+  const pinInputRef = useRef(null);
+  const confirmPinInputRef = useRef(null);
+
+  const handlePinChange = (setter) => (e) => {
+    const numericValue = e.target.value.replace(/\D/g, "").slice(0, 4);
+    setter(numericValue);
+  };
 
   const handleSave = () => {
     if (pin.length !== 4) {
@@ -35,24 +42,60 @@ export default function CreatePinScreen({ user_id, onSuccess }) {
         <h1 style={styles.title}>Crear PIN</h1>
 
         {/* INPUT PIN */}
-        <input
-          type="password"
-          value={pin}
-          onChange={(e) => setPin(e.target.value)}
-          placeholder="Ingrese PIN"
-          maxLength={4}
-          style={styles.input}
-        />
+        <div style={styles.inputGroup}>
+          <span style={styles.label}>Ingrese PIN</span>
+
+          <div
+            style={styles.pinBoxes}
+            onClick={() => pinInputRef.current?.focus()}
+          >
+            {[0, 1, 2, 3].map((index) => (
+              <div key={index} style={styles.pinBox}>
+                {pin[index] || ""}
+              </div>
+            ))}
+          </div>
+
+          <input
+            ref={pinInputRef}
+            type="tel"
+            inputMode="numeric"
+            autoComplete="new-password"
+            value={pin}
+            onChange={handlePinChange(setPin)}
+            placeholder="Ingrese PIN"
+            maxLength={4}
+            style={styles.hiddenInput}
+          />
+        </div>
 
         {/* INPUT CONFIRMAR */}
-        <input
-          type="password"
-          value={confirmPin}
-          onChange={(e) => setConfirmPin(e.target.value)}
-          placeholder="Confirme PIN"
-          maxLength={4}
-          style={styles.input}
-        />
+        <div style={styles.inputGroup}>
+          <span style={styles.label}>Confirme PIN</span>
+
+          <div
+            style={styles.pinBoxes}
+            onClick={() => confirmPinInputRef.current?.focus()}
+          >
+            {[0, 1, 2, 3].map((index) => (
+              <div key={index} style={styles.pinBox}>
+                {confirmPin[index] || ""}
+              </div>
+            ))}
+          </div>
+
+          <input
+            ref={confirmPinInputRef}
+            type="tel"
+            inputMode="numeric"
+            autoComplete="new-password"
+            value={confirmPin}
+            onChange={handlePinChange(setConfirmPin)}
+            placeholder="Confirme PIN"
+            maxLength={4}
+            style={styles.hiddenInput}
+          />
+        </div>
 
         <button onClick={handleSave} style={styles.button}>
           Guardar
@@ -89,13 +132,40 @@ const styles = {
   marginBottom: 10,
   color: "#d9c2ab",
 },
-  input: {
-    height: 55,
-    fontSize: 20,
-    textAlign: "center",
-    borderRadius: 10,
-    border: "1px solid #ccc",
-    outline: "none",
+  inputGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+  label: {
+    color: "#d9c2ab",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  pinBoxes: {
+    display: "flex",
+    gap: 12,
+    justifyContent: "center",
+    cursor: "text",
+  },
+  pinBox: {
+    width: 58,
+    height: 58,
+    borderRadius: 12,
+    background: "#f8fafc",
+    border: "2px solid #bfdbfe",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#1d4ed8",
+    boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)",
+  },
+  hiddenInput: {
+    position: "absolute",
+    opacity: 0,
+    pointerEvents: "none",
   },
   button: {
     height: 50,
