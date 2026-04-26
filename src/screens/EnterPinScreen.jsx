@@ -2,10 +2,12 @@ import { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 
 const MODO = "simulation";
+const ACCENT_COLOR = "#9da8b9";
 
 export default function EnterPinScreen({ user_id, onSuccess }) {
   const [pin, setPin] = useState("");
   const [error, setError] = useState(false);
+  const [activeKey, setActiveKey] = useState(null);
   const pinGuardado = localStorage.getItem("pin_demo") || "";
 
   const handleValidate = () => {
@@ -37,9 +39,22 @@ export default function EnterPinScreen({ user_id, onSuccess }) {
   };
 
   const getPinColor = (index) => {
-    if (!pin[index]) return "#e5e7eb";
+    if (!pin[index]) return ACCENT_COLOR;
     return pin[index] === pinGuardado[index] ? "#16a34a" : "#dc2626";
   };
+
+  const getKeyStyle = (keyId, overrides = {}) => ({
+    ...styles.key,
+    ...(activeKey === keyId ? styles.keyActive : {}),
+    ...overrides,
+  });
+
+  const getKeyEvents = (keyId) => ({
+    onPointerDown: () => setActiveKey(keyId),
+    onPointerUp: () => setActiveKey(null),
+    onPointerLeave: () => setActiveKey(null),
+    onPointerCancel: () => setActiveKey(null),
+  });
 
   return (
     <div style={styles.container}>
@@ -73,7 +88,8 @@ export default function EnterPinScreen({ user_id, onSuccess }) {
             <button
               key={n}
               onClick={() => addNumber(n)}
-              style={styles.key}
+              style={getKeyStyle(`num-${n}`)}
+              {...getKeyEvents(`num-${n}`)}
             >
               {n}
             </button>
@@ -82,17 +98,18 @@ export default function EnterPinScreen({ user_id, onSuccess }) {
          
 
           <button
-            style={{
-              ...styles.key,
-             background: "#d9c2ab",
-             color: "#1f2937" 
-            }}
+            style={getKeyStyle("ok")}
             onClick={handleValidate}
+            {...getKeyEvents("ok")}
             >
             OK
           </button>
 
-          <button style={styles.key} onClick={removeLast}>
+          <button
+            style={getKeyStyle("back")}
+            onClick={removeLast}
+            {...getKeyEvents("back")}
+          >
   <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
     <ChevronLeft size={30} />
   </div>
@@ -110,14 +127,14 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "#f9ebdc",
+    background: "#000000",
   },
   card: {
     width: "100%",
-    maxWidth: 400,
+    maxWidth: 330,
     padding: 30,
     borderRadius: 16,
-    background: "#1d4ed8",
+    background: "#000000",
     boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
     display: "flex",
     flexDirection: "column",
@@ -129,11 +146,11 @@ const styles = {
   fontWeight: "600",
   textAlign: "center",
   marginBottom: 10,
-  color: "#d9c2ab", 
+  color: ACCENT_COLOR,
 },
   pinContainer: {
     display: "flex",
-    gap: 15,
+    gap: 20,
     marginBottom: 10,
   },
   pinCircle: {
@@ -148,7 +165,7 @@ const styles = {
   keyboard: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 80px)",
-    gap: 15,
+    gap: 20,
     justifyContent: "center",
   },
   key: {
@@ -156,8 +173,17 @@ const styles = {
     fontSize: 25,
     borderRadius: 12,
     border: "none",
-    background: "#f1f5f9",
+    background: "linear-gradient(145deg, #050505, #111111)",
+    color: ACCENT_COLOR,
     cursor: "pointer",
-    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+    boxShadow: "0 10px 24px rgba(157, 168, 185, 0.18), inset 0 1px 0 rgba(255,255,255,0.05)",
+    transition: "transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease, color 0.14s ease",
+    touchAction: "manipulation",
+  },
+  keyActive: {
+    transform: "translateY(2px) scale(0.97)",
+    background: "linear-gradient(145deg, #9da8b9, #c3ccd8)",
+    color: "#050505",
+    boxShadow: "0 4px 14px rgba(157, 168, 185, 0.35), 0 0 0 1px rgba(255,255,255,0.08)",
   },
 };

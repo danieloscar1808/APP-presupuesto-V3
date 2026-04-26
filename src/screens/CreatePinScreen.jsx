@@ -1,10 +1,13 @@
 import { useRef, useState } from "react";
 
 const MODO = "simulation";
+const ACCENT_COLOR = "#9da8b9";
 
 export default function CreatePinScreen({ user_id, onSuccess }) {
   const [pin, setPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
+  const [focusedField, setFocusedField] = useState(null);
+  const [savePressed, setSavePressed] = useState(false);
   const pinInputRef = useRef(null);
   const confirmPinInputRef = useRef(null);
 
@@ -50,8 +53,14 @@ export default function CreatePinScreen({ user_id, onSuccess }) {
             onClick={() => pinInputRef.current?.focus()}
           >
             {[0, 1, 2, 3].map((index) => (
-              <div key={index} style={styles.pinBox}>
-                {pin[index] || ""}
+              <div
+                key={index}
+                style={{
+                  ...styles.pinBox,
+                  ...(focusedField === "pin" ? styles.pinBoxActive : {}),
+                }}
+              >
+                {pin[index] ? "*" : ""}
               </div>
             ))}
           </div>
@@ -63,6 +72,8 @@ export default function CreatePinScreen({ user_id, onSuccess }) {
             autoComplete="new-password"
             value={pin}
             onChange={handlePinChange(setPin)}
+            onFocus={() => setFocusedField("pin")}
+            onBlur={() => setFocusedField(null)}
             placeholder="Ingrese PIN"
             maxLength={4}
             style={styles.hiddenInput}
@@ -78,8 +89,14 @@ export default function CreatePinScreen({ user_id, onSuccess }) {
             onClick={() => confirmPinInputRef.current?.focus()}
           >
             {[0, 1, 2, 3].map((index) => (
-              <div key={index} style={styles.pinBox}>
-                {confirmPin[index] || ""}
+              <div
+                key={index}
+                style={{
+                  ...styles.pinBox,
+                  ...(focusedField === "confirm" ? styles.pinBoxActive : {}),
+                }}
+              >
+                {confirmPin[index] ? "*" : ""}
               </div>
             ))}
           </div>
@@ -91,13 +108,25 @@ export default function CreatePinScreen({ user_id, onSuccess }) {
             autoComplete="new-password"
             value={confirmPin}
             onChange={handlePinChange(setConfirmPin)}
+            onFocus={() => setFocusedField("confirm")}
+            onBlur={() => setFocusedField(null)}
             placeholder="Confirme PIN"
             maxLength={4}
             style={styles.hiddenInput}
           />
         </div>
 
-        <button onClick={handleSave} style={styles.button}>
+        <button
+          onClick={handleSave}
+          onPointerDown={() => setSavePressed(true)}
+          onPointerUp={() => setSavePressed(false)}
+          onPointerLeave={() => setSavePressed(false)}
+          onPointerCancel={() => setSavePressed(false)}
+          style={{
+            ...styles.button,
+            ...(savePressed ? styles.buttonActive : {}),
+          }}
+        >
           Guardar
         </button>
 
@@ -112,14 +141,14 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "#f9ebdc",
+    background: "#000000",
   },
   card: {
     width: "100%",
-    maxWidth: 400,
+    maxWidth: 330,
     padding: 30,
     borderRadius: 16,
-    background: "#1d4ed8",
+    background: "#000000",
     boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
     display: "flex",
     flexDirection: "column",
@@ -130,7 +159,7 @@ const styles = {
   fontWeight: "600",
   textAlign: "center",
   marginBottom: 10,
-  color: "#d9c2ab",
+  color: ACCENT_COLOR,
 },
   inputGroup: {
     display: "flex",
@@ -138,13 +167,13 @@ const styles = {
     gap: 10,
   },
   label: {
-    color: "#d9c2ab",
+    color: ACCENT_COLOR,
     fontSize: 16,
     fontWeight: "600",
   },
   pinBoxes: {
     display: "flex",
-    gap: 12,
+    gap: 20,
     justifyContent: "center",
     cursor: "text",
   },
@@ -152,15 +181,21 @@ const styles = {
     width: 58,
     height: 58,
     borderRadius: 12,
-    background: "#f8fafc",
-    border: "2px solid #bfdbfe",
+    background: "linear-gradient(145deg, #050505, #111111)",
+    border: "1px solid rgba(157, 168, 185, 0.28)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: 26,
+    fontSize: 38,
     fontWeight: "700",
-    color: "#1d4ed8",
-    boxShadow: "inset 0 1px 2px rgba(0,0,0,0.05)",
+    color: ACCENT_COLOR,
+    boxShadow: "0 10px 24px rgba(157, 168, 185, 0.18), inset 0 1px 0 rgba(255,255,255,0.05)",
+    transition: "transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease",
+  },
+  pinBoxActive: {
+    transform: "translateY(1px) scale(0.98)",
+    borderColor: ACCENT_COLOR,
+    boxShadow: "0 12px 28px rgba(157, 168, 185, 0.24), 0 0 0 1px rgba(157, 168, 185, 0.18)",
   },
   hiddenInput: {
     position: "absolute",
@@ -168,12 +203,21 @@ const styles = {
     pointerEvents: "none",
   },
   button: {
-    height: 50,
-    borderRadius: 10,
+    height: 70,
+    borderRadius: 12,
     border: "none",
-    background: "#d9c2ab",
-    color: " #1d4ed8" ,
+    background: "linear-gradient(145deg, #050505, #111111)",
+    color: ACCENT_COLOR,
     fontSize: 25,
     cursor: "pointer",
+    boxShadow: "0 10px 24px rgba(157, 168, 185, 0.18), inset 0 1px 0 rgba(255,255,255,0.05)",
+    transition: "transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease, color 0.14s ease",
+    touchAction: "manipulation",
+  },
+  buttonActive: {
+    transform: "translateY(2px) scale(0.98)",
+    background: "linear-gradient(145deg, #9da8b9, #c3ccd8)",
+    color: "#050505",
+    boxShadow: "0 4px 14px rgba(157, 168, 185, 0.35), 0 0 0 1px rgba(255,255,255,0.08)",
   },
 };
