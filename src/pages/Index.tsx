@@ -83,7 +83,7 @@ const budgetsActivos = budgets.filter(
   <span>Facturas</span>
   <span>Notas de Credito</span>
 </p>
-          <Button onClick={() => navigate('/profile')} className="btn-gradient mt-4">
+          <Button onClick={() => navigate('/profile')} className="btn-gradient mt-5 text-foreground">
             Configurar Perfil
           </Button>
         </div>

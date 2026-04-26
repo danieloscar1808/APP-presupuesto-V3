@@ -210,7 +210,7 @@ if (!autorizado) {
           </div>
         </div>
 
-        <Button type="submit" className="w-full btn-gradient h-12">
+        <Button type="submit" className="w-full btn-gradient h-12 text-foreground">
           <Save className="w-4 h-4 mr-2" />
           Guardar Perfil
         </Button>
