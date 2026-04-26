@@ -120,10 +120,10 @@ const setStatus = async (status: Budget["status"]) => {
         <Button
           onClick={() => setStatus("accepted")}
           disabled={disabled}
-          className="btn-gradient w-full"
+          className="w-full bg-emerald-500 text-black shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_14px_30px_rgba(16,185,129,0.28)] hover:bg-emerald-400"
         >
           <CheckCircle className="w-4 h-4 mr-2" />
-          Aceptado
+          Aceptar
         </Button>
 
       <Button

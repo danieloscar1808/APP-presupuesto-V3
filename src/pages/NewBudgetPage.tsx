@@ -330,7 +330,7 @@ if (isEditMode) {// Si estamos editando, mantenemos el mismo número de presupue
 
   return (
 
-    <PageLayout title="Nuevo Presupuesto">
+    <PageLayout title="Nuevo Presupuesto" contentWidth="wide">
 
       <div className="space-y-6">
 
@@ -556,9 +556,9 @@ if (isEditMode) {// Si estamos editando, mantenemos el mismo número de presupue
       </div>
 
       {showLaborCalculator && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4">
 
-          <div className="bg-white rounded-xl p-4 w-[420px] max-h-[80vh] overflow-y-auto">
+          <div className="app-panel surface-soft w-full max-h-[92vh] overflow-y-auto rounded-b-none rounded-t-[28px] p-4 sm:w-full sm:max-w-3xl sm:rounded-[28px] sm:p-6">
 
             <LaborCalculator
               onClose={() => setShowLaborCalculator(false)}

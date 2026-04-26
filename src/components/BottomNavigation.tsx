@@ -27,11 +27,13 @@ export const BottomNavigation = () => {
               key={item.path}
               onClick={() => navigate(item.path)}
               className={cn(
-                'flex flex-col items-center justify-center py-1 px-3 transition-colors',
-                isActive ? 'text-primary' : 'text-muted-foreground'
+                'flex min-w-16 flex-col items-center justify-center rounded-2xl py-2 px-3 transition-all duration-200',
+                isActive
+                  ? 'bg-primary text-primary-foreground shadow-[var(--shadow-glow)]'
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               )}
             >
-              <Icon className={cn('w-5 h-5', isActive && 'text-primary')} />
+              <Icon className={cn('w-5 h-5', isActive && 'text-primary-foreground')} />
               <span className={cn('text-xs mt-1', isActive && 'font-medium')}>
                 {item.label}
               </span>
