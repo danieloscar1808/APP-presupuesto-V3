@@ -6,7 +6,7 @@
   "scope": "/APP-presupuesto-V3/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#f9ebdc",
+  "theme_color": "#9da8b9",
   "orientation": "portrait-primary",
   "icons": [
     {
