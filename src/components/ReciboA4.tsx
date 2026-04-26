@@ -1,5 +1,6 @@
 import logoTickettt from "@/assets/Logo-Tickettt.png";
 
+
 const numeroALetras = (num, moneda) => {
   const unidades = [
     "", "uno", "dos", "tres", "cuatro", "cinco",
@@ -91,6 +92,7 @@ export const ReciboA4 = ({ recibo }) => {
 
   const montoARS = Number(recibo.monto || 0);
   const montoUSD = Number(recibo.monto_usd || 0);
+  const firmaScan = recibo.firma || recibo.firmaEscaneada || null;
 
   const montoMostrado =
     recibo.moneda === "USD" ? montoUSD : montoARS;
@@ -224,19 +226,53 @@ export const ReciboA4 = ({ recibo }) => {
         {/* 🔷 FIRMA */}
         <div
           style={{
-            marginTop: "60px",
+            marginTop: "40px",
             display: "flex",
             justifyContent: "space-between"
           }}
         >
-          <div>
-            <div style={{ borderTop: "1px solid black", width: "200px" }}></div>
-            <p>Firma del emisor</p>
+          <div
+            style={{
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              height: "150px"
+            }}
+          >
+            <div style={{ height: "70px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {firmaScan ? (
+                <img
+                  src={firmaScan}
+                  alt="Firma del emisor"
+                  style={{ width: "200px", height: "70px", objectFit: "contain" }}
+                />
+              ) : (
+                <div style={{ width: "200px", height: "70px" }}></div>
+              )}
+            </div>
+            <div style={{ borderTop: "1px solid black", width: "200px", margin: "0" }}></div>
+            <div style={{ height: "20px", display: "flex", alignItems: "center", justifyContent: "center", marginTop: "8px" }}>
+              <p style={{ margin: 0 }}>Firma del emisor</p>
+            </div>
           </div>
 
-          <div>
-            <div style={{ borderTop: "1px solid black", width: "200px" }}></div>
-            <p>Aclaración</p>
+          <div
+            style={{
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              height: "150px"
+            }}
+          >
+            <div style={{ height: "70px", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+              Daniel Oscar Bertolotti
+            </div>
+            <div style={{ borderTop: "1px solid black", width: "200px", margin: "0" }}></div>
+            <div style={{ height: "20px", display: "flex", alignItems: "center", justifyContent: "center", marginTop: "8px" }}>
+              <p style={{ margin: 0 }}>Emisor</p>
+            </div>
           </div>
         </div>
 

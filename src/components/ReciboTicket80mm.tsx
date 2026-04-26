@@ -215,11 +215,19 @@ export const ReciboTicket80mm = ({ recibo }) => {
 
             <hr />
 
-            {/* FIRMA */}
             <div style={{ marginTop: "20px", textAlign: "center" }}>
+                Daniel Oscar Bertolotti
+                <br />
                 -------------------------
                 <br />
-                Firma
+                Emisor
+            </div>
+
+            {/* FIRMA */}
+            <div style={{ marginTop: "60px", textAlign: "center" }}>
+                -------------------------
+                <br />
+                Firma del Emisor
             </div>
 
         </div>

@@ -1202,7 +1202,7 @@ Gracias por tu confianza.`;
 
             // 🔵 BOTÓN NORMAL
             <Button
-              className="w-full btn-gradient"
+              className="w-full btn-gradient text-white"
               onClick={() => setShowFiscalModal(true)}
             >
               Introducir datos fiscales
@@ -1274,7 +1274,7 @@ Gracias por tu confianza.`;
             {showReciboOptions && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
-                <div className="bg-white p-6 rounded-xl w-[280px] space-y-4">
+                <div className="bg-gray-600 p-6 rounded-xl w-[280px] space-y-4">
 
                   <h2 className="text-center font-bold">Elegir formato</h2>
 
@@ -1286,7 +1286,7 @@ Gracias por tu confianza.`;
                       setShowReciboOptions(false);
                     }}
                   >
-                    📄 Recibo A4
+                    Recibo A4
                   </Button>
 
                   {/* TICKET */}
@@ -1297,7 +1297,7 @@ Gracias por tu confianza.`;
                       setShowReciboOptions(false);
                     }}
                   >
-                    🧾 Recibo 80mm
+                    Recibo 80mm
                   </Button>
 
                   {/* CANCELAR */}
@@ -1313,9 +1313,6 @@ Gracias por tu confianza.`;
 
               </div>
             )}
-
-
-
 
             {/* BOTÓN PDF */}
             <div className="mt-2">
@@ -1364,7 +1361,7 @@ Gracias por tu confianza.`;
 
         {showFiscalModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl w-full max-w-md space-y-4">
+            <div className="bg-gray-800 p-6 rounded-xl w-full max-w-md space-y-4">
 
               <h2 className="text-lg font-bold">Datos Fiscales</h2>
 
@@ -1453,7 +1450,7 @@ Gracias por tu confianza.`;
         {showDownloadOptions && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
-            <div className="bg-white p-6 rounded-xl w-[280px] space-y-4">
+            <div className="bg-gray-600 p-6 rounded-xl w-[280px] space-y-4">
 
               <h2 className="text-center font-bold">Elegir formato</h2>
 
@@ -1465,7 +1462,7 @@ Gracias por tu confianza.`;
                   setShowDownloadOptions(false);
                 }}
               >
-                📄 Factura A4
+                Factura A4
               </Button>
 
               {/* TICKET */}
@@ -1476,7 +1473,7 @@ Gracias por tu confianza.`;
                   setShowDownloadOptions(false);
                 }}
               >
-                🧾 Factura 80mm
+                Factura 80mm
               </Button>
 
               {/* CANCELAR */}
@@ -1495,7 +1492,7 @@ Gracias por tu confianza.`;
 
         {showNotaCreditoDownloadOptions && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl w-[280px] space-y-4">
+            <div className="bg-gray-600 p-6 rounded-xl w-[280px] space-y-4">
               <h2 className="text-center font-bold">Elegir formato</h2>
 
               <Button
@@ -1505,7 +1502,7 @@ Gracias por tu confianza.`;
                   setShowNotaCreditoDownloadOptions(false);
                 }}
               >
-                📄 Nota de Crédito A4
+                Nota de Crédito A4
               </Button>
 
               <Button
@@ -1515,7 +1512,7 @@ Gracias por tu confianza.`;
                   setShowNotaCreditoDownloadOptions(false);
                 }}
               >
-                🧾 Nota de Crédito 80mm
+                Nota de Crédito 80mm
               </Button>
 
               <Button
@@ -1531,7 +1528,7 @@ Gracias por tu confianza.`;
 
         {showCancelReasonModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-            <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+            <div className="bg-gray-600 rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
               <h2 className="text-xl font-bold text-center">Motivo de la cancelación</h2>
               <p className="text-sm text-muted-foreground text-center">
                 Selecciona una razón para justificar la anulación de la factura.

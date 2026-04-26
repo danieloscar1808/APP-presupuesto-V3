@@ -191,7 +191,7 @@ export const ItemsEditor = ({ items, onChange, category }: ItemsEditorProps) => 
       </div>
 
       {/* Add new item */}
-      <div className="card-elevated bg-success/10 border-success/30 p-3 border-dashed space-y-2">
+      <div className="card-elevated bg-gray-600 border-success/30 p-3 border-dashed space-y-2">
         {availableCatalogItems.length > 0 && (
           <Select value="" onValueChange={handleCatalogSelect}>
             <SelectTrigger>

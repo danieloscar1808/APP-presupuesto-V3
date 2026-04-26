@@ -86,7 +86,7 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
           }}
         />
 
-        <div className="text-gray-600 text-[14px] leading-[1.3]">
+        <div className="text-black text-[14px] leading-[1.3]">
 
           <div>
             Punto de Venta: {preliminar ? "—" : String(factura?.puntoVenta || 1).padStart(5, "0")}
