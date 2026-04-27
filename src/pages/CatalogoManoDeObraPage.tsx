@@ -188,15 +188,15 @@ const CatalogoManoDeObraPage = () => {
       <div className="space-y-4">
 
         {/* Import / Export */}
-        <div className="flex gap-2">
-          <Button variant="outline" className="flex-1" onClick={handleImport}>
+        <div className="flex gap-2 ">
+          <Button variant="outline" className="flex-1 bg-primary text-primary-foreground btn-accent" onClick={handleImport}>
             <Download className="w-4 h-4 mr-2" />
             Importar
           </Button>
 
           <Button
             variant="outline"
-            className="flex-1"
+            className="flex-1 bg-primary text-primary-foreground btn-accent"
             onClick={handleExport}
             disabled={items.length === 0}
           >
@@ -244,7 +244,7 @@ const CatalogoManoDeObraPage = () => {
         <Card className="border-dashed">
           <CardContent className="p-2 space-y-2">
             <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 " />
               Agregar nuevo trabajo
             </div>
 
@@ -293,7 +293,7 @@ const CatalogoManoDeObraPage = () => {
               </Select>
             </div>
 
-            <Button className="w-full btn-gradient" onClick={handleAddItem}>
+            <Button className="w-full bg-primary text-primary-foreground btn-accent" onClick={handleAddItem}>
               <Plus className="w-4 h-4 mr-2" />
               Agregar trabajo
             </Button>
@@ -378,7 +378,7 @@ const CatalogoManoDeObraPage = () => {
             </Button>
 
             <Button
-              className="flex-1 btn-accent"
+              className="flex-1 bg-primary text-primary-foreground btn-accent"
               onClick={() => handleUpdateItem(item)}
             >
               Guardar
@@ -404,8 +404,8 @@ const CatalogoManoDeObraPage = () => {
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Trash2 className="w-4 h-4 text-destructive" />
+              <Button variant="ghost" size="icon" className="bg-primary text-primary-foreground btn-accent hover:bg-destructive hover:text-destructive-foreground">
+                <Trash2 className="w-4 h-4" />
               </Button>
             </AlertDialogTrigger>
 
@@ -420,7 +420,9 @@ const CatalogoManoDeObraPage = () => {
               </AlertDialogHeader>
 
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogCancel
+                 className="bg-primary text-primary-foreground btn-accent">
+                Cancelar</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => handleDeleteItem(item.id)}
                   className="bg-destructive text-destructive-foreground"

@@ -73,7 +73,7 @@ const ClientsPage = () => {
   // ---------------------------------------------------------
   const openNewDialog = () => {
     setEditingClient(null);
-    setFormData({ name: "", phone: "", email: "", address: "",docType: "DNI",docNumber: "", });
+    setFormData({ name: "", phone: "", email: "", address: "", docType: "DNI", docNumber: "", });
     setIsDialogOpen(true);
   };
 
@@ -283,50 +283,55 @@ const ClientsPage = () => {
             </div>
 
             <div>
-  <Label>Documento</Label>
+              <Label>Documento</Label>
 
-  <div className="flex gap-2">
-    
-    <select
-      value={formData.docType}
-      onChange={(e) =>
-        setFormData({ ...formData, docType: e.target.value })
-      }
-      className="border rounded px-2 py-1"
-    >
-      <option value="DNI">DNI</option>
-      <option value="CUIT">CUIT</option>
-    </select>
+              <div className="flex gap-2 text-foreground">
 
-    <Input
-      placeholder="Número"
-      value={formData.docNumber}
-      onChange={(e) => {
-        const value = e.target.value.replace(/\D/g, "");
+                <select
+                  value={formData.docType}
+                  onChange={(e) =>
+                    setFormData({ ...formData, docType: e.target.value })
+                  }
+                  className="border rounded px-2 py-1S bg-background"
+                >
+                  <option value="DNI">DNI</option>
+                  <option value="CUIT">CUIT</option>
+                </select>
 
-        if (
-          (formData.docType === "DNI" && value.length <= 8) ||
-          (formData.docType === "CUIT" && value.length <= 11)
-        ) {
-          setFormData({ ...formData, docNumber: value });
-        }
-      }}
-    />
+                <Input
+                  placeholder="Número"
+                  value={formData.docNumber}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
 
-  </div>
-</div>
+                    if (
+                      (formData.docType === "DNI" && value.length <= 8) ||
+                      (formData.docType === "CUIT" && value.length <= 11)
+                    ) {
+                      setFormData({ ...formData, docNumber: value });
+                    }
+                  }}
+                />
+
+              </div>
+            </div>
 
             <div className="flex gap-3">
               <Button
                 type="button"
-                variant="outline"
-                className="flex-1"
+                className="
+                  flex-1 bg-red-600 
+                  text-white 
+                  border border-red-600
+                  transition-all duration-200
+                  hover:bg-white hover:text-red-600
+                  active:bg-white active:text-red-600 active:scale-95"
                 onClick={() => setIsDialogOpen(false)}
               >
                 Cancelar
               </Button>
 
-              <Button type="submit" className="flex-1 btn-gradient">
+              <Button type="submit" className="flex-1 bg-primary text-primary-foreground btn-accent">
                 Guardar
               </Button>
             </div>

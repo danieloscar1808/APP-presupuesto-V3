@@ -1163,7 +1163,7 @@ Gracias por tu confianza.`;
           {/* BOTÓN MODIFICAR */}
           {!isLocked && budget && (
             <Button
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+              className="w-full bg-orange-500 text-white border border-orange-500 hover:bg-white hover:text-orange-500 active:bg-white active:text-orange-500"
               onClick={() => navigate(`/budgets/edit/${budget.id}`)}
             >
               Modificar Presupuesto
@@ -1202,7 +1202,14 @@ Gracias por tu confianza.`;
 
             // 🔵 BOTÓN NORMAL
             <Button
-              className="w-full btn-gradient text-white"
+              className="
+                w-full 
+                bg-blue-800 
+                text-white 
+                border border-blue-800
+                transition-all duration-200
+                hover:bg-white hover:text-blue-800
+                active:bg-white active:text-blue-800 active:scale-95"
               onClick={() => setShowFiscalModal(true)}
             >
               Introducir datos fiscales

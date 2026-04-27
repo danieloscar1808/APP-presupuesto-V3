@@ -13,8 +13,8 @@
     --popover: 220 18% 8%;
     --popover-foreground: 216 22% 87%;
 
-    --primary: 216 18% 67%;
-    --primary-foreground: 220 25% 6%;
+    --primary: 142 50% 35%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 220 16% 10%;
     --secondary-foreground: 216 18% 78%;
@@ -22,8 +22,8 @@
     --muted: 220 14% 11%;
     --muted-foreground: 215 12% 61%;
 
-    --accent: 216 22% 79%;
-    --accent-foreground: 220 25% 6%;
+    --accent: 142 50% 35%;
+    --accent-foreground: 0 0% 100%;
 
     --success: 145 60% 42%;
     --success-foreground: 0 0% 100%;
@@ -179,11 +179,17 @@
     @apply text-primary hover:brightness-110 transition-all duration-200;
   }
 
-  .btn-accent {
-    background: var(--gradient-accent);
-    box-shadow: var(--shadow-glow);
-    @apply text-accent-foreground hover:brightness-105 transition-all duration-200;
-  }
+ .btn-accent {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border: 1px solid hsl(var(--primary));
+  transition: all 0.2s ease;
+}
+
+.btn-accent:hover {
+  background: hsl(var(--primary-foreground));
+  color: hsl(var(--primary));
+}
 
   .status-pending {
     @apply bg-warning/10 text-warning;

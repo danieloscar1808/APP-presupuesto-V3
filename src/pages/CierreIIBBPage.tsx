@@ -97,7 +97,7 @@ console.log("alicuota:", alicuota);
 
       <button
         onClick={cerrar}
-        className="w-full bg-black text-white py-2 rounded"
+        className="w-full bg-primary text-primary-foreground btn-accent py-2 rounded"
       >
         {estadoMes?.cerrado ? "Mes cerrado" : "Cerrar mes"}
       </button>
@@ -123,7 +123,7 @@ console.log("alicuota:", alicuota);
 
       <button
         onClick={descargarPDF}
-        className="bg-black text-white px-4 py-2 rounded"
+        className="bg-primary text-primary-foreground btn-accent px-4 py-2 rounded"
       >
         Descargar PDF para AGIP
       </button>

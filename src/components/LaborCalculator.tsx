@@ -138,8 +138,8 @@ export const LaborCalculator = ({
 
                   <Button
                     size="icon"
-                    variant="outline"
-                    className="shrink-0"
+
+                    className="bg-primary text-primary-foreground btn-accent"
                     onClick={() => addItem(item)}
                     aria-label={`Agregar ${item.name}`}
                   >
@@ -183,8 +183,14 @@ export const LaborCalculator = ({
 
                   <Button
                     size="icon"
-                    variant="ghost"
-                    className="shrink-0"
+
+                    className="
+                    bg-red-500 
+                    text-white 
+                    border border-red-500
+                    transition-all duration-200
+                    hover:bg-white hover:text-red-500
+                    active:bg-white active:text-red-500 active:scale-95"
                     onClick={() => removeItem(index)}
                     aria-label={`Quitar ${item.name}`}
                   >
@@ -213,7 +219,10 @@ export const LaborCalculator = ({
           Usar total
         </Button>
 
-        <Button variant="outline" className="flex-1" onClick={onClose}>
+        <Button variant="outline"
+          className="flex-1 bg-blue-700 text-white border border-blue-700 transition-all duration-200
+                    hover:bg-white hover:text-blue-700 active:bg-white active:text-blue-700 active:scale-95"
+          onClick={onClose}>
           Cerrar
         </Button>
       </div>

@@ -223,14 +223,14 @@ const CatalogPage = () => {
       <div className="space-y-4">
         {/* Import / Export */}
         <div className="flex gap-2">
-          <Button variant="outline" className="flex-1" onClick={handleImport}>
+          <Button variant="outline" className="flex-1 bg-primary text-primary-foreground btn-accent" onClick={handleImport}>
             <Download className="w-4 h-4 mr-2" />
             Importar
           </Button>
 
           <Button
-            variant="outline"
-            className="flex-1"
+            
+            className="flex-1 bg-primary text-primary-foreground btn-accent"
             onClick={handleExport}
             disabled={items.length === 0}
           >
@@ -277,7 +277,7 @@ const CatalogPage = () => {
         {/* Nuevo Ítem */}
         <Card className="border-dashed">
           <CardContent className="p-2 space-y-2">
-            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground ">
               <Plus className="w-4 h-4" />
               Agregar nuevo ítem
             </div>
@@ -327,7 +327,7 @@ const CatalogPage = () => {
               </Select>
             </div>
 
-            <Button onClick={handleAddItem} className="w-full btn-gradient">
+            <Button onClick={handleAddItem} className="w-full bg-primary text-primary-foreground btn-accent">
               <Plus className="w-4 h-4 mr-2" />
               Agregar al Catálogo
             </Button>
@@ -410,7 +410,7 @@ const CatalogPage = () => {
                       <div className="flex gap-2 mt-3">
                         <Button
                           variant="outline"
-                          className="flex-1"
+                          className="flex-1 bg-primary text-primary-foreground btn-accent"
                           onClick={() => setEditingId(null)}
                         >
                           Cancelar
@@ -446,7 +446,7 @@ const CatalogPage = () => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-destructive"
+                            className="bg-primary text-primary-foreground btn-accent hover:bg-destructive hover:text-destructive-foreground"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -464,7 +464,8 @@ const CatalogPage = () => {
                           </AlertDialogHeader>
 
                           <AlertDialogFooter>
-                            <AlertDialogCancel>
+                            <AlertDialogCancel
+                             className="bg-primary text-primary-foreground btn-accent">
                               Cancelar
                             </AlertDialogCancel>
 

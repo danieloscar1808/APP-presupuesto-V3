@@ -29,9 +29,9 @@ export const PageLayout = ({
       {hasHeader && (
         <header className="header-gradient text-primary px-4 pt-4 pb-4 safe-top fixed top-0 left-0 right-0 z-40 border-b border-border/70 backdrop-blur-xl">
 
-  <div className={`${contentClassName} mx-auto flex flex-col items-center text-center app-panel px-5 py-4 surface-soft`}>
+  <div className={`${contentClassName} mx-auto flex flex-col items-center text-center app-panel px-5 py-4 surface-soft shadow-[0_0_0_1px_rgba(45,134,78,0.25),0_6px_20px_rgba(45,134,78,0.35)]`}>
 
-    {title && (
+    {title && (   
       <h1 className="text-lg sm:text-xl font-semibold leading-tight tracking-[0.02em]">
         {title}
       </h1>

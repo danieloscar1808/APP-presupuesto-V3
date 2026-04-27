@@ -95,7 +95,7 @@ const budgetsActivos = budgets.filter(
     <PageLayout title="Inicio">
     
       {/* Botón nuevo presupuesto */}
-      <Button onClick={() => navigate('/budgets/new')} className="w-full btn-accent h-14 text-base mb-6">
+      <Button onClick={() => navigate('/budgets/new')} className="w-full bg-primary text-primary-foreground h-14 text-base mb-6 btn-accent">
         <Plus className="w-5 h-5 mr-2" />
         Nuevo Presupuesto
       </Button>

@@ -32,7 +32,7 @@ export const FABMenu = () => {
                 navigate(item.path);
                 setOpen(false);
               }}
-              className="flex items-center gap-2 bg-primary text-black px-4 py-2 rounded-full shadow-xl border border-gray-300"
+              className="flex items-center gap-2 bg-primary text-black px-4 py-2 rounded-full shadow-xl border border-gray-300 btn-accent"
             >
               <Icon className="w-4 h-4" />
               {item.label}
@@ -43,7 +43,7 @@ export const FABMenu = () => {
       {/* Botón principal */}
       <button
         onClick={() => setOpen(!open)}
-        className="w-14 h-14 rounded-full bg-primary text-black flex items-center justify-center shadow-lg"
+        className="w-14 h-14 rounded-full bg-primary text-black flex items-center justify-center shadow-lg btn-accent"
       >
         {open ? <X /> : <Menu />}
       </button>

@@ -38,8 +38,8 @@ const ProfilePage = () => {
       }
       const pin = localStorage.getItem("pin_creado");
       if (pin === "true") {
-      setPinCreado(true);
-    }
+        setPinCreado(true);
+      }
     }
     load();
   }, []);
@@ -61,28 +61,28 @@ const ProfilePage = () => {
   };
 
   // 1. No tiene PIN → crear
-if (!pinCreado) {
-  return (
-    <CreatePinScreen
-      user_id={user_id}
-      onSuccess={() => setPinCreado(true)}
-    />
-  );
-}
+  if (!pinCreado) {
+    return (
+      <CreatePinScreen
+        user_id={user_id}
+        onSuccess={() => setPinCreado(true)}
+      />
+    );
+  }
 
-// 2. Tiene PIN pero no validó → pedir PIN
-if (!autorizado) {
-  return (
-    <EnterPinScreen
-      user_id={user_id}
-      onSuccess={() => {
-        console.log("AUTORIZADO");
-        setAutorizado(true);
-      }}
-    />
-  );
-}
-  
+  // 2. Tiene PIN pero no validó → pedir PIN
+  if (!autorizado) {
+    return (
+      <EnterPinScreen
+        user_id={user_id}
+        onSuccess={() => {
+          console.log("AUTORIZADO");
+          setAutorizado(true);
+        }}
+      />
+    );
+  }
+
   return (
     <PageLayout title="Perfil Profesional">
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -174,7 +174,7 @@ if (!autorizado) {
             <div>
               <Label htmlFor="address">Dirección</Label>
               <div className="relative mt-1">
-                
+
                 <Textarea
                   id="address"
                   value={profile.address}
@@ -188,29 +188,29 @@ if (!autorizado) {
             <div>
               <Label htmlFor="iibb">Ingresos Brutos (IIBB)</Label>
               <Input
-              id="iibb"
-              value={profile.iibb || ''}
+                id="iibb"
+                value={profile.iibb || ''}
                 onChange={(e) => updateField('iibb', e.target.value)}
                 placeholder="901-123456-7"
                 className="mt-1"
-                />
+              />
             </div>
 
             <div>
               <Label htmlFor="startDate">Inicio de Actividades</Label>
               <Input
-              id="startDate"
-              type="date"
-              value={profile.startDate || ''}
-              onChange={(e) => updateField('startDate', e.target.value)}
-              className="mt-1"
+                id="startDate"
+                type="date"
+                value={profile.startDate || ''}
+                onChange={(e) => updateField('startDate', e.target.value)}
+                className="mt-1"
               />
             </div>
 
           </div>
         </div>
 
-        <Button type="submit" className="w-full btn-gradient h-12 text-foreground">
+        <Button type="submit" className="w-full bg-primary text-primary-foreground h-12 text-foreground btn-accent">
           <Save className="w-4 h-4 mr-2" />
           Guardar Perfil
         </Button>
@@ -225,7 +225,7 @@ if (!autorizado) {
 
         {/* Exportar Backup */}
         <Button
-          className="btn-accent w-full"
+          className="bg-primary text-primary-foreground w-full btn-accent"
           onClick={async () => {
             const backup = await generateBackup();
             const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
@@ -244,54 +244,54 @@ if (!autorizado) {
 
         {/* Importar Backup */}
         <Button
-  variant="outline"
-  className="w-full"
-  onClick={() => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json";
+         
+          className="w-full bg-primary text-primary-foreground btn-accent"
+          onClick={() => {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = ".json";
 
-    input.onchange = (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (!file) {
-        toast.error("No seleccionaste ningún archivo");
-        return;
-      }
+            input.onchange = (event) => {
+              const file = (event.target as HTMLInputElement).files?.[0];
+              if (!file) {
+                toast.error("No seleccionaste ningún archivo");
+                return;
+              }
 
-      const reader = new FileReader();
+              const reader = new FileReader();
 
-      reader.onload = async () => {
-        try {
-          const text = reader.result as string;
-          const data = JSON.parse(text);
+              reader.onload = async () => {
+                try {
+                  const text = reader.result as string;
+                  const data = JSON.parse(text);
 
-          const { importBackup } = await import("@/lib/storage");
+                  const { importBackup } = await import("@/lib/storage");
 
-          await importBackup(data);
+                  await importBackup(data);
 
-          toast.success("Backup importado. Recargando...");
+                  toast.success("Backup importado. Recargando...");
 
-          setTimeout(() => {
-            window.location.reload();
-          }, 800);
-        } catch (error) {
-          console.error(error);
-          toast.error("Error al procesar el archivo");
-        }
-      };
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 800);
+                } catch (error) {
+                  console.error(error);
+                  toast.error("Error al procesar el archivo");
+                }
+              };
 
-      reader.onerror = () => {
-        toast.error("Error leyendo el archivo");
-      };
+              reader.onerror = () => {
+                toast.error("Error leyendo el archivo");
+              };
 
-      reader.readAsText(file);
-    };
+              reader.readAsText(file);
+            };
 
-    input.click();
-  }}
->
-  Importar Backup
-</Button>
+            input.click();
+          }}
+        >
+          Importar Backup
+        </Button>
       </div>
 
     </PageLayout>

@@ -34,27 +34,27 @@ export const ShareOptions = ({ budget, profile, onStatusChange, disabled }: Prop
   };
 
   // ---------------------------------------------------------
-// ESTADOS DEL PRESUPUESTO
-// ---------------------------------------------------------
-const setStatus = async (status: Budget["status"]) => {
-  // 🔒 BLOQUEO DURO
-  if (disabled) {
-    console.warn("Presupuesto bloqueado - no se puede cambiar estado");
-    return;
-  }
+  // ESTADOS DEL PRESUPUESTO
+  // ---------------------------------------------------------
+  const setStatus = async (status: Budget["status"]) => {
+    // 🔒 BLOQUEO DURO
+    if (disabled) {
+      console.warn("Presupuesto bloqueado - no se puede cambiar estado");
+      return;
+    }
 
-  try {
-    setLoading(true);
-    await updateBudgetStatus(budget.id, status);
-    toast.success("Estado actualizado");
+    try {
+      setLoading(true);
+      await updateBudgetStatus(budget.id, status);
+      toast.success("Estado actualizado");
 
-    if (onStatusChange) onStatusChange();
-  } catch (err) {
-    toast.error("No se pudo actualizar el estado");
-  } finally {
-    setLoading(false);
-  }
-};
+      if (onStatusChange) onStatusChange();
+    } catch (err) {
+      toast.error("No se pudo actualizar el estado");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ---------------------------------------------------------
   // WHATSAPP
@@ -88,7 +88,14 @@ const setStatus = async (status: Budget["status"]) => {
       <Button
         onClick={handleDownloadPDF}
         disabled={loading}
-        className="w-full btn-accent"
+        className="
+          w-full 
+          bg-blue-500 
+          text-white 
+          border border-blue-500
+          transition-all duration-200
+          hover:bg-white hover:text-blue-500
+          active:bg-white active:text-blue-500"
       >
         <FileDown className="w-4 h-4 mr-2" />
         Descargar PDF
@@ -98,7 +105,14 @@ const setStatus = async (status: Budget["status"]) => {
       <Button
         onClick={sendWhatsApp}
         disabled={loading}
-        className="w-full bg-green-600 hover:bg-green-700 text-white"
+        className="
+          w-full 
+          bg-green-500 
+          text-white 
+          border border-green-500
+          transition-all duration-200
+          hover:bg-white hover:text-green-500
+          active:bg-white active:text-green-500"
       >
         <MessageCircle className="w-4 h-4 mr-2" />
         Enviar por WhatsApp
@@ -109,7 +123,14 @@ const setStatus = async (status: Budget["status"]) => {
         onClick={sendEmail}
         disabled={loading}
         variant="outline"
-        className="w-full"
+        className="
+          w-full 
+          bg-amber-700 
+          text-white 
+          border border-amber-700
+          transition-all duration-200
+          hover:bg-white hover:text-amber-700
+          active:bg-white active:text-amber-700 active:scale-95"
       >
         <Mail className="w-4 h-4 mr-2" />
         Enviar por Email
@@ -120,17 +141,31 @@ const setStatus = async (status: Budget["status"]) => {
         <Button
           onClick={() => setStatus("accepted")}
           disabled={disabled}
-          className="w-full bg-emerald-500 text-black shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_14px_30px_rgba(16,185,129,0.28)] hover:bg-emerald-400"
+          className="
+            w-full 
+            bg-emerald-600 
+            text-white 
+            border border-emerald-600
+            transition-all duration-200
+            hover:bg-white hover:text-emerald-600
+            active:bg-white active:text-emerald-600 active:scale-95"
         >
           <CheckCircle className="w-4 h-4 mr-2" />
           Aceptar
         </Button>
 
-      <Button
+        <Button
           onClick={() => setStatus("rejected")}
           disabled={disabled}
           variant="destructive"
-          className="w-full"
+          className="
+            w-full 
+            bg-red-500 
+            text-white 
+            border border-red-500
+            transition-all duration-200
+            hover:bg-white hover:text-red-500
+            active:bg-white active:text-red-500 active:scale-95"
         >
           <XCircle className="w-4 h-4 mr-2" />
           Rechazado
@@ -142,7 +177,14 @@ const setStatus = async (status: Budget["status"]) => {
         <Button
           onClick={() => setStatus("sent")}
           disabled={loading}
-          className="w-full mt-2"
+         className="
+            w-full 
+            bg-gray-500 
+            text-white 
+            border border-gray-500
+            transition-all duration-200
+            hover:bg-white hover:text-gray-500
+            active:bg-white active:text-gray-500 active:scale-95"
         >
           <Send className="w-4 h-4 mr-2" />
           Marcar como enviado
