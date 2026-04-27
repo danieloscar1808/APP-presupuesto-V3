@@ -88,14 +88,7 @@ export const ShareOptions = ({ budget, profile, onStatusChange, disabled }: Prop
       <Button
         onClick={handleDownloadPDF}
         disabled={loading}
-        className="
-          w-full 
-          bg-blue-500 
-          text-white 
-          border border-blue-500
-          transition-all duration-200
-          hover:bg-white hover:text-blue-500
-          active:bg-white active:text-blue-500"
+        className="btn-blue"
       >
         <FileDown className="w-4 h-4 mr-2" />
         Descargar PDF
@@ -105,14 +98,7 @@ export const ShareOptions = ({ budget, profile, onStatusChange, disabled }: Prop
       <Button
         onClick={sendWhatsApp}
         disabled={loading}
-        className="
-          w-full 
-          bg-green-500 
-          text-white 
-          border border-green-500
-          transition-all duration-200
-          hover:bg-white hover:text-green-500
-          active:bg-white active:text-green-500"
+        className="btn-green"
       >
         <MessageCircle className="w-4 h-4 mr-2" />
         Enviar por WhatsApp
@@ -123,14 +109,7 @@ export const ShareOptions = ({ budget, profile, onStatusChange, disabled }: Prop
         onClick={sendEmail}
         disabled={loading}
         variant="outline"
-        className="
-          w-full 
-          bg-amber-700 
-          text-white 
-          border border-amber-700
-          transition-all duration-200
-          hover:bg-white hover:text-amber-700
-          active:bg-white active:text-amber-700 active:scale-95"
+        className="btn-amber"
       >
         <Mail className="w-4 h-4 mr-2" />
         Enviar por Email
@@ -141,14 +120,7 @@ export const ShareOptions = ({ budget, profile, onStatusChange, disabled }: Prop
         <Button
           onClick={() => setStatus("accepted")}
           disabled={disabled}
-          className="
-            w-full 
-            bg-emerald-600 
-            text-white 
-            border border-emerald-600
-            transition-all duration-200
-            hover:bg-white hover:text-emerald-600
-            active:bg-white active:text-emerald-600 active:scale-95"
+          className="btn-emerald"
         >
           <CheckCircle className="w-4 h-4 mr-2" />
           Aceptar
@@ -158,14 +130,7 @@ export const ShareOptions = ({ budget, profile, onStatusChange, disabled }: Prop
           onClick={() => setStatus("rejected")}
           disabled={disabled}
           variant="destructive"
-          className="
-            w-full 
-            bg-red-500 
-            text-white 
-            border border-red-500
-            transition-all duration-200
-            hover:bg-white hover:text-red-500
-            active:bg-white active:text-red-500 active:scale-95"
+          className="btn-red"
         >
           <XCircle className="w-4 h-4 mr-2" />
           Rechazado

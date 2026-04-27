@@ -1163,7 +1163,7 @@ Gracias por tu confianza.`;
           {/* BOTÓN MODIFICAR */}
           {!isLocked && budget && (
             <Button
-              className="w-full bg-orange-500 text-white border border-orange-500 hover:bg-white hover:text-orange-500 active:bg-white active:text-orange-500"
+              className="btn-orange"
               onClick={() => navigate(`/budgets/edit/${budget.id}`)}
             >
               Modificar Presupuesto
@@ -1202,14 +1202,7 @@ Gracias por tu confianza.`;
 
             // 🔵 BOTÓN NORMAL
             <Button
-              className="
-                w-full 
-                bg-blue-800 
-                text-white 
-                border border-blue-800
-                transition-all duration-200
-                hover:bg-white hover:text-blue-800
-                active:bg-white active:text-blue-800 active:scale-95"
+              className="btn-blue-dark"
               onClick={() => setShowFiscalModal(true)}
             >
               Introducir datos fiscales
@@ -1234,7 +1227,7 @@ Gracias por tu confianza.`;
             {budget.status === "listo_para_facturar" && (
               <div className="mt-2">
                 <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="btn-blue-dark"
                   onClick={generarFactura}
                 >
                   Emitir Factura
@@ -1270,7 +1263,7 @@ Gracias por tu confianza.`;
 
             {factura?.cae && recibo && !procesandoPago && (
               <Button
-                className="w-full bg-gray-500 hover:bg-gray-700 text-white mt-2"
+                className="btn-gray mt-2"
                 onClick={() => setShowReciboOptions(true)}
               >
                 Imprimir Recibo
@@ -1287,7 +1280,7 @@ Gracias por tu confianza.`;
 
                   {/* PDF A4 */}
                   <Button
-                    className="w-full"
+                    className="btn-emerald"
                     onClick={() => {
                       imprimirReciboA4();
                       setShowReciboOptions(false);
@@ -1298,7 +1291,7 @@ Gracias por tu confianza.`;
 
                   {/* TICKET */}
                   <Button
-                    className="w-full bg-gray-800 text-white"
+                    className="btn-blue"
                     onClick={() => {
                       imprimirReciboTicket80mm();
                       setShowReciboOptions(false);
@@ -1310,7 +1303,7 @@ Gracias por tu confianza.`;
                   {/* CANCELAR */}
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="btn-red"
                     onClick={() => setShowReciboOptions(false)}
                   >
                     Cancelar
@@ -1324,7 +1317,7 @@ Gracias por tu confianza.`;
             {/* BOTÓN PDF */}
             <div className="mt-2">
               <Button
-                className="w-full"
+                className="btn-blue"
                 onClick={() => setShowDownloadOptions(true)}
               >
                 Descargar Factura
@@ -1332,7 +1325,7 @@ Gracias por tu confianza.`;
 
               {budget?.notaCredito && (
                 <Button
-                  className="w-full bg-slate-800 hover:bg-slate-900 text-white mt-2"
+                  className="btn-yellow mt-2"
                   onClick={() => setShowNotaCreditoDownloadOptions(true)}
                 >
                   Descargar Nota de Crédito
@@ -1340,7 +1333,7 @@ Gracias por tu confianza.`;
               )}
 
               <Button
-                className="w-full bg-green-600 hover:bg-green-700 text-white mt-2"
+                className="btn-green"
                 onClick={enviarWhatsApp}
               >
                 Enviar por WhatsApp
@@ -1356,7 +1349,7 @@ Gracias por tu confianza.`;
 
               ) : (
                 <Button
-                  className="w-full bg-red-600 hover:bg-red-700 text-white mt-2"
+                  className="mt-2 btn-red"
                   onClick={handleStartCancelFactura}
                 >
                   Cancelar Factura
@@ -1433,7 +1426,7 @@ Gracias por tu confianza.`;
               {/* BOTONES */}
               <div className="flex gap-2">
                 <Button
-                  className="w-full"
+                  className="btn-red"
                   variant="outline"
                   onClick={() => setShowFiscalModal(false)}
                 >
@@ -1441,7 +1434,7 @@ Gracias por tu confianza.`;
                 </Button>
 
                 <Button
-                  className="w-full"
+                  className="btn-emerald"
                   onClick={() => {
                     generarPreliminar(); // usamos tu función actual por ahora
                     setShowFiscalModal(false);
@@ -1463,7 +1456,7 @@ Gracias por tu confianza.`;
 
               {/* PDF A4 */}
               <Button
-                className="w-full"
+                className="btn-emerald"
                 onClick={() => {
                   descargarPDFA4();
                   setShowDownloadOptions(false);
@@ -1474,7 +1467,7 @@ Gracias por tu confianza.`;
 
               {/* TICKET */}
               <Button
-                className="w-full bg-gray-800 text-white"
+                className="btn-blue"
                 onClick={() => {
                   imprimirTicket80mm();
                   setShowDownloadOptions(false);
@@ -1486,7 +1479,7 @@ Gracias por tu confianza.`;
               {/* CANCELAR */}
               <Button
                 variant="outline"
-                className="w-full"
+                className="btn-red"
                 onClick={() => setShowDownloadOptions(false)}
               >
                 Cancelar
@@ -1503,7 +1496,7 @@ Gracias por tu confianza.`;
               <h2 className="text-center font-bold">Elegir formato</h2>
 
               <Button
-                className="w-full"
+                className="btn-emerald"
                 onClick={() => {
                   descargarNotaCreditoPDFA4();
                   setShowNotaCreditoDownloadOptions(false);
@@ -1513,7 +1506,7 @@ Gracias por tu confianza.`;
               </Button>
 
               <Button
-                className="w-full bg-gray-800 text-white"
+                className="btn-blue"
                 onClick={() => {
                   imprimirNotaCreditoTicket80mm();
                   setShowNotaCreditoDownloadOptions(false);
@@ -1524,7 +1517,7 @@ Gracias por tu confianza.`;
 
               <Button
                 variant="outline"
-                className="w-full"
+                className="btn-red"
                 onClick={() => setShowNotaCreditoDownloadOptions(false)}
               >
                 Cancelar
@@ -1543,7 +1536,7 @@ Gracias por tu confianza.`;
 
               <div className="space-y-2 max-h-64 overflow-auto">
                 {cancelReasonOptions.map((option) => (
-                  <label key={option} className="flex items-center gap-3 rounded-xl border p-3 cursor-pointer hover:bg-slate-50">
+                  <label key={option} className="flex items-center gap-3 rounded-xl border p-3 cursor-pointer hover:bg-slate-500">
                     <input
                       type="radio"
                       name="cancelReason"
@@ -1569,13 +1562,13 @@ Gracias por tu confianza.`;
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="btn-blue"
                   onClick={() => setShowCancelReasonModal(false)}
                 >
                   Volver
                 </Button>
                 <Button
-                  className="w-full"
+                  className="btn-green-ok"
                   onClick={handleConfirmCancelFactura}
                 >
                   Aceptar

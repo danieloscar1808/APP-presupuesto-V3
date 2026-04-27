@@ -38,6 +38,9 @@ export default function CreatePinScreen({ user_id, onSuccess }) {
     onSuccess();
   };
 
+
+  
+
   return (
     <div style={styles.container}>
       <div style={styles.card}>
@@ -195,7 +198,7 @@ const styles = {
   pinBoxActive: {
     transform: "translateY(1px) scale(0.98)",
     borderColor: ACCENT_COLOR,
-    boxShadow: "0 12px 28px rgba(157, 168, 185, 0.24), 0 0 0 1px rgba(157, 168, 185, 0.18)",
+    boxShadow: "0 10px 24px rgba(45, 134, 78, 1), inset 0 1px 0 rgba(255,255,255,0.05)",
   },
   hiddenInput: {
     position: "absolute",
@@ -210,7 +213,7 @@ const styles = {
     color: ACCENT_COLOR,
     fontSize: 25,
     cursor: "pointer",
-    boxShadow: "0 10px 24px rgba(157, 168, 185, 0.18), inset 0 1px 0 rgba(255,255,255,0.05)",
+    boxShadow: "0 10px 24px rgba(45, 134, 78, 1), inset 0 1px 0 rgba(255,255,255,0.05)",
     transition: "transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease, color 0.14s ease",
     touchAction: "manipulation",
   },

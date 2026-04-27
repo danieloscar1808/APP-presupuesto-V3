@@ -175,7 +175,8 @@
 
   .btn-gradient {
     background: var(--gradient-primary);
-    box-shadow: var(--shadow-card);
+    box-shadow: 0 10px 24px rgba(45, 134, 78, 1),
+    inset 0 1px 0 rgba(255,255,255,0.05);
     @apply text-primary hover:brightness-110 transition-all duration-200;
   }
 
@@ -311,4 +312,236 @@
     box-shadow: none !important;
     border: none !important;
   }
+}
+
+
+
+.btn-yellow {
+  width: 100%;
+  background-color: #ca8a04; /* yellow-600 */
+  color: white;
+  border: 1px solid #ca8a04;
+  transition: all 0.2s ease;
+}
+
+/* Hover solo en desktop */
+@media (hover: hover) {
+  .btn-yellow:hover {
+    background-color: white;
+    color: #ca8a04;
+  }
+}
+
+/* Click (mobile + desktop) */
+.btn-yellow:active {
+  background-color: white;
+  color: #ca8a04;
+  transform: scale(0.95);
+}
+
+
+.btn-green {
+  width: 100%;
+  margin-top: 0.5rem; /* mt-2 */
+  background-color: #22c55e; /* green-500 */
+  color: white;
+  border: 1px solid #22c55e;
+  transition: all 0.2s ease;
+}
+
+/* Hover solo en desktop */
+@media (hover: hover) {
+  .btn-green:hover {
+    background-color: white;
+    color: #22c55e;
+  }
+}
+
+/* Click (mobile + desktop) */
+.btn-green:active {
+  background-color: white;
+  color: #22c55e;
+}
+
+.btn-blue {
+  width: 100%;
+  background-color: #3b82f6; /* blue-500 */
+  color: white;
+  border: 1px solid #3b82f6;
+  transition: all 0.2s ease;
+}
+
+/* Hover solo en desktop */
+@media (hover: hover) {
+  .btn-blue:hover {
+    background-color: white;
+    color: #3b82f6;
+  }
+}
+
+/* Click (mobile + desktop) */
+.btn-blue:active {
+  background-color: white;
+  color: #3b82f6;
+}
+
+.btn-red {
+  width: 100%;
+  background-color: #ef4444; /* red-500 */
+  color: white;
+  border: 1px solid #ef4444;
+  transition: all 0.2s ease;
+}
+
+/* Hover solo en desktop */
+@media (hover: hover) {
+  .btn-red:hover {
+    background-color: white;
+    color: #ef4444;
+  }
+}
+
+/* Click (mobile + desktop) */
+.btn-red:active {
+  background-color: white;
+  color: #ef4444;
+  transform: scale(0.95);
+}
+
+.btn-emerald {
+  width: 100%;
+  background-color: #059669; /* emerald-600 */
+  color: white;
+  border: 1px solid #059669;
+  transition: all 0.2s ease;
+}
+
+/* Hover solo en desktop */
+@media (hover: hover) {
+  .btn-emerald:hover {
+    background-color: white;
+    color: #059669;
+  }
+}
+
+/* Click (mobile + desktop) */
+.btn-emerald:active {
+  background-color: white;
+  color: #059669;
+  transform: scale(0.95);
+}
+
+.btn-gray {
+  width: 100%;
+  background-color: #4b5563; /* gray-600 */
+  color: white;
+  border: 1px solid #4b5563;
+  transition: all 0.2s ease;
+}
+
+/* Hover solo en desktop */
+@media (hover: hover) {
+  .btn-gray:hover {
+    background-color: white;
+    color: #4b5563;
+  }
+}
+
+/* Click (mobile + desktop) */
+.btn-gray:active {
+  background-color: white;
+  color: #4b5563;
+  transform: scale(0.95);
+}
+
+.btn-blue-dark {
+  width: 100%;
+  background-color: #1d4ed8; /* blue-700 */
+  color: white;
+  border: 1px solid #1d4ed8;
+  transition: all 0.2s ease;
+}
+
+/* Hover solo en desktop */
+@media (hover: hover) {
+  .btn-blue-dark:hover {
+    background-color: white;
+    color: #1d4ed8;
+  }
+}
+
+/* Click (mobile + desktop) */
+.btn-blue-dark:active {
+  background-color: white;
+  color: #1d4ed8;
+  transform: scale(0.95);
+}
+
+.btn-orange {
+  width: 100%;
+  background-color: #f97316; /* orange-500 */
+  color: white;
+  border: 1px solid #f97316;
+  transition: all 0.2s ease;
+}
+
+/* Hover solo en desktop */
+@media (hover: hover) {
+  .btn-orange:hover {
+    background-color: white;
+    color: #f97316;
+  }
+}
+
+/* Click (mobile + desktop) */
+.btn-orange:active {
+  background-color: white;
+  color: #f97316;
+  transform: scale(0.95);
+}
+
+.btn-amber {
+  width: 100%;
+  background-color: #b45309; /* amber-700 */
+  color: white;
+  border: 1px solid #b45309;
+  transition: all 0.2s ease;
+}
+
+/* Hover solo en desktop */
+@media (hover: hover) {
+  .btn-amber:hover {
+    background-color: white;
+    color: #b45309;
+  }
+}
+
+/* Click (mobile + desktop) */
+.btn-amber:active {
+  background-color: white;
+  color: #b45309;
+  transform: scale(0.95);
+}
+
+.btn-green-ok {
+  width: 100%;
+  background-color: #059669; /* emerald-600 */
+  color: white;
+  border: 1px solid #059669;
+  transition: all 0.2s ease;
+}
+
+/* Hover solo en desktop */
+@media (hover: hover) {
+  .btn-green-ok:hover {
+    background-color: white;
+    color: #059669;
+  }
+}
+
+/* Click (mobile + desktop) */
+.btn-green-ok:active {
+  background-color: white;
+  color: #059669;
+  transform: scale(0.95);
 }
