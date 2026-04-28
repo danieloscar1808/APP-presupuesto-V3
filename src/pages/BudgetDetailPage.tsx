@@ -774,6 +774,16 @@ Gracias por tu confianza.`;
     setShowCancelReasonModal(false);
 
     try {
+
+      if (!factura || !factura.numero) {
+        console.error("❌ FACTURA INVALIDA:", factura);
+        setLoadingAFIP(false);
+        return;
+      }
+
+      const tipoCambio =
+        factura.tipo_cambio ?? factura.tipoCambio ?? 1;
+
       const response = await fetch(
         "https://facturacion-server-backend.onrender.com/api/nota-credito",
         {
@@ -785,28 +795,49 @@ Gracias por tu confianza.`;
             facturaNumero: factura.numero,
             total: factura.total,
             moneda: factura.moneda || "ARS",
-            tipoCambio: factura.tipoCambio || null,
+            tipoCambio: tipoCambio,
             totalUSD:
               factura.moneda === "USD"
-                ? Number(factura.total) / Number(factura.tipoCambio || 1)
+                ? Math.round(Number(factura.total) / Number(tipoCambio))
                 : null,
             motivo,
           })
         }
       );
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ ERROR BACKEND NC:", errorText);
+        setLoadingAFIP(false);
+        return;
+      }
+
       const data = await response.json();
 
       const dataConNumero = {
         numero: data.numero,
-        facturaAsociada: data.facturaAsociada || factura.numero,
+
+        // 🔥 CLAVE
+        facturaAsociada: factura.numero,
+
         total: Math.round(Number(data.total || 0)),
+
+        // 🔥 AGREGAR ESTO (IMPORTANTE PARA USD)
+        moneda: factura.moneda,
+        tipo_cambio: tipoCambio,
+        total_usd:
+          factura.moneda === "USD"
+            ? Math.round(Number(factura.total) / Number(tipoCambio))
+            : null,
+
         CAE: data.CAE,
         vencimiento: data.vencimiento,
         fecha: new Date().toISOString(),
         qr: data.qr,
         motivo,
       };
+
+      console.log("✅ NOTA CREDITO GENERADA:", dataConNumero);
 
       cancelarFacturaStore(
         Number(budget.factura.numero.split("-")[1]),
