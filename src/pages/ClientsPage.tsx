@@ -218,7 +218,7 @@ const ClientsPage = () => {
 
       {/* DIALOGO */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-sm mx-4">
+        <DialogContent className="w-[95vw] max-w-md rounded-2xl">
           <DialogHeader>
             <DialogTitle>
               {editingClient ? "Editar Cliente" : "Nuevo Cliente"}
@@ -278,7 +278,7 @@ const ClientsPage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, docType: e.target.value })
                   }
-                  className="border rounded px-2 py-1S bg-background"
+                  className="border rounded px-2 py-1 bg-background"
                 >
                   <option value="DNI">DNI</option>
                   <option value="CUIT">CUIT</option>
@@ -302,7 +302,7 @@ const ClientsPage = () => {
               </div>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row">
               {editingClient && (
                 <Button
                   type="button"

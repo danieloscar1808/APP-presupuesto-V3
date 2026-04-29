@@ -1374,7 +1374,7 @@ Gracias por tu confianza.`;
                 Enviar por WhatsApp
               </Button>
 
-             {budget.status !== "cancelado" && (
+              {budget.status !== "cancelado" && (
                 <Button
                   className="mt-2 btn-red"
                   onClick={handleStartCancelFactura}
@@ -1607,9 +1607,9 @@ Gracias por tu confianza.`;
 
         {/* ANIMACIÓN AFIP PRO */}
         {loadingAFIP && (
-          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[999]">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[999]">
 
-            <div className="bg-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
+            <div className="bg-gray-600 text-white rounded-xl p-6 shadow-xl flex flex-col items-center gap-6 w-[300px]">
 
               {/* TÍTULO */}
               <p className="font-semibold text-base">
@@ -1624,7 +1624,7 @@ Gracias por tu confianza.`;
                   <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
                     <Server className="w-8 h-8 text-blue-600" />
                   </div>
-                  <span className="text-base mt-2 text-blue-700 font-medium">
+                  <span className="text-base mt-2 text-blue-300 bg-slate-500  font-medium">
                     SICE
                   </span>
                 </div>
@@ -1633,14 +1633,14 @@ Gracias por tu confianza.`;
                 <div className="flex flex-col items-center gap-2">
 
                   {/* IDA */}
-                  <div className="flex gap-1 text-blue-500 text-lg">
+                  <div className="flex gap-1 text-blue-300 text-lg">
                     <span className="animate-[pulse_1s_infinite]">→</span>
                     <span className="animate-[pulse_1s_infinite_0.2s]">→</span>
                     <span className="animate-[pulse_1s_infinite_0.4s]">→</span>
                   </div>
 
                   {/* VUELTA */}
-                  <div className="flex gap-1 text-green-500 text-lg">
+                  <div className="flex gap-1 text-green-400 text-lg">
                     <span className="animate-[pulse_1s_infinite]">←</span>
                     <span className="animate-[pulse_1s_infinite_0.2s]">←</span>
                     <span className="animate-[pulse_1s_infinite_0.4s]">←</span>
@@ -1653,7 +1653,7 @@ Gracias por tu confianza.`;
                   <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
                     <Building2 className="w-8 h-8 text-green-600" />
                   </div>
-                  <span className="text-base mt-2 text-green-700 font-medium">
+                  <span className="text-base mt-2 bg-slate-500 text-green-400 font-medium">
                     ARCA
                   </span>
                 </div>
@@ -1661,17 +1661,17 @@ Gracias por tu confianza.`;
               </div>
 
               {/* TEXTO */}
-              <p className="text-sm text-muted-foreground text-center animate-pulse">
+              <p className="text-sm text-gray-300 text-center animate-pulse">
                 Enviando datos fiscales y esperando validación...
               </p>
 
               {/* SPINNER */}
-              <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+              <div className="w-6 h-6 border-2 border-gray-400 border-t-green-400 rounded-full animate-spin"></div>
 
               {/* BARRA DE PROGRESO */}
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-gray-500 rounded-full h-2 overflow-hidden">
                 <div
-                  className="bg-blue-500 h-2 transition-all duration-300"
+                  className="bg-green-500 h-2 transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
