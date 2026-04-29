@@ -197,7 +197,7 @@
   }
 
   .status-sent {
-    @apply bg-primary/10 text-primary border border-primary/20;
+    @apply bg-gray-500 text-gray-900 border border-primary/20;
   }
 
   .status-accepted {
@@ -342,7 +342,6 @@
 
 .btn-green {
   width: 100%;
-  margin-top: 0.5rem; /* mt-2 */
   background-color: #22c55e; /* green-500 */
   color: white;
   border: 1px solid #22c55e;

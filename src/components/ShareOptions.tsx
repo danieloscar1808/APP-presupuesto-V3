@@ -115,46 +115,44 @@ export const ShareOptions = ({ budget, profile, onStatusChange, disabled }: Prop
         Enviar por Email
       </Button>
 
-      {/* CAMBIAR ESTADO */}
-      <div className="grid grid-cols-2 gap-2 pt-2">
-        <Button
-          onClick={() => setStatus("accepted")}
-          disabled={disabled}
-          className="btn-emerald"
-        >
-          <CheckCircle className="w-4 h-4 mr-2" />
-          Aceptar
-        </Button>
-
-        <Button
-          onClick={() => setStatus("rejected")}
-          disabled={disabled}
-          variant="destructive"
-          className="btn-red"
-        >
-          <XCircle className="w-4 h-4 mr-2" />
-          Rechazado
-        </Button>
-      </div>
-
       {/* MARCAR COMO ENVIADO */}
       {budget.status === "draft" && (
+
         <Button
           onClick={() => setStatus("sent")}
           disabled={loading}
-         className="
-            w-full 
-            bg-gray-500 
-            text-white 
-            border border-gray-500
-            transition-all duration-200
-            hover:bg-white hover:text-gray-500
-            active:bg-white active:text-gray-500 active:scale-95"
+          className="btn-gray"
         >
           <Send className="w-4 h-4 mr-2" />
           Marcar como enviado
         </Button>
+
       )}
+
+
+      {/* CAMBIAR ESTADO */}
+      {!disabled && (
+        <div className="grid grid-cols-2 gap-2 pt-3 mb-3 border-t">
+          <Button
+            onClick={() => setStatus("accepted")}
+            className="btn-emerald"
+          >
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Aceptar
+          </Button>
+
+          <Button
+            onClick={() => setStatus("rejected")}
+            variant="destructive"
+            className="btn-red"
+          >
+            <XCircle className="w-4 h-4 mr-2" />
+            Rechazado
+          </Button>
+        </div>
+      )}
+
+
     </div>
   );
 };

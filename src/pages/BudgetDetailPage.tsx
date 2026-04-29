@@ -853,6 +853,8 @@ Gracias por tu confianza.`;
       await saveBudget(updatedBudgetCancelado);
       setBudget(updatedBudgetCancelado);
 
+      toast.success("Factura cancelada correctamente");
+
       setProgress(100);
 
       setTimeout(() => {
@@ -1263,6 +1265,8 @@ Gracias por tu confianza.`;
                 >
                   Emitir Factura
                 </Button>
+
+
               </div>
             )}
 
@@ -1364,21 +1368,13 @@ Gracias por tu confianza.`;
               )}
 
               <Button
-                className="btn-green"
+                className="btn-green mt-2"
                 onClick={enviarWhatsApp}
               >
                 Enviar por WhatsApp
               </Button>
 
-              {budget.notaCredito ? (
-
-                <div className="w-full mt-2">
-                  <div className="w-full h-10 bg-red-600 text-white rounded-md flex items-center justify-center font-medium">
-                    Factura cancelada correctamente
-                  </div>
-                </div>
-
-              ) : (
+             {budget.status !== "cancelado" && (
                 <Button
                   className="mt-2 btn-red"
                   onClick={handleStartCancelFactura}

@@ -177,11 +177,15 @@ const ClientsPage = () => {
       ) : (
         <div className="space-y-3">
           {filteredClients.map((client) => (
-            <div key={client.id} className="card-elevated p-4">
+            <div
+              key={client.id}
+              onClick={() => openEditDialog(client)}
+              className="card-elevated p-4 cursor-pointer hover:scale-[1.01] transition"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <span className="text-sm font-medium text-primary">
+                  <div className="w-10 h-10 rounded-full bg-primary/30 flex items-center justify-center shrink-0">
+                    <span className="text-lg font-medium text-primary-foreground drop-shadow-[0_0_6px_hsl(var(--primary)/0.9)]">
                       {client.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -205,25 +209,7 @@ const ClientsPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => openEditDialog(client)}
-                    className="h-8 w-8 flex items-center justify-center"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
 
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(client.id)}
-                    className="h-8 w-8 text-destructive"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
               </div>
             </div>
           ))}
@@ -317,24 +303,36 @@ const ClientsPage = () => {
             </div>
 
             <div className="flex gap-3">
+              {editingClient && (
+                <Button
+                  type="button"
+                  className="flex-1 btn-red"
+                  onClick={() => {
+                    handleDelete(editingClient.id);
+                    setIsDialogOpen(false);
+                  }}
+                >
+                  Eliminar
+                </Button>
+              )}
+
               <Button
                 type="button"
-                className="
-                  flex-1 bg-red-600 
-                  text-white 
-                  border border-red-600
-                  transition-all duration-200
-                  hover:bg-white hover:text-red-600
-                  active:bg-white active:text-red-600 active:scale-95"
+                className="flex-1 btn-orange"
                 onClick={() => setIsDialogOpen(false)}
               >
                 Cancelar
               </Button>
 
-              <Button type="submit" className="flex-1 bg-primary text-primary-foreground btn-accent">
+              <Button
+                type="submit"
+                className="flex-1 btn-green"
+              >
                 Guardar
               </Button>
             </div>
+
+
           </form>
         </DialogContent>
       </Dialog>
