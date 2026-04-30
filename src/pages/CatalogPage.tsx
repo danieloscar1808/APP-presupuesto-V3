@@ -71,7 +71,7 @@ const CatalogPage = () => {
     const data = await getCatalogItems();
 
     const sorted = data.sort((a, b) =>
-    a.name.localeCompare(b.name, "es", { sensitivity: "base" })
+      a.name.localeCompare(b.name, "es", { sensitivity: "base" })
     );
 
     setItems(sorted);
@@ -144,39 +144,39 @@ const CatalogPage = () => {
   // ---------------------------------------------------------
   const handleAddItem = async () => {
 
-  if (!newItem.description) return;
+    if (!newItem.description) return;
 
-  // -----------------------------
-  // crear item del presupuesto
-  // -----------------------------
-  const item: BudgetItem = {
-    id: uuid(),
-    description: newItem.description,
-    quantity: newItem.quantity,
-    unitPrice: newItem.unitPrice
-  };
-
-  // agregar al presupuesto
-  onChange([...items, item]);
-
-  // -------------------------------------------------
-  // guardar también en el catálogo si no existe
-  // -------------------------------------------------
-
-  const existing = await getCatalogItemByName(newItem.description);
-
-  if (!existing) {
-
-    const catalogItem: CatalogItem = {
+    // -----------------------------
+    // crear item del presupuesto
+    // -----------------------------
+    const item: BudgetItem = {
       id: uuid(),
-      name: newItem.description,
-      price: newItem.unitPrice,
-      category: category || "general"
+      description: newItem.description,
+      quantity: newItem.quantity,
+      unitPrice: newItem.unitPrice
     };
 
-    await saveCatalogItem(catalogItem);
-  }
-};
+    // agregar al presupuesto
+    onChange([...items, item]);
+
+    // -------------------------------------------------
+    // guardar también en el catálogo si no existe
+    // -------------------------------------------------
+
+    const existing = await getCatalogItemByName(newItem.description);
+
+    if (!existing) {
+
+      const catalogItem: CatalogItem = {
+        id: uuid(),
+        name: newItem.description,
+        price: newItem.unitPrice,
+        category: category || "general"
+      };
+
+      await saveCatalogItem(catalogItem);
+    }
+  };
 
   // ---------------------------------------------------------
   // GUARDAR ÍTEM EDITADO
@@ -229,7 +229,7 @@ const CatalogPage = () => {
           </Button>
 
           <Button
-            
+
             className="flex-1 bg-primary text-primary-foreground btn-accent"
             onClick={handleExport}
             disabled={items.length === 0}
@@ -407,21 +407,59 @@ const CatalogPage = () => {
                         </Select>
                       </div>
 
+
+
                       <div className="flex gap-2 mt-3">
+
+                        {/* ELIMINAR */}
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button className="flex-1 btn-red">
+                              Eliminar
+                            </Button>
+                          </AlertDialogTrigger>
+
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Eliminar ítem
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                ¿Seguro que deseas eliminar "{item.name}" del catálogo?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="flex-1 btn-blue-dark">
+                                Cancelar
+                              </AlertDialogCancel>
+
+                              <AlertDialogAction
+                                onClick={() => handleDeleteItem(item.id)}
+                                className="flex-1 btn-red"
+                              >
+                                Confirmar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+
+                        {/* CANCELAR */}
                         <Button
-                          variant="outline"
-                          className="flex-1 bg-primary text-primary-foreground btn-accent"
+                          className="flex-1 btn-orange"
                           onClick={() => setEditingId(null)}
                         >
                           Cancelar
                         </Button>
 
+                        {/* GUARDAR */}
                         <Button
-                          className="flex-1 btn-accent"
+                          className="flex-1 btn-green"
                           onClick={() => handleUpdateItem(item)}
                         >
                           Guardar
                         </Button>
+
                       </div>
                     </>
                   ) : (
@@ -440,46 +478,6 @@ const CatalogPage = () => {
                           <span>{getCategoryLabel(item.category)}</span>
                         </div>
                       </div>
-
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="bg-primary text-primary-foreground btn-accent hover:bg-destructive hover:text-destructive-foreground"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Eliminar ítem
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              ¿Seguro que deseas eliminar "
-                              {item.name}" del catálogo?
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-
-                          <AlertDialogFooter>
-                            <AlertDialogCancel
-                             className="bg-primary text-primary-foreground btn-accent">
-                              Cancelar
-                            </AlertDialogCancel>
-
-                            <AlertDialogAction
-                              onClick={() =>
-                                handleDeleteItem(item.id)
-                              }
-                              className="bg-destructive text-destructive-foreground"
-                            >
-                              Eliminar
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
                     </div>
                   )}
                 </CardContent>
@@ -495,7 +493,7 @@ const CatalogPage = () => {
           </p>
         )}
       </div>
-    </PageLayout>
+    </PageLayout >
   );
 };
 

@@ -1360,7 +1360,7 @@ Gracias por tu confianza.`;
 
               {budget?.notaCredito && (
                 <Button
-                  className="btn-yellow mt-2"
+                  className="btn-amber mt-2"
                   onClick={() => setShowNotaCreditoDownloadOptions(true)}
                 >
                   Descargar Nota de Crédito
