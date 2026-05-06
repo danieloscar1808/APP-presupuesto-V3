@@ -1,4 +1,5 @@
 import logoTickettt from "@/assets/Logo-Tickettt.png";
+import firmaEmisorBase from "@/assets/firma.png";
 
 export const ReciboTicket80mm = ({ recibo }) => {
     const formatMoney = (n) =>
@@ -6,6 +7,7 @@ export const ReciboTicket80mm = ({ recibo }) => {
 
     const montoARS = Number(recibo.monto || 0);
     const montoUSD = Number(recibo.monto_usd || 0);
+    const firmaEmisor = recibo.firma || recibo.firmaEscaneada || firmaEmisorBase;
 
     const montoMostrado =
         recibo.moneda === "USD" ? montoUSD : montoARS;
@@ -225,7 +227,34 @@ export const ReciboTicket80mm = ({ recibo }) => {
 
             {/* FIRMA */}
             <div style={{ marginTop: "60px", textAlign: "center" }}>
-                -------------------------
+                <div
+                    style={{
+                        height: "62px",
+                        display: "flex",
+                        alignItems: "flex-end",
+                        justifyContent: "center",
+                        marginBottom: "-4px"
+                    }}
+                >
+                    <img
+                        src={firmaEmisor}
+                        alt="Firma del emisor"
+                        style={{
+                            width: "145px",
+                            height: "58px",
+                            objectFit: "contain",
+                            objectPosition: "center bottom",
+                            mixBlendMode: "multiply"
+                        }}
+                    />
+                </div>
+                <div
+                    style={{
+                        borderTop: "1px solid black",
+                        width: "150px",
+                        margin: "0 auto"
+                    }}
+                ></div>
                 <br />
                 Firma del Emisor
             </div>

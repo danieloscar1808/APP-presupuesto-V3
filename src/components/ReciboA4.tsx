@@ -1,4 +1,5 @@
 import logoTickettt from "@/assets/Logo-Tickettt.png";
+import firmaEmisorBase from "@/assets/firma.png";
 
 
 const numeroALetras = (num, moneda) => {
@@ -92,7 +93,7 @@ export const ReciboA4 = ({ recibo }) => {
 
   const montoARS = Number(recibo.monto || 0);
   const montoUSD = Number(recibo.monto_usd || 0);
-  const firmaScan = recibo.firma || recibo.firmaEscaneada || null;
+  const firmaEmisor = recibo.firma || recibo.firmaEscaneada || firmaEmisorBase;
 
   const montoMostrado =
     recibo.moneda === "USD" ? montoUSD : montoARS;
@@ -240,18 +241,29 @@ export const ReciboA4 = ({ recibo }) => {
               height: "150px"
             }}
           >
-            <div style={{ height: "70px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {firmaScan ? (
-                <img
-                  src={firmaScan}
-                  alt="Firma del emisor"
-                  style={{ width: "200px", height: "70px", objectFit: "contain" }}
-                />
-              ) : (
-                <div style={{ width: "200px", height: "70px" }}></div>
-              )}
+            <div
+              style={{
+                height: "78px",
+                width: "220px",
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: "center",
+                marginBottom: "-6px"
+              }}
+            >
+              <img
+                src={firmaEmisor}
+                alt="Firma del emisor"
+                style={{
+                  width: "190px",
+                  height: "72px",
+                  objectFit: "contain",
+                  objectPosition: "center bottom",
+                  mixBlendMode: "multiply"
+                }}
+              />
             </div>
-            <div style={{ borderTop: "1px solid black", width: "200px", margin: "0" }}></div>
+            <div style={{ borderTop: "1px solid black", width: "220px", margin: "0" }}></div>
             <div style={{ height: "20px", display: "flex", alignItems: "center", justifyContent: "center", marginTop: "8px" }}>
               <p style={{ margin: 0 }}>Firma del emisor</p>
             </div>
