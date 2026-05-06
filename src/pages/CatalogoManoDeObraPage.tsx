@@ -311,133 +311,136 @@ const CatalogoManoDeObraPage = () => {
               </p>
             </div>
           ) : (
-           filteredItems.map((item) => (
-  <Card key={item.id} className="card-elevated">
-    <CardContent className="p-4">
+            filteredItems.map((item) => (
+              <Card key={item.id} className="card-elevated">
+                <CardContent className="p-4">
 
-      {editingId === item.id ? (
-        <>
-          <Input
-            value={item.name}
-            onChange={(e) => {
-              const updated = { ...item, name: e.target.value };
-              setItems((prev) =>
-                prev.map((i) => (i.id === item.id ? updated : i))
-              );
-            }}
-          />
+                  {editingId === item.id ? (
+                    <>
+                      <Input
+                        value={item.name}
+                        onChange={(e) => {
+                          const updated = { ...item, name: e.target.value };
+                          setItems((prev) =>
+                            prev.map((i) => (i.id === item.id ? updated : i))
+                          );
+                        }}
+                      />
 
-          <div className="flex gap-2 mt-2">
-            <Input
-              type="number"
-              value={item.price}
-              onChange={(e) => {
-                const updated = {
-                  ...item,
-                  price: Number(e.target.value),
-                };
-                setItems((prev) =>
-                  prev.map((i) => (i.id === item.id ? updated : i))
-                );
-              }}
-              className="flex-1"
-            />
+                      <div className="flex gap-2 mt-2">
+                        <Input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) => {
+                            const updated = {
+                              ...item,
+                              price: Number(e.target.value),
+                            };
+                            setItems((prev) =>
+                              prev.map((i) => (i.id === item.id ? updated : i))
+                            );
+                          }}
+                          className="flex-1"
+                        />
 
-            <Select
-              value={item.category || "general"}
-              onValueChange={(val) => {
-                const updated = {
-                  ...item,
-                  category: val as BudgetCategory | "general",
-                };
-                setItems((prev) =>
-                  prev.map((i) => (i.id === item.id ? updated : i))
-                );
-              }}
-            >
-              <SelectTrigger className="w-36">
-                <SelectValue />
-              </SelectTrigger>
+                        <Select
+                          value={item.category || "general"}
+                          onValueChange={(val) => {
+                            const updated = {
+                              ...item,
+                              category: val as BudgetCategory | "general",
+                            };
+                            setItems((prev) =>
+                              prev.map((i) => (i.id === item.id ? updated : i))
+                            );
+                          }}
+                        >
+                          <SelectTrigger className="w-36">
+                            <SelectValue />
+                          </SelectTrigger>
 
-              <SelectContent>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="ac">Aire Acond.</SelectItem>
-                <SelectItem value="electric">Eléctrico</SelectItem>
-                <SelectItem value="solar">Solar</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                          <SelectContent>
+                            <SelectItem value="general">General</SelectItem>
+                            <SelectItem value="ac">Aire Acond.</SelectItem>
+                            <SelectItem value="electric">Eléctrico</SelectItem>
+                            <SelectItem value="solar">Solar</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-          <div className="flex gap-2 mt-3">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => setEditingId(null)}
-            >
-              Cancelar
-            </Button>
+                      <div className="flex gap-2 mt-3">
+                        {/* ELIMINAR */}
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button className="flex-1 btn-red">
+                              Eliminar
+                            </Button>
+                          </AlertDialogTrigger>
 
-            <Button
-              className="flex-1 bg-primary text-primary-foreground btn-accent"
-              onClick={() => handleUpdateItem(item)}
-            >
-              Guardar
-            </Button>
-          </div>
-        </>
-      ) : (
-        <div className="flex items-center justify-between">
-          <div
-            className="flex-1 cursor-pointer"
-            onClick={() => setEditingId(item.id)}
-          >
-            <p className="font-medium text-foreground">
-              {item.name}
-            </p>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Eliminar trabajo
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                ¿Seguro que deseas eliminar "{item.name}"?
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
 
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>${item.price.toLocaleString("es-AR")}</span>
-              <span>•</span>
-              <span>{getCategoryLabel(item.category)}</span>
-            </div>
-          </div>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel className="flex-1 btn-blue-dark">
+                                Cancelar
+                              </AlertDialogCancel>
 
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="bg-primary text-primary-foreground btn-accent hover:bg-destructive hover:text-destructive-foreground">
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </AlertDialogTrigger>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteItem(item.id)}
+                                className="flex-1 btn-red"
+                              >
+                                Confirmar
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
 
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Eliminar trabajo
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  ¿Seguro que deseas eliminar "{item.name}"?
-                </AlertDialogDescription>
-              </AlertDialogHeader>
+                        {/* CANCELAR */}
+                        <Button
+                          className="flex-1 btn-orange"
+                          onClick={() => setEditingId(null)}
+                        >
+                          Cancelar
+                        </Button>
 
-              <AlertDialogFooter>
-                <AlertDialogCancel
-                 className="bg-primary text-primary-foreground btn-accent">
-                Cancelar</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => handleDeleteItem(item.id)}
-                  className="bg-destructive text-destructive-foreground"
-                >
-                  Eliminar
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
-      )}
+                        {/* GUARDAR */}
+                        <Button
+                          className="flex-1 btn-green"
+                          onClick={() => handleUpdateItem(item)}
+                        >
+                          Guardar
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div
+                        className="flex-1 cursor-pointer"
+                        onClick={() => setEditingId(item.id)}
+                      >
+                        <p className="font-medium text-foreground">
+                          {item.name}
+                        </p>
 
-    </CardContent>
-  </Card>
-))
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span>${item.price.toLocaleString("es-AR")}</span>
+                          <span>•</span>
+                          <span>{getCategoryLabel(item.category)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                </CardContent>
+              </Card>
+            ))
           )}
         </div>
       </div>
