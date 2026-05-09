@@ -226,10 +226,10 @@ export const ReciboTicket80mm = ({ recibo }) => {
             </div>
 
             {/* FIRMA */}
-            <div style={{ marginTop: "60px", textAlign: "center" }}>
+            <div style={{ marginTop: "20px", textAlign: "center" }}>
                 <div
                     style={{
-                        height: "62px",
+                        height: "52px",
                         display: "flex",
                         alignItems: "flex-end",
                         justifyContent: "center",
