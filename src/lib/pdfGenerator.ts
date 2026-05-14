@@ -1,6 +1,11 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Budget, Profile, CATEGORY_LABELS } from "@/types";
+import {
+  getLaborItemQuantity,
+  getLaborItemTotal,
+  normalizeLaborItems,
+} from "@/lib/labor";
 import logoHeader from "@/assets/logo-header.png";
 
 // Azul del encabezado
@@ -184,12 +189,14 @@ export const generateBudgetPDF = (budget: Budget, profile: Profile): jsPDF => {
 
   y = (doc as any).lastAutoTable.finalY + 10;
 
-  if (budget.laborItems && budget.laborItems.length > 0) {
-    const laborTableData = budget.laborItems.map((item) => [
-      1,
+  const normalizedLaborItems = normalizeLaborItems(budget.laborItems || []);
+
+  if (normalizedLaborItems.length > 0) {
+    const laborTableData = normalizedLaborItems.map((item) => [
+      getLaborItemQuantity(item),
       item.name,
       `$${Number(item.price || 0).toLocaleString("es-AR")}`,
-      `$${Number(item.price || 0).toLocaleString("es-AR")}`,
+      `$${getLaborItemTotal(item).toLocaleString("es-AR")}`,
     ]);
 
     autoTable(doc, {

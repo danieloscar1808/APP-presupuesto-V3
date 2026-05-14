@@ -45,6 +45,38 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
     datos?.moneda === "USD"
       ? Math.round(totalARS / Number(tipoCambio))
       : null;
+
+  const notaCreditoMoneda =
+    budget?.notaCredito?.moneda ||
+    factura?.moneda ||
+    budget?.factura?.moneda ||
+    budget?.facturaPreliminar?.moneda ||
+    "ARS";
+
+  const notaCreditoTipoCambio = Number(
+    budget?.notaCredito?.tipo_cambio ||
+    budget?.notaCredito?.exchangeRate ||
+    factura?.tipo_cambio ||
+    factura?.exchangeRate ||
+    budget?.factura?.tipo_cambio ||
+    budget?.factura?.exchangeRate ||
+    datos?.tipo_cambio ||
+    datos?.exchangeRate ||
+    1
+  );
+
+  const notaCreditoTotalUSD =
+    notaCreditoMoneda === "USD"
+      ? Math.round(
+        Number(
+          budget?.notaCredito?.total_usd ??
+          budget?.notaCredito?.totalUSD ??
+          (notaCreditoTipoCambio
+            ? Number(budget?.notaCredito?.total || totalARS) / notaCreditoTipoCambio
+            : 0)
+        )
+      )
+      : null;
   console.log("FACTURA:", factura);
   console.log("QR:", factura?.qr);
 
@@ -357,6 +389,12 @@ const FacturaView = ({ factura, profile, budget, preliminar }: Props) => {
               Total: $
               {Number(budget?.notaCredito?.total || 0).toLocaleString("es-AR")}
             </p>
+
+            {notaCreditoMoneda === "USD" && notaCreditoTotalUSD !== null && (
+              <p>
+                Total USD: U$S {notaCreditoTotalUSD.toLocaleString("es-AR")}
+              </p>
+            )}
           </div>
         </div>
       )}

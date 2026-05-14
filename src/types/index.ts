@@ -8,6 +8,10 @@ export interface CatalogItem {
   createdAt: string;
 }
 
+export interface BudgetLaborItem extends CatalogItem {
+  quantity?: number;
+}
+
 export interface Profile {
   id: string;
   name: string;
@@ -50,6 +54,7 @@ export interface Budget {
   totalUSD?: string;
   totalARS?: string;
   items: BudgetItem[];
+  laborItems?: BudgetLaborItem[];
   laborCost: number;
   subtotal: number;
   taxRate: number;

@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getBudgets } from "@/lib/storage";
 
 import { PageLayout } from "@/components/PageLayout";
-import { Client, Budget, BudgetCategory } from "@/types";
+import { Client, Budget, BudgetCategory, BudgetLaborItem } from "@/types";
+import { normalizeLaborItems } from "@/lib/labor";
 
 import { getClients, saveBudget } from "@/lib/storage";
 
@@ -88,7 +89,7 @@ const parseNumber = (value: string) => {
   const isEditMode = !!id;
 
   const [laborCost, setLaborCost] = useState(0);
-  const [laborItems, setLaborItems] = useState<any[]>([]);
+  const [laborItems, setLaborItems] = useState<BudgetLaborItem[]>([]);
   const [discount, setDiscount] = useState(0);
 
   const [laborInput, setLaborInput] = useState("");
@@ -146,6 +147,7 @@ const parseNumber = (value: string) => {
   const [solarQty, setSolarQty] = useState<number>(0);
 
   const SOLAR_NOTE = `La instalación del sistema fotovoltaico requiere condiciones climáticas favorables. En caso de lluvia, tormenta o humedad excesiva, los trabajos se suspenderán y se reprogramarán para garantizar la seguridad del personal y la calidad de la instalación.`;
+  const removeSolarNote = (value: string) => value.replace(SOLAR_NOTE, "").trim();
 
 
   /* CARGAR CLIENTES */
@@ -171,6 +173,11 @@ const parseNumber = (value: string) => {
   useEffect(() => {
     if (category === "solar" && notes.trim() === "") {
       setNotes(SOLAR_NOTE);
+      return;
+    }
+
+    if (category !== "solar" && notes.includes(SOLAR_NOTE)) {
+      setNotes((currentNotes) => removeSolarNote(currentNotes));
     }
   }, [category]);
 
@@ -191,7 +198,7 @@ useEffect(() => {
 
         setCategory(existing.category);
         setItems(existing.items || []);
-        setLaborItems(existing.laborItems || []);
+        setLaborItems(normalizeLaborItems(existing.laborItems || []));
 
         setLaborCost(existing.laborCost || 0);
         setDiscount(existing.discount || 0);
@@ -573,8 +580,9 @@ if (isEditMode) {// Si estamos editando, mantenemos el mismo número de presupue
                   new Intl.NumberFormat("es-AR").format(nuevoTotal)
                 );
 
-                // 👇 guardar desglose
-                setLaborItems((prev) => [...prev, ...selectedItems]);
+                setLaborItems((prev) =>
+                  normalizeLaborItems([...prev, ...selectedItems])
+                );
 
                 setShowLaborCalculator(false);
               }}

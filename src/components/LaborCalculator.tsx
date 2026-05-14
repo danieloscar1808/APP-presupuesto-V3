@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { Filter, Minus, Plus, Search, Wrench } from "lucide-react";
 import { getLaborItems } from "@/lib/storage";
-import { BudgetCategory, CatalogItem } from "@/types";
+import { BudgetCategory, BudgetLaborItem, CatalogItem } from "@/types";
+import {
+  getLaborItemQuantity,
+  getLaborItemTotal,
+  getLaborItemsTotal,
+  getLaborUnitsCount,
+} from "@/lib/labor";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +20,7 @@ import {
 
 interface LaborCalculatorProps {
   onClose: () => void;
-  onUseTotal: (total: number, selectedItems: CatalogItem[]) => void;
+  onUseTotal: (total: number, selectedItems: BudgetLaborItem[]) => void;
 }
 
 export const LaborCalculator = ({
@@ -22,7 +28,7 @@ export const LaborCalculator = ({
   onUseTotal,
 }: LaborCalculatorProps) => {
   const [items, setItems] = useState<CatalogItem[]>([]);
-  const [selected, setSelected] = useState<CatalogItem[]>([]);
+  const [selected, setSelected] = useState<BudgetLaborItem[]>([]);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<
     "all" | "general" | "ac" | "electric" | "solar"
@@ -38,14 +44,75 @@ export const LaborCalculator = ({
   };
 
   const addItem = (item: CatalogItem) => {
-    setSelected((prev) => [...prev, item]);
+    setSelected((prev) => {
+      const existingIndex = prev.findIndex(
+        (selectedItem) => selectedItem.id === item.id
+      );
+
+      if (existingIndex === -1) {
+        return [...prev, { ...item, quantity: 1 }];
+      }
+
+      return prev.map((selectedItem, index) =>
+        index === existingIndex
+          ? {
+              ...selectedItem,
+              quantity: getLaborItemQuantity(selectedItem) + 1,
+            }
+          : selectedItem
+      );
+    });
   };
 
-  const removeItem = (index: number) => {
-    setSelected((prev) => prev.filter((_, i) => i !== index));
+  const updateQuantity = (index: number, quantityValue: string) => {
+    const parsedQuantity = Number(quantityValue.replace(/\D/g, ""));
+
+    setSelected((prev) =>
+      prev.map((item, itemIndex) =>
+        itemIndex === index
+          ? {
+              ...item,
+              quantity: parsedQuantity > 0 ? parsedQuantity : 1,
+            }
+          : item
+      )
+    );
   };
 
-  const total = selected.reduce((acc, item) => acc + item.price, 0);
+  const decreaseQuantity = (index: number) => {
+    setSelected((prev) => {
+      const currentItem = prev[index];
+
+      if (!currentItem) {
+        return prev;
+      }
+
+      const currentQuantity = getLaborItemQuantity(currentItem);
+
+      if (currentQuantity <= 1) {
+        return prev.filter((_, itemIndex) => itemIndex !== index);
+      }
+
+      return prev.map((item, itemIndex) =>
+        itemIndex === index
+          ? { ...item, quantity: currentQuantity - 1 }
+          : item
+      );
+    });
+  };
+
+  const increaseQuantity = (index: number) => {
+    setSelected((prev) =>
+      prev.map((item, itemIndex) =>
+        itemIndex === index
+          ? { ...item, quantity: getLaborItemQuantity(item) + 1 }
+          : item
+      )
+    );
+  };
+
+  const total = getLaborItemsTotal(selected);
+  const totalUnits = getLaborUnitsCount(selected);
 
   const filtered = items.filter((item) => {
     const matchesSearch = item.name
@@ -155,7 +222,7 @@ export const LaborCalculator = ({
           <div className="flex w-full min-w-0 items-center justify-between gap-2">
             <p className="text-sm font-medium text-primary">Seleccionados</p>
             <span className="shrink-0 text-xs text-muted-foreground">
-              {selected.length} agregados
+              {selected.length} rubros / {totalUnits} unidades
             </span>
           </div>
 
@@ -170,32 +237,63 @@ export const LaborCalculator = ({
               selected.map((item, index) => (
                 <div
                   key={`${item.id}-${index}`}
-                  className="flex w-full min-w-0 items-center justify-between gap-3 rounded-xl border border-border/70 bg-secondary/55 px-3 py-3"
+                  className="flex w-full min-w-0 flex-col gap-3 rounded-xl border border-border/70 bg-secondary/55 px-3 py-3"
                 >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium text-foreground">
-                      {item.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      ${item.price.toLocaleString("es-AR")}
-                    </p>
+                  <div className="flex w-full min-w-0 items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-foreground">
+                        {item.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Unitario: ${item.price.toLocaleString("es-AR")}
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-primary">
+                        ${getLaborItemTotal(item).toLocaleString("es-AR")}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        x {getLaborItemQuantity(item)}
+                      </p>
+                    </div>
                   </div>
 
-                  <Button
-                    size="icon"
+                  <div className="flex w-full items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="icon"
+                        className="bg-red-500 text-white border border-red-500 transition-all duration-200 hover:bg-white hover:text-red-500 active:bg-white active:text-red-500 active:scale-95"
+                        onClick={() => decreaseQuantity(index)}
+                        aria-label={`Restar ${item.name}`}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
 
-                    className="
-                    bg-red-500 
-                    text-white 
-                    border border-red-500
-                    transition-all duration-200
-                    hover:bg-white hover:text-red-500
-                    active:bg-white active:text-red-500 active:scale-95"
-                    onClick={() => removeItem(index)}
-                    aria-label={`Quitar ${item.name}`}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
+                      <Input
+                        type="number"
+                        min="1"
+                        inputMode="numeric"
+                        value={getLaborItemQuantity(item)}
+                        onChange={(e) => updateQuantity(index, e.target.value)}
+                        className="h-9 w-20 text-center"
+                        aria-label={`Cantidad de ${item.name}`}
+                      />
+
+                      <Button
+                        size="icon"
+                        className="bg-primary text-primary-foreground btn-accent"
+                        onClick={() => increaseQuantity(index)}
+                        aria-label={`Sumar ${item.name}`}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
+                      Cantidad
+                    </p>
+                  </div>
                 </div>
               ))
             )}

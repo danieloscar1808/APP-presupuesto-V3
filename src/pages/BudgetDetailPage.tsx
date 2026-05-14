@@ -12,6 +12,11 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import {
+  getLaborItemQuantity,
+  getLaborItemTotal,
+  normalizeLaborItems,
+} from "@/lib/labor";
 import FacturaView from "@/components/FacturaView";
 import { useRef } from "react";
 import html2pdf from "html2pdf.js";
@@ -38,6 +43,9 @@ const BudgetDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [factura, setFactura] = useState(null);
   const [clientAddress, setClientAddress] = useState("");
+  const normalizedLaborItems = budget
+    ? normalizeLaborItems(budget.laborItems || [])
+    : [];
   const [client, setClient] = useState<any>(null);
   const facturaRef = useRef(null);
   const [showFiscalModal, setShowFiscalModal] = useState(false);
@@ -1099,20 +1107,20 @@ Gracias por tu confianza.`;
         </div>
 
         {/* DETALLE DE MANO DE OBRA (SI EXISTE)*/}
-        {budget.laborItems && budget.laborItems.length > 0 && (
+        {normalizedLaborItems.length > 0 && (
           <div className="card-elevated p-2 mb-2">
             <h3 className="font-semibold text-primary text-sm mb-3">
               Detalle de Mano de Obra
             </h3>
             <div className="space-y-2">
-              {budget.laborItems.map((item, index) => (
-                <div key={index} className="flex justify-between text-sm">
+              {normalizedLaborItems.map((item, index) => (
+                <div key={`${item.id}-${index}`} className="flex justify-between gap-3 text-sm">
                   <span className="text-foreground">
-                    {item.name}
+                    {item.name} x {getLaborItemQuantity(item)}
                   </span>
 
-                  <span className="text-muted-foreground">
-                    ${item.price.toLocaleString("es-AR")}
+                  <span className="text-muted-foreground text-right">
+                    ${getLaborItemTotal(item).toLocaleString("es-AR")}
                   </span>
                 </div>
               ))}
@@ -1624,7 +1632,7 @@ Gracias por tu confianza.`;
                   <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center animate-pulse">
                     <Server className="w-8 h-8 text-blue-600" />
                   </div>
-                  <span className="text-base mt-2 text-blue-300 bg-slate-500  font-medium">
+                  <span className="text-base mt-2 text-blue-300 font-medium">
                     SICE
                   </span>
                 </div>
@@ -1653,7 +1661,7 @@ Gracias por tu confianza.`;
                   <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center animate-pulse">
                     <Building2 className="w-8 h-8 text-green-600" />
                   </div>
-                  <span className="text-base mt-2 bg-slate-500 text-green-400 font-medium">
+                  <span className="text-base mt-2 text-green-400 font-medium">
                     ARCA
                   </span>
                 </div>
